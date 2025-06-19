@@ -164,4 +164,4 @@ function processMeshData({vertices, faces}) {
     return {vertices: processedVertices, faces: processedFaces, edges}
 }
 
-export { processMeshData, parseOFF };
+export { processMeshData, parseOFF, decomposeSelfIntersectingPolygon, getUniqueSortedPairs };

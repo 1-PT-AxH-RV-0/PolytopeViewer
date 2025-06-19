@@ -5,6 +5,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 
 import { processMeshData, parseOFF } from './offProcessor.js'
+import { process4DMeshData, parse4OFF } from './offProcessor4D.js'
 import url from '../assets/models/tri.off'
 import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json'
 
@@ -317,8 +318,66 @@ function createWireframeAndVertices(edges, {
     return { wireframeGroup, verticesGroup };
 }
 
+function create4DWireframeAndVertices(edges, { 
+    cylinderRadius = 1,
+    sphereRadiusMultiplier = 2,
+    cylinderMaterial,
+    sphereMaterial,
+    cylinderColor = 0xC0C0C0,
+    sphereColor = 0xffd700
+} = {}) {
+    // const defaultCylinderMaterial = cylinderMaterial || new THREE.MeshStandardMaterial({
+        // color: cylinderColor,
+        // metalness: 1.0,
+        // roughness: 0.4
+    // });
+
+    const defaultSphereMaterial = sphereMaterial || new THREE.MeshStandardMaterial({
+        color: sphereColor,
+        metalness: 1.0,
+        roughness: 0.5
+    });
+
+    // const wireframeGroup = new THREE.Group();
+    const verticesGroup = new THREE.Group();
+    const uniquePoints = new Set();
+
+    const sphereRadius = cylinderRadius * sphereRadiusMultiplier;
+
+    edges.forEach(([start, end]) => {
+        const startKey = `${start.x},${start.y},${start.z},${start.w}`;
+        const endKey = `${end.x},${end.y},${end.z},${end.w}`;
+        
+        const startVec = new THREE.Vector3(start.x, start.y, start.z);
+        const endVec = new THREE.Vector3(end.x, end.y, end.z);
+
+        if (!uniquePoints.has(startKey)) {
+            const sphere = new THREE.Mesh(
+                new THREE.SphereGeometry(sphereRadius, 16, 16),
+                defaultSphereMaterial
+            );
+            sphere.position.copy(startVec);
+            verticesGroup.add(sphere);
+            uniquePoints.add(startKey);
+        }
+
+        // if (!uniquePoints.has(endKey)) {
+            // const sphere = new THREE.Mesh(
+                // new THREE.SphereGeometry(sphereRadius, 16, 16),
+                // defaultSphereMaterial
+            // );
+            // sphere.position.copy(endVec);
+            // verticesGroup.add(sphere);
+            // uniquePoints.add(endKey);
+        // }
+    });
+
+    return { wireframeGroup: null, verticesGroup };
+}
+
 // 修改材质属性
 function changeMaterialProperty(group, propertyName, newValue) {
+    if (!group) return;
     group.traverse((child) => {
         if (child.isMesh && child.material) {
             if (!Array.isArray(child.material)) {
@@ -337,6 +396,7 @@ function changeMaterialProperty(group, propertyName, newValue) {
 
 // 修改球体半径
 function changeSpheresRadius(group, newRadius) {
+  if (!group) return;
   group.children.forEach(child => {
     if (child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry) {
       child.geometry.dispose();
@@ -351,6 +411,7 @@ function changeSpheresRadius(group, newRadius) {
 
 // 修改圆柱半径
 function changeCylindersRadius(group, newRadius) {
+  if (!group) return;
   group.traverse(child => {
     if (child.isMesh && child.geometry instanceof THREE.CylinderGeometry) {
       const oldGeo = child.geometry;
@@ -409,12 +470,70 @@ function loadMesh(meshData, material) {
   return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};
 }
 
+function load4DMesh(meshData, material) {
+  const container = new THREE.Object3D();
+  const geometry = new THREE.BufferGeometry();
+  
+  // 这里 position 属性虽然没有实际作用，但是必须得写，防止着色器报错
+  const vertices = new Float32Array(meshData.vertices.length * 3);
+  meshData.vertices.forEach((v, i) => {
+    vertices[i * 3] = v.x;
+    vertices[i * 3 + 1] = v.y;
+    vertices[i * 3 + 2] = v.z;
+  });
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  
+  const vertices4D = new Float32Array(meshData.vertices.length * 4);
+  meshData.vertices.forEach((v, i) => {
+    vertices4D[i * 4] = v.x;
+    vertices4D[i * 4 + 1] = v.y;
+    vertices4D[i * 4 + 2] = v.z;
+    vertices4D[i * 4 + 3] = v.w;
+  });
+  geometry.setAttribute('position4D', new THREE.BufferAttribute(vertices4D, 4));
+  
+  const indices = [];
+  meshData.faces.forEach(face => {
+    if (face.length === 3) indices.push(...face);
+  });
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.material.side = THREE.DoubleSide;
+  geometry.computeBoundingBox();
+  
+  const aabb = geometry.boundingBox;
+  const objSize = aabb.max.sub(aabb.min).length();
+  const scaleFactor = 100 / objSize;
+  
+  const { wireframeGroup, verticesGroup } = create4DWireframeAndVertices(meshData.edges, { cylinderRadius: 0.5 / scaleFactor })
+  
+  container.add(mesh);
+  // container.add(wireframeGroup);
+  container.add(verticesGroup);
+  container.scale.setScalar(scaleFactor)
+  
+  scene.add(container);
+  render();
+  
+  // return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};
+  return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup: null, verticesGroup };
+}
+
 // 加载 OFF
 function loadMeshFromOffData(data, material) {
   const mesh = parseOFF(data)
   const processedMesh = processMeshData(mesh);
 
   ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup } = loadMesh(processedMesh, material));
+}
+
+function loadMeshFrom4OffData(data, material) {
+  const mesh = parse4OFF(data)
+  const processedMesh = process4DMeshData(mesh);
+
+  ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup } = load4DMesh(processedMesh, material));
 }
 
 function loadMeshFromUrl(url, material) {
@@ -491,7 +610,25 @@ fileInput.addEventListener('change', (e) => {
             flatShading: true
         });
         
-        loadMeshFromOffData(data, material)
+        material.onBeforeCompile = (shader) => {
+          shader.vertexShader = `
+            vec3 stereographicProjection(vec4 point4D) {
+              return 3.0 * point4D.xyz / (3.0 - point4D.w);
+            }
+            attribute vec4 position4D;
+            ${shader.vertexShader}
+          `;
+          
+          shader.vertexShader = shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            `
+            #include <begin_vertex>
+            transformed = stereographicProjection(position4D);
+            `
+          );
+        };
+        
+        loadMeshFrom4OffData(data, material)
         updateProperties()
     };
     reader.readAsText(file);

@@ -11,7 +11,6 @@ module.exports = {
     clean: true
   },
   optimization: {
-    minimize: false,
     minimizer: [new TerserPlugin()],
     splitChunks: {
       chunks: 'all',
@@ -69,5 +68,5 @@ module.exports = {
       chunks: ['index']
     })
   ],
-  mode: 'production'
+  mode: 'development'
 };
