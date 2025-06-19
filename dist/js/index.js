@@ -1,886 +1,92 @@
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 73:
-/***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
+/***/ "./assets/fonts/Sarasa_Mono_SC_Bold.typeface.json":
+/*!********************************************************!*\
+  !*** ./assets/fonts/Sarasa_Mono_SC_Bold.typeface.json ***!
+  \********************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
-var injectStylesIntoStyleTag = __webpack_require__(72);
-var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
-var styleDomAPI = __webpack_require__(825);
-var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
-var insertBySelector = __webpack_require__(659);
-var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
-var setAttributesWithoutAttributes = __webpack_require__(56);
-var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
-var insertStyleElement = __webpack_require__(540);
-var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
-// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
-var styleTagTransform = __webpack_require__(113);
-var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style.css
-var style = __webpack_require__(208);
-;// ./src/style.css
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (styleTagTransform_default());
-options.setAttributes = (setAttributesWithoutAttributes_default());
-options.insert = insertBySelector_default().bind(null, "head");
-options.domAPI = (styleDomAPI_default());
-options.insertStyleElement = (insertStyleElement_default());
-
-var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
-
-
-
-
-       /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
-
-// EXTERNAL MODULE: ./node_modules/three/build/three.module.js
-var three_module = __webpack_require__(437);
-// EXTERNAL MODULE: ./node_modules/three/build/three.core.js
-var three_core = __webpack_require__(922);
-// EXTERNAL MODULE: ./node_modules/three/examples/jsm/controls/TrackballControls.js
-var TrackballControls = __webpack_require__(34);
-// EXTERNAL MODULE: ./node_modules/three/examples/jsm/loaders/FontLoader.js
-var FontLoader = __webpack_require__(264);
-// EXTERNAL MODULE: ./node_modules/three/examples/jsm/geometries/TextGeometry.js
-var TextGeometry = __webpack_require__(385);
-// EXTERNAL MODULE: ./node_modules/poly2tri/src/poly2tri.js
-var poly2tri = __webpack_require__(312);
-// EXTERNAL MODULE: ./node_modules/polygon-clipping/dist/polygon-clipping.umd.js
-var polygon_clipping_umd = __webpack_require__(4);
-;// ./src/offProcessor.js
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function _createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-
-
-function decomposeSelfIntersectingPolygon(originalPoints) {
-  var coords = originalPoints.map(function (p) {
-    return [+p.x.toFixed(6), +p.y.toFixed(6)];
-  });
-  if (coords.length > 0) {
-    coords.push([coords[0][0], coords[0][1]]);
-  }
-  var result = polygon_clipping_umd.union([coords]);
-  var decomposed = [];
-  var _iterator = _createForOfIteratorHelper(result),
-    _step;
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var polygon = _step.value;
-      var _iterator2 = _createForOfIteratorHelper(polygon),
-        _step2;
-      try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var ring = _step2.value;
-          if (ring.length === 0) continue;
-          var ringPoints = ring.slice(0, -1);
-          var points = ringPoints.map(function (_ref) {
-            var _ref2 = _slicedToArray(_ref, 2),
-              x = _ref2[0],
-              y = _ref2[1];
-            return new poly2tri.Point(x, y);
-          });
-          decomposed.push(points);
-        }
-      } catch (err) {
-        _iterator2.e(err);
-      } finally {
-        _iterator2.f();
-      }
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-  return decomposed;
-}
-function parseOFF(data) {
-  var lines = data.split('\n').filter(function (line) {
-    return line.trim() !== '' && !line.startsWith('#');
-  });
-  if (lines[0].trim() !== 'OFF') throw new Error('Invalid OFF file format');
-  var _lines$1$trim$split$m = lines[1].trim().split(/\s+/).map(Number),
-    _lines$1$trim$split$m2 = _slicedToArray(_lines$1$trim$split$m, 2),
-    nVertices = _lines$1$trim$split$m2[0],
-    nFaces = _lines$1$trim$split$m2[1];
-  var vertices = [];
-  for (var i = 0; i < nVertices; i++) {
-    var _lines$trim$split$map = lines[i + 2].trim().split(/\s+/).map(parseFloat),
-      _lines$trim$split$map2 = _slicedToArray(_lines$trim$split$map, 3),
-      x = _lines$trim$split$map2[0],
-      y = _lines$trim$split$map2[1],
-      z = _lines$trim$split$map2[2];
-    vertices.push({
-      x: x,
-      y: y,
-      z: z
-    });
-  }
-  var faces = [];
-  for (var _i = 0; _i < nFaces; _i++) {
-    var parts = lines[_i + 2 + nVertices].trim().split(/\s+/);
-    var count = parseInt(parts[0]);
-    faces.push(parts.slice(1, count + 1).map(Number));
-  }
-  return {
-    vertices: vertices,
-    faces: faces
-  };
-}
-function computeNormal(points) {
-  var v1 = {
-    x: points[1].x - points[0].x,
-    y: points[1].y - points[0].y,
-    z: points[1].z - points[0].z
-  };
-  var v2 = {
-    x: points[2].x - points[0].x,
-    y: points[2].y - points[0].y,
-    z: points[2].z - points[0].z
-  };
-  var nx = v1.y * v2.z - v1.z * v2.y;
-  var ny = v1.z * v2.x - v1.x * v2.z;
-  var nz = v1.x * v2.y - v1.y * v2.x;
-  var length = Math.sqrt(nx ** 2 + ny ** 2 + nz ** 2);
-  return {
-    x: nx / length,
-    y: ny / length,
-    z: nz / length
-  };
-}
-function rotatePoint(p, theta, phi) {
-  var cosT = Math.cos(theta),
-    sinT = Math.sin(theta);
-  var cosP = Math.cos(phi),
-    sinP = Math.sin(phi);
-  var y1 = p.y * cosT - p.z * sinT;
-  var z1 = p.y * sinT + p.z * cosT;
-  var x2 = p.x * cosP + z1 * sinP;
-  var z2 = -p.x * sinP + z1 * cosP;
-  return {
-    x: x2,
-    y: y1,
-    z: z2,
-    orig: p
-  };
-}
-function inverseRotatePoint(p, theta, phi) {
-  var cosT = Math.cos(-theta),
-    sinT = Math.sin(-theta);
-  var cosP = Math.cos(-phi),
-    sinP = Math.sin(-phi);
-  var x1 = p.x * cosP + p.z * sinP;
-  var z1 = -p.x * sinP + p.z * cosP;
-  var y2 = p.y * cosT - z1 * sinT;
-  var z2 = p.y * sinT + z1 * cosT;
-  return {
-    x: x1,
-    y: y2,
-    z: z2
-  };
-}
-function rotateToXY(points) {
-  var normal = computeNormal(points);
-  var theta = Math.atan2(normal.y, normal.z);
-  var phi = Math.atan2(-normal.x, Math.sqrt(normal.y ** 2 + normal.z ** 2));
-  var rotated = points.map(function (p) {
-    return rotatePoint(p, theta, phi);
-  });
-  return {
-    rotated: rotated,
-    theta: theta,
-    phi: phi,
-    z: rotated[0].z
-  };
-}
-function arePointsClose(point1, point2) {
-  var epsilon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Number.EPSILON;
-  var dx = Math.abs(point1.x - point2.x);
-  var dy = Math.abs(point1.y - point2.y);
-  var dz = Math.abs(point1.z - point2.z);
-  return dx <= epsilon && dy <= epsilon && dz <= epsilon;
-}
-function getUniqueSortedPairs(arrays) {
-  var pairs = arrays.flatMap(function (arr) {
-    return arr.map(function (v, i) {
-      return [Math.min(v, arr[(i + 1) % arr.length]), Math.max(v, arr[(i + 1) % arr.length])];
-    });
-  });
-  return _toConsumableArray(new Set(pairs.map(JSON.stringify))).map(JSON.parse);
-}
-;
-function processMeshData(_ref3) {
-  var vertices = _ref3.vertices,
-    faces = _ref3.faces;
-  var processedVertices = _toConsumableArray(vertices);
-  var processedFaces = [];
-  var edges = getUniqueSortedPairs(faces).map(function (edge) {
-    return edge.map(function (index) {
-      return vertices[index];
-    });
-  });
-  faces.forEach(function (face) {
-    if (face.length === 3) {
-      processedFaces.push(face);
-      return;
-    }
-    var faceVertices = face.map(function (idx) {
-      return vertices[idx];
-    });
-    function triangulateFace(vertices3D) {
-      var _rotateToXY = rotateToXY(vertices3D),
-        rotated = _rotateToXY.rotated,
-        theta = _rotateToXY.theta,
-        phi = _rotateToXY.phi,
-        z = _rotateToXY.z;
-      var contour = rotated.map(function (p) {
-        return new poly2tri.Point(p.x, p.y);
-      });
-      var triangles = [];
-      var decomposed = decomposeSelfIntersectingPolygon(contour);
-      var _iterator3 = _createForOfIteratorHelper(decomposed),
-        _step3;
-      try {
-        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-          var subPolygon = _step3.value;
-          var swctx = new poly2tri.SweepContext(subPolygon);
-          swctx.triangulate();
-          var subTriangles = swctx.getTriangles().map(function (triangle) {
-            return triangle.getPoints().map(function (pt) {
-              pt.z = z;
-              var origPoint = inverseRotatePoint(pt, theta, phi);
-              var origIndex = processedVertices.findIndex(function (p) {
-                return arePointsClose(p, origPoint);
-              });
-              if (origIndex > -1) return origIndex;
-              processedVertices.push(origPoint);
-              return processedVertices.length - 1;
-            });
-          });
-          triangles.push.apply(triangles, _toConsumableArray(subTriangles));
-        }
-      } catch (err) {
-        _iterator3.e(err);
-      } finally {
-        _iterator3.f();
-      }
-      return triangles;
-    }
-    var triangles = triangulateFace(faceVertices);
-    triangles.forEach(function (t) {
-      if (t.length === 3) processedFaces.push(t);
-    });
-  });
-  return {
-    vertices: processedVertices,
-    faces: processedFaces,
-    edges: edges
-  };
-}
-
-;// ./assets/models/tri.off
-const tri_namespaceObject = __webpack_require__.p + "assets/tri.off";
-;// ./assets/fonts/Sarasa_Mono_SC_Bold.typeface.json
-const Sarasa_Mono_SC_Bold_typeface_namespaceObject = __webpack_require__.p + "assets/Sarasa_Mono_SC_Bold.typeface.json";
-;// ./src/viewer.js
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function viewer_createForOfIteratorHelper(r, e) { var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (!t) { if (Array.isArray(r) || (t = viewer_unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t["return"] || t["return"](); } finally { if (u) throw o; } } }; }
-function viewer_slicedToArray(r, e) { return viewer_arrayWithHoles(r) || viewer_iterableToArrayLimit(r, e) || viewer_unsupportedIterableToArray(r, e) || viewer_nonIterableRest(); }
-function viewer_nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function viewer_iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
-function viewer_arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
-function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
-function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
-function _construct(t, e, r) { if (_isNativeReflectConstruct()) return Reflect.construct.apply(null, arguments); var o = [null]; o.push.apply(o, e); var p = new (t.bind.apply(t, o))(); return r && _setPrototypeOf(p, r.prototype), p; }
-function _setPrototypeOf(t, e) { return _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) { return t.__proto__ = e, t; }, _setPrototypeOf(t, e); }
-function _isNativeReflectConstruct() { try { var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); } catch (t) {} return (_isNativeReflectConstruct = function _isNativeReflectConstruct() { return !!t; })(); }
-function viewer_toConsumableArray(r) { return viewer_arrayWithoutHoles(r) || viewer_iterableToArray(r) || viewer_unsupportedIterableToArray(r) || viewer_nonIterableSpread(); }
-function viewer_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function viewer_unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return viewer_arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? viewer_arrayLikeToArray(r, a) : void 0; } }
-function viewer_iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function viewer_arrayWithoutHoles(r) { if (Array.isArray(r)) return viewer_arrayLikeToArray(r); }
-function viewer_arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
-
-
-
-
-
-
-
-
-var faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');
-var wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');
-var verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher');
-var axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher');
-var facesOpacitySlider = document.getElementById('facesOpacitySlider');
-var wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');
-var fileInput = document.getElementById('fileInput');
-var scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup;
-
-// 初始化渲染器
-var dpr = window.devicePixelRatio || 1;
-var canvas = document.getElementById('polyhedronRenderer');
-var renderer = new three_module/* WebGLRenderer */.JeP({
-  antialias: true,
-  powerPreference: "high-performance",
-  canvas: canvas
-});
-var maxSize = Math.min(Math.min(window.innerWidth, window.innerHeight) - 16, 720);
-renderer.setSize(maxSize * dpr, maxSize * dpr, false);
-canvas.style.width = "".concat(maxSize, "px");
-canvas.style.height = "".concat(maxSize, "px");
-canvas.style.display = 'block';
-window.addEventListener('resize', function () {
-  var newMaxSize = Math.min(Math.min(window.innerWidth, window.innerHeight) - 16, 720);
-  renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
-  canvas.style.width = "".concat(newMaxSize, "px");
-  canvas.style.height = "".concat(newMaxSize, "px");
-});
-
-// 添加场景
-var scene = new three_core/* Scene */.Z58();
-scene.background = new three_core/* Color */.Q1f(0x111111);
-
-// 配置摄像头
-var camera = new three_core/* PerspectiveCamera */.ubm(60, 1.0, 0.01, 500);
-camera.position.z = 120;
-var isPersp = true;
-
-// 配置控制器
-var controls = new TrackballControls/* TrackballControls */.V(camera, renderer.domElement);
-controls.dynamicDampingFactor = 0.8;
-controls.rotateSpeed = 4.0;
-controls.maxDistance = 150.0;
-controls.minDistance = 0.1;
-controls.noPan = true;
-
-// 渲染循环
-renderer.setAnimationLoop(render);
-function render() {
-  controls.update();
-  renderer.render(scene, camera);
-}
-
-//添加坐标轴
-var axisLength = 100;
-var cylinderRadius = 0.5;
-var coneRadius = 1;
-var coneHeight = 3;
-var textSize = 5;
-var textOffset = 5;
-
-// 加载字体
-function loadFontAsync(url) {
-  return new Promise(function (resolve, reject) {
-    var loader = new FontLoader/* FontLoader */.J();
-    loader.load(url, function (font) {
-      return resolve(font);
-    }, undefined, function (error) {
-      return reject(error);
-    });
-  });
-}
-
-// 创建材质
-function createMaterial(color) {
-  return new three_core/* MeshPhongMaterial */.tXL({
-    color: color,
-    shininess: 40
-  });
-}
-
-// 创建坐标轴圆柱
-function createAxis(color, rotationAxis, rotationAngle) {
-  var geometry = new three_core/* CylinderGeometry */.Ho_(cylinderRadius, cylinderRadius, axisLength, 32);
-  if (rotationAxis && rotationAngle) {
-    if (rotationAxis[0] === 1) geometry.rotateX(rotationAngle);else if (rotationAxis[1] === 1) geometry.rotateY(rotationAngle);else if (rotationAxis[2] === 1) geometry.rotateZ(rotationAngle);
-  }
-  return new three_core/* Mesh */.eaF(geometry, createMaterial(color));
-}
-
-// 创建箭头
-function createArrow(color, position, rotation) {
-  var _mesh$position;
-  var geometry = new three_core/* ConeGeometry */.qFE(coneRadius, coneHeight, 32);
-  var mesh = new three_core/* Mesh */.eaF(geometry, createMaterial(color));
-  (_mesh$position = mesh.position).set.apply(_mesh$position, viewer_toConsumableArray(position));
-  if (rotation) mesh.setRotationFromEuler(_construct(three_core/* Euler */.O9p, viewer_toConsumableArray(rotation)));
-  return mesh;
-}
-
-// 创建坐标轴标签
-function createAxisLabel(text, color, font, position, axisDirection) {
-  var _mesh$position2;
-  var geometry = new TextGeometry/* TextGeometry */._(text, {
-    font: font,
-    size: textSize,
-    depth: cylinderRadius * 2,
-    curveSegments: 12
-  });
-  geometry.computeBoundingBox();
-  geometry.center();
-  var mesh = new three_core/* Mesh */.eaF(geometry, createMaterial(color));
-  (_mesh$position2 = mesh.position).set.apply(_mesh$position2, viewer_toConsumableArray(position));
-  if (axisDirection === 'y') {
-    mesh.rotation.y = Math.PI / 4;
-  } else if (axisDirection === 'z') {
-    mesh.rotation.y = Math.PI / 2;
-  }
-  return mesh;
-}
-
-// 创建完整坐标轴系统
-function createAxes(_x) {
-  return _createAxes.apply(this, arguments);
-}
-function _createAxes() {
-  _createAxes = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(scene) {
-    var font, container, xAxis, xArrow, xLabel, yAxis, yArrow, yLabel, zAxis, zArrow, zLabel;
-    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
-        case 0:
-          _context3.next = 2;
-          return loadFontAsync(Sarasa_Mono_SC_Bold_typeface_namespaceObject);
-        case 2:
-          font = _context3.sent;
-          container = new three_core/* Group */.YJl(); // X轴（红色）
-          xAxis = createAxis(0xff0000, [0, 0, 1], Math.PI / 2); // X轴箭头
-          xArrow = createArrow(0xff0000, [axisLength / 2, 0, 0], [0, 0, -Math.PI / 2]); // X轴标签
-          _context3.next = 8;
-          return createAxisLabel('X', 0xff0000, font, [axisLength / 2 + textOffset, 0, 0], 'x');
-        case 8:
-          xLabel = _context3.sent;
-          // Y轴（绿色）
-          yAxis = createAxis(0x00ff00); // Y轴箭头
-          yArrow = createArrow(0x00ff00, [0, axisLength / 2, 0]); // Y轴标签
-          _context3.next = 13;
-          return createAxisLabel('Y', 0x00ff00, font, [0, axisLength / 2 + textOffset, 0], 'y');
-        case 13:
-          yLabel = _context3.sent;
-          // Z轴（蓝色）
-          zAxis = createAxis(0x0000ff, [1, 0, 0], Math.PI / 2); // Z轴箭头
-          zArrow = createArrow(0x0000ff, [0, 0, axisLength / 2], [Math.PI / 2, 0, 0]); // Z轴标签
-          _context3.next = 18;
-          return createAxisLabel('Z', 0x0000ff, font, [0, 0, axisLength / 2 + textOffset], 'z');
-        case 18:
-          zLabel = _context3.sent;
-          container.add(xAxis, xArrow, xLabel);
-          container.add(yAxis, yArrow, yLabel);
-          container.add(zAxis, zArrow, zLabel);
-          scene.add(container);
-          return _context3.abrupt("return", container);
-        case 24:
-        case "end":
-          return _context3.stop();
-      }
-    }, _callee3);
-  }));
-  return _createAxes.apply(this, arguments);
-}
-_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-  return _regeneratorRuntime().wrap(function _callee$(_context) {
-    while (1) switch (_context.prev = _context.next) {
-      case 0:
-        _context.next = 2;
-        return createAxes(scene);
-      case 2:
-        axis = _context.sent;
-      case 3:
-      case "end":
-        return _context.stop();
-    }
-  }, _callee);
-}))();
-
-// 添加光源
-var directionalLight = new three_core/* DirectionalLight */.ZyN(0xffffff);
-directionalLight.position.set(0.5, 0.6, 0.4).normalize();
-directionalLight.intensity = 7;
-directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.mapSize.height = 2048;
-scene.add(directionalLight);
-var ambientLight = new three_core/* AmbientLight */.$p8(0x222222);
-ambientLight.intensity = 100;
-scene.add(ambientLight);
-var backLight = new three_core/* DirectionalLight */.ZyN(0xddddea, 0.9);
-backLight.intensity = 8;
-backLight.position.set(-0.5, -0.6, -0.4).normalize();
-backLight.castShadow = true;
-backLight.shadow.mapSize.width = 2048;
-backLight.shadow.mapSize.height = 2048;
-scene.add(backLight);
-
-// 创建边和顶点
-function createWireframeAndVertices(edges) {
-  var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-    _ref2$cylinderRadius = _ref2.cylinderRadius,
-    cylinderRadius = _ref2$cylinderRadius === void 0 ? 1 : _ref2$cylinderRadius,
-    _ref2$sphereRadiusMul = _ref2.sphereRadiusMultiplier,
-    sphereRadiusMultiplier = _ref2$sphereRadiusMul === void 0 ? 2 : _ref2$sphereRadiusMul,
-    cylinderMaterial = _ref2.cylinderMaterial,
-    sphereMaterial = _ref2.sphereMaterial,
-    _ref2$cylinderColor = _ref2.cylinderColor,
-    cylinderColor = _ref2$cylinderColor === void 0 ? 0xC0C0C0 : _ref2$cylinderColor,
-    _ref2$sphereColor = _ref2.sphereColor,
-    sphereColor = _ref2$sphereColor === void 0 ? 0xffd700 : _ref2$sphereColor;
-  var defaultCylinderMaterial = cylinderMaterial || new three_core/* MeshStandardMaterial */._4j({
-    color: cylinderColor,
-    metalness: 1.0,
-    roughness: 0.4
-  });
-  var defaultSphereMaterial = sphereMaterial || new three_core/* MeshStandardMaterial */._4j({
-    color: sphereColor,
-    metalness: 1.0,
-    roughness: 0.5
-  });
-  var wireframeGroup = new three_core/* Group */.YJl();
-  var verticesGroup = new three_core/* Group */.YJl();
-  var uniquePoints = new Set();
-  var sphereRadius = cylinderRadius * sphereRadiusMultiplier;
-  edges.forEach(function (_ref3) {
-    var _ref4 = viewer_slicedToArray(_ref3, 2),
-      start = _ref4[0],
-      end = _ref4[1];
-    var startKey = "".concat(start.x, ",").concat(start.y, ",").concat(start.z);
-    var endKey = "".concat(end.x, ",").concat(end.y, ",").concat(end.z);
-    var startVec = new three_core/* Vector3 */.Pq0(start.x, start.y, start.z);
-    var endVec = new three_core/* Vector3 */.Pq0(end.x, end.y, end.z);
-    var direction = new three_core/* Vector3 */.Pq0().subVectors(endVec, startVec);
-    var length = direction.length();
-    var cylinder = new three_core/* Mesh */.eaF(new three_core/* CylinderGeometry */.Ho_(cylinderRadius, cylinderRadius, length, 8, 1, false), defaultCylinderMaterial);
-    cylinder.quaternion.setFromUnitVectors(new three_core/* Vector3 */.Pq0(0, 1, 0), direction.clone().normalize());
-    cylinder.position.copy(new three_core/* Vector3 */.Pq0().addVectors(startVec, endVec).multiplyScalar(0.5));
-    wireframeGroup.add(cylinder);
-    if (!uniquePoints.has(startKey)) {
-      var sphere = new three_core/* Mesh */.eaF(new three_core/* SphereGeometry */.Gu$(sphereRadius, 16, 16), defaultSphereMaterial);
-      sphere.position.copy(startVec);
-      verticesGroup.add(sphere);
-      uniquePoints.add(startKey);
-    }
-    if (!uniquePoints.has(endKey)) {
-      var _sphere = new three_core/* Mesh */.eaF(new three_core/* SphereGeometry */.Gu$(sphereRadius, 16, 16), defaultSphereMaterial);
-      _sphere.position.copy(endVec);
-      verticesGroup.add(_sphere);
-      uniquePoints.add(endKey);
-    }
-  });
-  return {
-    wireframeGroup: wireframeGroup,
-    verticesGroup: verticesGroup
-  };
-}
-
-// 修改材质属性
-function changeMaterialProperty(group, propertyName, newValue) {
-  group.traverse(function (child) {
-    if (child.isMesh && child.material) {
-      if (!Array.isArray(child.material)) {
-        child.material[propertyName] = newValue;
-        child.material.needsUpdate = true;
-      } else {
-        var _iterator = viewer_createForOfIteratorHelper(child.material),
-          _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var _material = _step.value;
-            _material[propertyName] = newValue;
-            _material.needsUpdate = true;
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-      }
-    }
-  });
-}
-
-// 修改球体半径
-function changeSpheresRadius(group, newRadius) {
-  group.children.forEach(function (child) {
-    if (child instanceof three_core/* Mesh */.eaF && child.geometry instanceof three_core/* SphereGeometry */.Gu$) {
-      child.geometry.dispose();
-      child.geometry = new three_core/* SphereGeometry */.Gu$(newRadius, child.geometry.parameters.widthSegments, child.geometry.parameters.heightSegments);
-    }
-  });
-}
-
-// 修改圆柱半径
-function changeCylindersRadius(group, newRadius) {
-  group.traverse(function (child) {
-    if (child.isMesh && child.geometry instanceof three_core/* CylinderGeometry */.Ho_) {
-      var oldGeo = child.geometry;
-      child.geometry.dispose();
-      child.geometry = new three_core/* CylinderGeometry */.Ho_(newRadius, newRadius, oldGeo.parameters.height, oldGeo.parameters.radialSegments, oldGeo.parameters.heightSegments, oldGeo.parameters.openEnded);
-    }
-  });
-}
-
-// 加载模型
-function loadMesh(meshData, material) {
-  var container = new three_core/* Object3D */.B69();
-  var geometry = new three_core/* BufferGeometry */.LoY();
-  var vertices = new Float32Array(meshData.vertices.length * 3);
-  meshData.vertices.forEach(function (v, i) {
-    vertices[i * 3] = v.x;
-    vertices[i * 3 + 1] = v.y;
-    vertices[i * 3 + 2] = v.z;
-  });
-  geometry.setAttribute('position', new three_core/* BufferAttribute */.THS(vertices, 3));
-  var indices = [];
-  meshData.faces.forEach(function (face) {
-    if (face.length === 3) indices.push.apply(indices, viewer_toConsumableArray(face));
-  });
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  var mesh = new three_core/* Mesh */.eaF(geometry, material);
-  mesh.material.side = three_core/* DoubleSide */.$EB;
-  geometry.computeBoundingBox();
-  var aabb = geometry.boundingBox;
-  var objSize = aabb.max.sub(aabb.min).length();
-  var scaleFactor = 100 / objSize;
-  var _createWireframeAndVe = createWireframeAndVertices(meshData.edges, {
-      cylinderRadius: 0.5 / scaleFactor
-    }),
-    wireframeGroup = _createWireframeAndVe.wireframeGroup,
-    verticesGroup = _createWireframeAndVe.verticesGroup;
-  container.add(mesh);
-  container.add(wireframeGroup);
-  container.add(verticesGroup);
-  container.scale.setScalar(scaleFactor);
-  scene.add(container);
-  render();
-  return {
-    scaleFactor: scaleFactor,
-    solidGroup: container,
-    facesGroup: mesh,
-    wireframeGroup: wireframeGroup,
-    verticesGroup: verticesGroup
-  };
-}
-
-// 加载 OFF
-function loadMeshFromOffData(data, material) {
-  var mesh = parseOFF(data);
-  var processedMesh = processMeshData(mesh);
-  var _loadMesh = loadMesh(processedMesh, material);
-  scaleFactor = _loadMesh.scaleFactor;
-  solidGroup = _loadMesh.solidGroup;
-  facesGroup = _loadMesh.facesGroup;
-  wireframeGroup = _loadMesh.wireframeGroup;
-  verticesGroup = _loadMesh.verticesGroup;
-}
-function loadMeshFromUrl(url, material) {
-  return new Promise(function (resolve, reject) {
-    fetch(url).then(function (response) {
-      if (!response.ok) {
-        throw new Error('网络响应不正常');
-      }
-      return response.text();
-    }).then(function (data) {
-      loadMeshFromOffData(data, material);
-      resolve();
-    });
-  });
-}
-
-// 释放组
-function disposeGroup(group) {
-  group.traverse(function (child) {
-    if (child.isMesh) {
-      var _child$geometry, _child$material;
-      (_child$geometry = child.geometry) === null || _child$geometry === void 0 || _child$geometry.dispose();
-      (_child$material = child.material) === null || _child$material === void 0 || _child$material.dispose();
-    }
-  });
-  group.clear();
-}
-var material = new three_core/* MeshPhongMaterial */.tXL({
-  color: 0x555555,
-  specular: 0x222222,
-  shininess: 50,
-  flatShading: true
-});
-loadMeshFromUrl(tri_namespaceObject, material);
-
-// 事件监听
-function updateProperties() {
-  changeMaterialProperty(facesGroup, 'visible', faceVisibleSwitcher.checked);
-  changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked);
-  changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked);
-  changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked);
-  changeMaterialProperty(facesGroup, 'transparent', true);
-  changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value);
-  changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor);
-  changeSpheresRadius(verticesGroup, +wireframeAndVerticesDimSlider.value / scaleFactor * 2);
-}
-faceVisibleSwitcher.addEventListener('change', updateProperties);
-wireframeVisibleSwitcher.addEventListener('change', updateProperties);
-verticesVisibleSwitcher.addEventListener('change', updateProperties);
-axisVisibleSwitcher.addEventListener('change', updateProperties);
-facesOpacitySlider.addEventListener('input', updateProperties);
-wireframeAndVerticesDimSlider.addEventListener('input', updateProperties);
-fileInput.addEventListener('change', function (e) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = /*#__PURE__*/function () {
-    var _ref5 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
-      var data, material;
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
-          case 0:
-            data = e.target.result;
-            if (solidGroup) {
-              disposeGroup(solidGroup);
-              scene.remove(solidGroup);
-            }
-            material = new three_core/* MeshPhongMaterial */.tXL({
-              color: 0x555555,
-              specular: 0x222222,
-              shininess: 50,
-              flatShading: true
-            });
-            loadMeshFromOffData(data, material);
-            updateProperties();
-          case 5:
-          case "end":
-            return _context2.stop();
-        }
-      }, _callee2);
-    }));
-    return function (_x2) {
-      return _ref5.apply(this, arguments);
-    };
-  }();
-  reader.readAsText(file);
-});
-;// ./src/index.js
-
-
+eval("module.exports = __webpack_require__.p + \"assets/Sarasa_Mono_SC_Bold.typeface.json\";\n\n//# sourceURL=webpack:///./assets/fonts/Sarasa_Mono_SC_Bold.typeface.json?");
 
 /***/ }),
 
-/***/ 208:
+/***/ "./assets/models/tri.off":
+/*!*******************************!*\
+  !*** ./assets/models/tri.off ***!
+  \*******************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("module.exports = __webpack_require__.p + \"assets/tri.off\";\n\n//# sourceURL=webpack:///./assets/models/tri.off?");
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/style.css":
+/*!*************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/style.css ***!
+  \*************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/noSourceMaps.js */ \"./node_modules/css-loader/dist/runtime/noSourceMaps.js\");\n/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);\n// Imports\n\n\nvar ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));\n// Module\n___CSS_LOADER_EXPORT___.push([module.id, `body {\n    margin: 8px;\n}\n\n.button {\n    background-color: #049DD9;\n    border: none;\n    color: white;\n    padding: 8px 12px;\n    text-align: center;\n    text-decoration: none;\n    display: inline-block;\n    font-size: 18px;\n    border-radius: 6px;\n    user-select: none;\n    border: 1px solid black;\n    font-family: Verdana, sans-serif;\n    margin: 4px;\n    width: 120px;\n}\n.button:hover {\n    background-color: #0477BF;\n}\n.button:active {\n    background-color: #0468BF;\n    transform: translateY(1px);\n}\n\n.dropdown {\n    position: relative;\n    display: inline-block;\n}\n.dropdown:hover .dropdown-content {\n    display: block;\n}\n.dropdown-content {\n    display: none;\n    bottom: 100%;\n    position: absolute;\n    margin: -4px 4px;\n    border-radius: 8px;\n    border: 1px solid black;\n    text-align: center;\n    background-color: #049DD9;\n    min-width: 120px;\n    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);\n    z-index: 1;\n}\n.dropdown-content div {\n    padding: 4px 8px;\n    color: white;\n    font-size: 18px;\n    font-family: Verdana, sans-serif;\n    text-decoration: none;\n    display: block;\n    user-select: none;\n}\n.dropdown-content div:hover {\n    background-color: #0477BF;\n    border-radius: 8px;\n}\n\n#mapText {\n    position: absolute;\n    top: 16px;\n    left: 16px;\n    color: white;\n    font-size: 20px;\n    user-select: none;\n}`, \"\"]);\n// Exports\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);\n\n\n//# sourceURL=webpack:///./src/style.css?./node_modules/css-loader/dist/cjs.js");
 
+/***/ }),
 
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `body {
-    margin: 8px;
-}
+/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-.button {
-    background-color: #049DD9;
-    border: none;
-    color: white;
-    padding: 8px 12px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 18px;
-    border-radius: 6px;
-    user-select: none;
-    border: 1px solid black;
-    font-family: Verdana, sans-serif;
-    margin: 4px;
-    width: 120px;
-}
-.button:hover {
-    background-color: #0477BF;
-}
-.button:active {
-    background-color: #0468BF;
-    transform: translateY(1px);
-}
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./style.css */ \"./src/style.css\");\n/* harmony import */ var _viewer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewer.js */ \"./src/viewer.js\");\n\n\n\n//# sourceURL=webpack:///./src/index.js?");
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-.dropdown-content {
-    display: none;
-    bottom: 100%;
-    position: absolute;
-    margin: -4px 4px;
-    border-radius: 8px;
-    border: 1px solid black;
-    text-align: center;
-    background-color: #049DD9;
-    min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-.dropdown-content div {
-    padding: 4px 8px;
-    color: white;
-    font-size: 18px;
-    font-family: Verdana, sans-serif;
-    text-decoration: none;
-    display: block;
-    user-select: none;
-}
-.dropdown-content div:hover {
-    background-color: #0477BF;
-    border-radius: 8px;
-}
+/***/ }),
 
-#mapText {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    color: white;
-    font-size: 20px;
-    user-select: none;
-}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+/***/ "./src/offProcessor.js":
+/*!*****************************!*\
+  !*** ./src/offProcessor.js ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   decomposeSelfIntersectingPolygon: () => (/* binding */ decomposeSelfIntersectingPolygon),\n/* harmony export */   getUniqueSortedPairs: () => (/* binding */ getUniqueSortedPairs),\n/* harmony export */   parseOFF: () => (/* binding */ parseOFF),\n/* harmony export */   processMeshData: () => (/* binding */ processMeshData)\n/* harmony export */ });\n/* harmony import */ var poly2tri__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! poly2tri */ \"./node_modules/poly2tri/src/poly2tri.js\");\n/* harmony import */ var poly2tri__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(poly2tri__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var polygon_clipping__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! polygon-clipping */ \"./node_modules/polygon-clipping/dist/polygon-clipping.umd.js\");\n/* harmony import */ var polygon_clipping__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(polygon_clipping__WEBPACK_IMPORTED_MODULE_1__);\nfunction _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _iterableToArray(r) { if (\"undefined\" != typeof Symbol && null != r[Symbol.iterator] || null != r[\"@@iterator\"]) return Array.from(r); }\nfunction _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }\nfunction _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _iterableToArrayLimit(r, l) { var t = null == r ? null : \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t[\"return\"] && (u = t[\"return\"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }\nfunction _arrayWithHoles(r) { if (Array.isArray(r)) return r; }\nfunction _createForOfIteratorHelper(r, e) { var t = \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && \"number\" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError(\"Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t[\"return\"] || t[\"return\"](); } finally { if (u) throw o; } } }; }\nfunction _unsupportedIterableToArray(r, a) { if (r) { if (\"string\" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return \"Object\" === t && r.constructor && (t = r.constructor.name), \"Map\" === t || \"Set\" === t ? Array.from(r) : \"Arguments\" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }\nfunction _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }\n\n\nfunction decomposeSelfIntersectingPolygon(originalPoints) {\n  var coords = originalPoints.map(function (p) {\n    return [+p.x.toFixed(6), +p.y.toFixed(6)];\n  });\n  if (coords.length > 0) {\n    coords.push([coords[0][0], coords[0][1]]);\n  }\n  var result = polygon_clipping__WEBPACK_IMPORTED_MODULE_1__.union([coords]);\n  var decomposed = [];\n  var _iterator = _createForOfIteratorHelper(result),\n    _step;\n  try {\n    for (_iterator.s(); !(_step = _iterator.n()).done;) {\n      var polygon = _step.value;\n      var _iterator2 = _createForOfIteratorHelper(polygon),\n        _step2;\n      try {\n        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {\n          var ring = _step2.value;\n          if (ring.length === 0) continue;\n          var ringPoints = ring.slice(0, -1);\n          var points = ringPoints.map(function (_ref) {\n            var _ref2 = _slicedToArray(_ref, 2),\n              x = _ref2[0],\n              y = _ref2[1];\n            return new poly2tri__WEBPACK_IMPORTED_MODULE_0__.Point(x, y);\n          });\n          decomposed.push(points);\n        }\n      } catch (err) {\n        _iterator2.e(err);\n      } finally {\n        _iterator2.f();\n      }\n    }\n  } catch (err) {\n    _iterator.e(err);\n  } finally {\n    _iterator.f();\n  }\n  return decomposed;\n}\nfunction parseOFF(data) {\n  var lines = data.split('\\n').filter(function (line) {\n    return line.trim() !== '' && !line.startsWith('#');\n  });\n  if (lines[0].trim() !== 'OFF') throw new Error('Invalid OFF file format');\n  var _lines$1$trim$split$m = lines[1].trim().split(/\\s+/).map(Number),\n    _lines$1$trim$split$m2 = _slicedToArray(_lines$1$trim$split$m, 2),\n    nVertices = _lines$1$trim$split$m2[0],\n    nFaces = _lines$1$trim$split$m2[1];\n  var vertices = [];\n  for (var i = 0; i < nVertices; i++) {\n    var _lines$trim$split$map = lines[i + 2].trim().split(/\\s+/).map(parseFloat),\n      _lines$trim$split$map2 = _slicedToArray(_lines$trim$split$map, 3),\n      x = _lines$trim$split$map2[0],\n      y = _lines$trim$split$map2[1],\n      z = _lines$trim$split$map2[2];\n    vertices.push({\n      x: x,\n      y: y,\n      z: z\n    });\n  }\n  var faces = [];\n  for (var _i = 0; _i < nFaces; _i++) {\n    var parts = lines[_i + 2 + nVertices].trim().split(/\\s+/);\n    var count = parseInt(parts[0]);\n    faces.push(parts.slice(1, count + 1).map(Number));\n  }\n  return {\n    vertices: vertices,\n    faces: faces\n  };\n}\nfunction computeNormal(points) {\n  var v1 = {\n    x: points[1].x - points[0].x,\n    y: points[1].y - points[0].y,\n    z: points[1].z - points[0].z\n  };\n  var v2 = {\n    x: points[2].x - points[0].x,\n    y: points[2].y - points[0].y,\n    z: points[2].z - points[0].z\n  };\n  var nx = v1.y * v2.z - v1.z * v2.y;\n  var ny = v1.z * v2.x - v1.x * v2.z;\n  var nz = v1.x * v2.y - v1.y * v2.x;\n  var length = Math.sqrt(nx ** 2 + ny ** 2 + nz ** 2);\n  return {\n    x: nx / length,\n    y: ny / length,\n    z: nz / length\n  };\n}\nfunction rotatePoint(p, theta, phi) {\n  var cosT = Math.cos(theta),\n    sinT = Math.sin(theta);\n  var cosP = Math.cos(phi),\n    sinP = Math.sin(phi);\n  var y1 = p.y * cosT - p.z * sinT;\n  var z1 = p.y * sinT + p.z * cosT;\n  var x2 = p.x * cosP + z1 * sinP;\n  var z2 = -p.x * sinP + z1 * cosP;\n  return {\n    x: x2,\n    y: y1,\n    z: z2,\n    orig: p\n  };\n}\nfunction inverseRotatePoint(p, theta, phi) {\n  var cosT = Math.cos(-theta),\n    sinT = Math.sin(-theta);\n  var cosP = Math.cos(-phi),\n    sinP = Math.sin(-phi);\n  var x1 = p.x * cosP + p.z * sinP;\n  var z1 = -p.x * sinP + p.z * cosP;\n  var y2 = p.y * cosT - z1 * sinT;\n  var z2 = p.y * sinT + z1 * cosT;\n  return {\n    x: x1,\n    y: y2,\n    z: z2\n  };\n}\nfunction rotateToXY(points) {\n  var normal = computeNormal(points);\n  var theta = Math.atan2(normal.y, normal.z);\n  var phi = Math.atan2(-normal.x, Math.sqrt(normal.y ** 2 + normal.z ** 2));\n  var rotated = points.map(function (p) {\n    return rotatePoint(p, theta, phi);\n  });\n  return {\n    rotated: rotated,\n    theta: theta,\n    phi: phi,\n    z: rotated[0].z\n  };\n}\nfunction arePointsClose(point1, point2) {\n  var epsilon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Number.EPSILON;\n  var dx = Math.abs(point1.x - point2.x);\n  var dy = Math.abs(point1.y - point2.y);\n  var dz = Math.abs(point1.z - point2.z);\n  return dx <= epsilon && dy <= epsilon && dz <= epsilon;\n}\nfunction getUniqueSortedPairs(arrays) {\n  var pairs = arrays.flatMap(function (arr) {\n    return arr.map(function (v, i) {\n      return [Math.min(v, arr[(i + 1) % arr.length]), Math.max(v, arr[(i + 1) % arr.length])];\n    });\n  });\n  return _toConsumableArray(new Set(pairs.map(JSON.stringify))).map(JSON.parse);\n}\n;\nfunction processMeshData(_ref3) {\n  var vertices = _ref3.vertices,\n    faces = _ref3.faces;\n  var processedVertices = _toConsumableArray(vertices);\n  var processedFaces = [];\n  var edges = getUniqueSortedPairs(faces).map(function (edge) {\n    return edge.map(function (index) {\n      return vertices[index];\n    });\n  });\n  faces.forEach(function (face) {\n    if (face.length === 3) {\n      processedFaces.push(face);\n      return;\n    }\n    var faceVertices = face.map(function (idx) {\n      return vertices[idx];\n    });\n    function triangulateFace(vertices3D) {\n      var _rotateToXY = rotateToXY(vertices3D),\n        rotated = _rotateToXY.rotated,\n        theta = _rotateToXY.theta,\n        phi = _rotateToXY.phi,\n        z = _rotateToXY.z;\n      var contour = rotated.map(function (p) {\n        return new poly2tri__WEBPACK_IMPORTED_MODULE_0__.Point(p.x, p.y);\n      });\n      var triangles = [];\n      var decomposed = decomposeSelfIntersectingPolygon(contour);\n      var _iterator3 = _createForOfIteratorHelper(decomposed),\n        _step3;\n      try {\n        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {\n          var subPolygon = _step3.value;\n          var swctx = new poly2tri__WEBPACK_IMPORTED_MODULE_0__.SweepContext(subPolygon);\n          swctx.triangulate();\n          var subTriangles = swctx.getTriangles().map(function (triangle) {\n            return triangle.getPoints().map(function (pt) {\n              pt.z = z;\n              var origPoint = inverseRotatePoint(pt, theta, phi);\n              var origIndex = processedVertices.findIndex(function (p) {\n                return arePointsClose(p, origPoint);\n              });\n              if (origIndex > -1) return origIndex;\n              processedVertices.push(origPoint);\n              return processedVertices.length - 1;\n            });\n          });\n          triangles.push.apply(triangles, _toConsumableArray(subTriangles));\n        }\n      } catch (err) {\n        _iterator3.e(err);\n      } finally {\n        _iterator3.f();\n      }\n      return triangles;\n    }\n    var triangles = triangulateFace(faceVertices);\n    triangles.forEach(function (t) {\n      if (t.length === 3) processedFaces.push(t);\n    });\n  });\n  return {\n    vertices: processedVertices,\n    faces: processedFaces,\n    edges: edges\n  };\n}\n\n\n//# sourceURL=webpack:///./src/offProcessor.js?");
+
+/***/ }),
+
+/***/ "./src/offProcessor4D.js":
+/*!*******************************!*\
+  !*** ./src/offProcessor4D.js ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   parse4OFF: () => (/* binding */ parse4OFF),\n/* harmony export */   process4DMeshData: () => (/* binding */ process4DMeshData)\n/* harmony export */ });\n/* harmony import */ var _offProcessor_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./offProcessor.js */ \"./src/offProcessor.js\");\n/* harmony import */ var poly2tri__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! poly2tri */ \"./node_modules/poly2tri/src/poly2tri.js\");\n/* harmony import */ var poly2tri__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(poly2tri__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var polygon_clipping__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! polygon-clipping */ \"./node_modules/polygon-clipping/dist/polygon-clipping.umd.js\");\n/* harmony import */ var polygon_clipping__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(polygon_clipping__WEBPACK_IMPORTED_MODULE_2__);\nfunction _createForOfIteratorHelper(r, e) { var t = \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && \"number\" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError(\"Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t[\"return\"] || t[\"return\"](); } finally { if (u) throw o; } } }; }\nfunction _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _iterableToArrayLimit(r, l) { var t = null == r ? null : \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t[\"return\"] && (u = t[\"return\"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }\nfunction _arrayWithHoles(r) { if (Array.isArray(r)) return r; }\nfunction _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _unsupportedIterableToArray(r, a) { if (r) { if (\"string\" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return \"Object\" === t && r.constructor && (t = r.constructor.name), \"Map\" === t || \"Set\" === t ? Array.from(r) : \"Arguments\" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }\nfunction _iterableToArray(r) { if (\"undefined\" != typeof Symbol && null != r[Symbol.iterator] || null != r[\"@@iterator\"]) return Array.from(r); }\nfunction _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }\nfunction _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }\n\n\n\nfunction rotate4DPointsToXY(points) {\n  // 1. 提取前三个点\n  var p0 = points[0];\n  var p1 = points[1];\n  var p2 = points[2];\n\n  // 2. 计算向量u和v\n  var u = [p1.x - p0.x, p1.y - p0.y, p1.z - p0.z, p1.w - p0.w];\n  var v = [p2.x - p0.x, p2.y - p0.y, p2.z - p0.z, p2.w - p0.w];\n\n  // 3. 归一化u得到q1\n  var normU = Math.sqrt(u.reduce(function (sum, val) {\n    return sum + val * val;\n  }, 0));\n  if (normU < 1e-10) throw new Error(\"Vector u is too small\");\n  var q1 = u.map(function (x) {\n    return x / normU;\n  });\n\n  // 4. 计算v在u上的投影并正交化\n  var dotUV = v.reduce(function (sum, val, i) {\n    return sum + val * u[i];\n  }, 0);\n  var projUV = u.map(function (x) {\n    return dotUV / (normU * normU) * x;\n  });\n  var vOrtho = v.map(function (val, i) {\n    return val - projUV[i];\n  });\n  var normVOrtho = Math.sqrt(vOrtho.reduce(function (sum, val) {\n    return sum + val * val;\n  }, 0));\n  if (normVOrtho < 1e-10) throw new Error(\"Vectors are linearly dependent\");\n  var q2 = vOrtho.map(function (x) {\n    return x / normVOrtho;\n  });\n\n  // 5. 构造与q1,q2正交的基向量\n  var basis = [q1, q2];\n  var orthoVecs = [];\n  var stdBasis = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];\n  var _loop = function _loop() {\n    var e = _stdBasis[_i];\n    var vec = _toConsumableArray(e);\n    var _loop2 = function _loop2() {\n      var b = _basis[_i2];\n      var dot = vec.reduce(function (sum, val, i) {\n        return sum + val * b[i];\n      }, 0);\n      vec = vec.map(function (val, i) {\n        return val - dot * b[i];\n      });\n    };\n    for (var _i2 = 0, _basis = basis; _i2 < _basis.length; _i2++) {\n      _loop2();\n    }\n    var norm = Math.sqrt(vec.reduce(function (sum, val) {\n      return sum + val * val;\n    }, 0));\n    if (norm > 1e-6) {\n      orthoVecs.push(vec.map(function (x) {\n        return x / norm;\n      }));\n      basis.push(vec.map(function (x) {\n        return x / norm;\n      }));\n      if (orthoVecs.length >= 2) return 1; // break\n    }\n  };\n  for (var _i = 0, _stdBasis = stdBasis; _i < _stdBasis.length; _i++) {\n    if (_loop()) break;\n  }\n  if (orthoVecs.length < 2) throw new Error(\"Failed to find orthogonal basis\");\n  var q3 = orthoVecs[0],\n    q4 = orthoVecs[1];\n\n  // 6. 构造旋转矩阵（行向量为q1, q2, q3, q4）\n  var rotationMatrix = [q1, q2, q3, q4];\n\n  // 7. 应用旋转矩阵\n  var rotatedPoints = points.map(function (p) {\n    return apply4DMatrix(p, rotationMatrix);\n  });\n\n  // 8. 提取结果\n  var firstRotated = rotatedPoints[0];\n  return {\n    rotated: rotatedPoints,\n    rotationMatrix: rotationMatrix,\n    z: firstRotated.z,\n    w: firstRotated.w\n  };\n}\nfunction apply4DMatrix(point, matrix) {\n  var vec = [point.x, point.y, point.z, point.w];\n  var transformed = [matrix[0][0] * vec[0] + matrix[0][1] * vec[1] + matrix[0][2] * vec[2] + matrix[0][3] * vec[3], matrix[1][0] * vec[0] + matrix[1][1] * vec[1] + matrix[1][2] * vec[2] + matrix[1][3] * vec[3], matrix[2][0] * vec[0] + matrix[2][1] * vec[1] + matrix[2][2] * vec[2] + matrix[2][3] * vec[3], matrix[3][0] * vec[0] + matrix[3][1] * vec[1] + matrix[3][2] * vec[2] + matrix[3][3] * vec[3]];\n  return {\n    x: transformed[0],\n    y: transformed[1],\n    z: transformed[2],\n    w: transformed[3]\n  };\n}\nfunction apply4DInverseRotation(rotatedPoint, rotationMatrix) {\n  // 计算旋转矩阵的逆矩阵（转置矩阵，因为旋转矩阵是正交矩阵）\n  var inverseRotation = [[rotationMatrix[0][0], rotationMatrix[1][0], rotationMatrix[2][0], rotationMatrix[3][0]], [rotationMatrix[0][1], rotationMatrix[1][1], rotationMatrix[2][1], rotationMatrix[3][1]], [rotationMatrix[0][2], rotationMatrix[1][2], rotationMatrix[2][2], rotationMatrix[3][2]], [rotationMatrix[0][3], rotationMatrix[1][3], rotationMatrix[2][3], rotationMatrix[3][3]]];\n  return apply4DMatrix(rotatedPoint, inverseRotation);\n}\nfunction parse4OFF(data) {\n  var lines = data.split('\\n').filter(function (line) {\n    return line.trim() !== '' && !line.startsWith('#');\n  });\n  if (lines[0].trim() !== '4OFF') throw new Error('Invalid 4OFF file format');\n  var _lines$1$trim$split$m = lines[1].trim().split(/\\s+/).map(Number),\n    _lines$1$trim$split$m2 = _slicedToArray(_lines$1$trim$split$m, 4),\n    nVertices = _lines$1$trim$split$m2[0],\n    nFaces = _lines$1$trim$split$m2[1],\n    _ = _lines$1$trim$split$m2[2],\n    nCells = _lines$1$trim$split$m2[3];\n  var vertices = [];\n  for (var i = 0; i < nVertices; i++) {\n    var _lines$trim$split$map = lines[i + 2].trim().split(/\\s+/).map(parseFloat),\n      _lines$trim$split$map2 = _slicedToArray(_lines$trim$split$map, 4),\n      x = _lines$trim$split$map2[0],\n      y = _lines$trim$split$map2[1],\n      z = _lines$trim$split$map2[2],\n      w = _lines$trim$split$map2[3];\n    vertices.push({\n      x: x,\n      y: y,\n      z: z,\n      w: w\n    });\n  }\n  var faces = [];\n  for (var _i3 = 0; _i3 < nFaces; _i3++) {\n    var parts = lines[_i3 + 2 + nVertices].trim().split(/\\s+/);\n    var count = parseInt(parts[0]);\n    faces.push(parts.slice(1, count + 1).map(Number));\n  }\n  var cells = [];\n  for (var _i4 = 0; _i4 < nCells; _i4++) {\n    var _parts = lines[_i4 + 2 + nVertices + nFaces].trim().split(/\\s+/);\n    var _count = parseInt(_parts[0]);\n    cells.push(_parts.slice(1, _count + 1).map(Number));\n  }\n  return {\n    vertices: vertices,\n    faces: faces,\n    cells: cells\n  };\n}\nfunction are4DPointsClose(point1, point2) {\n  var epsilon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Number.EPSILON;\n  var dx = Math.abs(point1.x - point2.x);\n  var dy = Math.abs(point1.y - point2.y);\n  var dz = Math.abs(point1.z - point2.z);\n  var dw = Math.abs(point1.w - point2.w);\n  return dx <= epsilon && dy <= epsilon && dz <= epsilon && dw <= epsilon;\n}\nfunction range(start, stop) {\n  var length = Math.max(stop - start + 1, 0);\n  return Array.from({\n    length: length\n  }, function (_, i) {\n    return start + i;\n  });\n}\nfunction process4DMeshData(_ref) {\n  var vertices = _ref.vertices,\n    faces = _ref.faces,\n    cells = _ref.cells;\n  var processedVertices = _toConsumableArray(vertices);\n  var processedFaces = [];\n  var processedCells = [];\n  var edges = (0,_offProcessor_js__WEBPACK_IMPORTED_MODULE_0__.getUniqueSortedPairs)(faces).map(function (edge) {\n    return edge.map(function (index) {\n      return vertices[index];\n    });\n  });\n  var facesMap = {};\n  faces.forEach(function (face, faceIndex) {\n    if (face.length === 3) {\n      processedFaces.push(face);\n      return;\n    }\n    var faceVertices = face.map(function (idx) {\n      return vertices[idx];\n    });\n    function triangulateFace(vertices4D) {\n      var _rotate4DPointsToXY = rotate4DPointsToXY(vertices4D),\n        rotated = _rotate4DPointsToXY.rotated,\n        rotationMatrix = _rotate4DPointsToXY.rotationMatrix,\n        z = _rotate4DPointsToXY.z,\n        w = _rotate4DPointsToXY.w;\n      var contour = rotated.map(function (p) {\n        return new poly2tri__WEBPACK_IMPORTED_MODULE_1__.Point(p.x, p.y);\n      });\n      var triangles = [];\n      var decomposed = (0,_offProcessor_js__WEBPACK_IMPORTED_MODULE_0__.decomposeSelfIntersectingPolygon)(contour);\n      var _iterator = _createForOfIteratorHelper(decomposed),\n        _step;\n      try {\n        for (_iterator.s(); !(_step = _iterator.n()).done;) {\n          var subPolygon = _step.value;\n          var swctx = new poly2tri__WEBPACK_IMPORTED_MODULE_1__.SweepContext(subPolygon);\n          swctx.triangulate();\n          var subTriangles = swctx.getTriangles().map(function (triangle) {\n            return triangle.getPoints().map(function (pt) {\n              pt.z = z;\n              pt.w = w;\n              var origPoint = apply4DInverseRotation(pt, rotationMatrix);\n              var origIndex = processedVertices.findIndex(function (p) {\n                return are4DPointsClose(p, origPoint);\n              });\n              if (origIndex > -1) return origIndex;\n              processedVertices.push(origPoint);\n              return processedVertices.length - 1;\n            });\n          });\n          triangles.push.apply(triangles, _toConsumableArray(subTriangles));\n        }\n      } catch (err) {\n        _iterator.e(err);\n      } finally {\n        _iterator.f();\n      }\n      return triangles;\n    }\n    var trianglesForFaceStartIndex = processedFaces.length;\n    var triangles = triangulateFace(faceVertices);\n    triangles.forEach(function (t) {\n      if (t.length === 3) processedFaces.push(t);\n    });\n    var trianglesForFaceEndIndex = processedFaces.length - 1;\n    facesMap[faceIndex] = [trianglesForFaceStartIndex, trianglesForFaceEndIndex];\n  });\n  var _iterator2 = _createForOfIteratorHelper(cells),\n    _step2;\n  try {\n    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {\n      var cell = _step2.value;\n      var processedCell = [];\n      var _iterator3 = _createForOfIteratorHelper(cell),\n        _step3;\n      try {\n        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {\n          var face = _step3.value;\n          processedCell.push.apply(processedCell, _toConsumableArray(range.apply(void 0, _toConsumableArray(facesMap[face]))));\n        }\n      } catch (err) {\n        _iterator3.e(err);\n      } finally {\n        _iterator3.f();\n      }\n      processedCells.push(processedCell);\n    }\n  } catch (err) {\n    _iterator2.e(err);\n  } finally {\n    _iterator2.f();\n  }\n  return {\n    vertices: processedVertices,\n    faces: processedFaces,\n    edges: edges,\n    cells: processedCells\n  };\n}\n\n\n//# sourceURL=webpack:///./src/offProcessor4D.js?");
+
+/***/ }),
+
+/***/ "./src/style.css":
+/*!***********************!*\
+  !*** ./src/style.css ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ \"./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/styleDomAPI.js */ \"./node_modules/style-loader/dist/runtime/styleDomAPI.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/insertBySelector.js */ \"./node_modules/style-loader/dist/runtime/insertBySelector.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ \"./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/insertStyleElement.js */ \"./node_modules/style-loader/dist/runtime/insertStyleElement.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);\n/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/styleTagTransform.js */ \"./node_modules/style-loader/dist/runtime/styleTagTransform.js\");\n/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);\n/* harmony import */ var _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../node_modules/css-loader/dist/cjs.js!./style.css */ \"./node_modules/css-loader/dist/cjs.js!./src/style.css\");\n\n      \n      \n      \n      \n      \n      \n      \n      \n      \n\nvar options = {};\n\noptions.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());\noptions.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());\noptions.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, \"head\");\noptions.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());\noptions.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());\n\nvar update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__[\"default\"], options);\n\n\n\n\n       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__[\"default\"] && _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__[\"default\"].locals ? _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__[\"default\"].locals : undefined);\n\n\n//# sourceURL=webpack:///./src/style.css?");
+
+/***/ }),
+
+/***/ "./src/viewer.js":
+/*!***********************!*\
+  !*** ./src/viewer.js ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! three */ \"./node_modules/three/build/three.module.js\");\n/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! three */ \"./node_modules/three/build/three.core.js\");\n/* harmony import */ var three_addons_controls_TrackballControls_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! three/addons/controls/TrackballControls.js */ \"./node_modules/three/examples/jsm/controls/TrackballControls.js\");\n/* harmony import */ var three_addons_loaders_FontLoader_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! three/addons/loaders/FontLoader.js */ \"./node_modules/three/examples/jsm/loaders/FontLoader.js\");\n/* harmony import */ var three_addons_geometries_TextGeometry_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! three/addons/geometries/TextGeometry.js */ \"./node_modules/three/examples/jsm/geometries/TextGeometry.js\");\n/* harmony import */ var _offProcessor_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./offProcessor.js */ \"./src/offProcessor.js\");\n/* harmony import */ var _offProcessor4D_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./offProcessor4D.js */ \"./src/offProcessor4D.js\");\n/* harmony import */ var _assets_models_tri_off__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../assets/models/tri.off */ \"./assets/models/tri.off\");\n/* harmony import */ var _assets_fonts_Sarasa_Mono_SC_Bold_typeface_json__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json */ \"./assets/fonts/Sarasa_Mono_SC_Bold.typeface.json\");\nfunction _typeof(o) { \"@babel/helpers - typeof\"; return _typeof = \"function\" == typeof Symbol && \"symbol\" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && \"function\" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? \"symbol\" : typeof o; }, _typeof(o); }\nfunction _createForOfIteratorHelper(r, e) { var t = \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (!t) { if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && \"number\" == typeof r.length) { t && (r = t); var _n = 0, F = function F() {}; return { s: F, n: function n() { return _n >= r.length ? { done: !0 } : { done: !1, value: r[_n++] }; }, e: function e(r) { throw r; }, f: F }; } throw new TypeError(\"Invalid attempt to iterate non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); } var o, a = !0, u = !1; return { s: function s() { t = t.call(r); }, n: function n() { var r = t.next(); return a = r.done, r; }, e: function e(r) { u = !0, o = r; }, f: function f() { try { a || null == t[\"return\"] || t[\"return\"](); } finally { if (u) throw o; } } }; }\nfunction _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _iterableToArrayLimit(r, l) { var t = null == r ? null : \"undefined\" != typeof Symbol && r[Symbol.iterator] || r[\"@@iterator\"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t[\"return\"] && (u = t[\"return\"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }\nfunction _arrayWithHoles(r) { if (Array.isArray(r)) return r; }\nfunction _regeneratorRuntime() { \"use strict\"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = \"function\" == typeof Symbol ? Symbol : {}, a = i.iterator || \"@@iterator\", c = i.asyncIterator || \"@@asyncIterator\", u = i.toStringTag || \"@@toStringTag\"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, \"\"); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, \"_invoke\", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: \"normal\", arg: t.call(e, r) }; } catch (t) { return { type: \"throw\", arg: t }; } } e.wrap = wrap; var h = \"suspendedStart\", l = \"suspendedYield\", f = \"executing\", s = \"completed\", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { [\"next\", \"throw\", \"return\"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if (\"throw\" !== c.type) { var u = c.arg, h = u.value; return h && \"object\" == _typeof(h) && n.call(h, \"__await\") ? e.resolve(h.__await).then(function (t) { invoke(\"next\", t, i, a); }, function (t) { invoke(\"throw\", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke(\"throw\", t, i, a); }); } a(c.arg); } var r; o(this, \"_invoke\", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error(\"Generator is already running\"); if (o === s) { if (\"throw\" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if (\"next\" === n.method) n.sent = n._sent = n.arg;else if (\"throw\" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else \"return\" === n.method && n.abrupt(\"return\", n.arg); o = f; var p = tryCatch(e, r, n); if (\"normal\" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } \"throw\" === p.type && (o = s, n.method = \"throw\", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, \"throw\" === n && e.iterator[\"return\"] && (r.method = \"return\", r.arg = t, maybeInvokeDelegate(e, r), \"throw\" === r.method) || \"return\" !== n && (r.method = \"throw\", r.arg = new TypeError(\"The iterator does not provide a '\" + n + \"' method\")), y; var i = tryCatch(o, e.iterator, r.arg); if (\"throw\" === i.type) return r.method = \"throw\", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, \"return\" !== r.method && (r.method = \"next\", r.arg = t), r.delegate = null, y) : a : (r.method = \"throw\", r.arg = new TypeError(\"iterator result is not an object\"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = \"normal\", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: \"root\" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || \"\" === e) { var r = e[a]; if (r) return r.call(e); if (\"function\" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + \" is not iterable\"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, \"constructor\", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, \"constructor\", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, \"GeneratorFunction\"), e.isGeneratorFunction = function (t) { var e = \"function\" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || \"GeneratorFunction\" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, \"GeneratorFunction\")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, \"Generator\"), define(g, a, function () { return this; }), define(g, \"toString\", function () { return \"[object Generator]\"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = \"next\", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) \"t\" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if (\"throw\" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = \"throw\", a.arg = e, r.next = n, o && (r.method = \"next\", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if (\"root\" === i.tryLoc) return handle(\"end\"); if (i.tryLoc <= this.prev) { var c = n.call(i, \"catchLoc\"), u = n.call(i, \"finallyLoc\"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error(\"try statement without catch or finally\"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, \"finallyLoc\") && this.prev < o.finallyLoc) { var i = o; break; } } i && (\"break\" === t || \"continue\" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = \"next\", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if (\"throw\" === t.type) throw t.arg; return \"break\" === t.type || \"continue\" === t.type ? this.next = t.arg : \"return\" === t.type ? (this.rval = this.arg = t.arg, this.method = \"return\", this.next = \"end\") : \"normal\" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, \"catch\": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if (\"throw\" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error(\"illegal catch attempt\"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, \"next\" === this.method && (this.arg = t), y; } }, e; }\nfunction asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }\nfunction _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, \"next\", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, \"throw\", n); } _next(void 0); }); }; }\nfunction _construct(t, e, r) { if (_isNativeReflectConstruct()) return Reflect.construct.apply(null, arguments); var o = [null]; o.push.apply(o, e); var p = new (t.bind.apply(t, o))(); return r && _setPrototypeOf(p, r.prototype), p; }\nfunction _setPrototypeOf(t, e) { return _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) { return t.__proto__ = e, t; }, _setPrototypeOf(t, e); }\nfunction _isNativeReflectConstruct() { try { var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); } catch (t) {} return (_isNativeReflectConstruct = function _isNativeReflectConstruct() { return !!t; })(); }\nfunction _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\nfunction _unsupportedIterableToArray(r, a) { if (r) { if (\"string\" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return \"Object\" === t && r.constructor && (t = r.constructor.name), \"Map\" === t || \"Set\" === t ? Array.from(r) : \"Arguments\" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }\nfunction _iterableToArray(r) { if (\"undefined\" != typeof Symbol && null != r[Symbol.iterator] || null != r[\"@@iterator\"]) return Array.from(r); }\nfunction _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }\nfunction _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }\n\n\n\n\n\n\n\n\n\nvar faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');\nvar wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');\nvar verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher');\nvar axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher');\nvar facesOpacitySlider = document.getElementById('facesOpacitySlider');\nvar wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');\nvar fileInput = document.getElementById('fileInput');\nvar scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup;\n\n// 初始化渲染器\nvar dpr = window.devicePixelRatio || 1;\nvar canvas = document.getElementById('polyhedronRenderer');\nvar renderer = new three__WEBPACK_IMPORTED_MODULE_4__.WebGLRenderer({\n  antialias: true,\n  powerPreference: \"high-performance\",\n  canvas: canvas\n});\nvar maxSize = Math.min(Math.min(window.innerWidth, window.innerHeight) - 16, 720);\nrenderer.setSize(maxSize * dpr, maxSize * dpr, false);\ncanvas.style.width = \"\".concat(maxSize, \"px\");\ncanvas.style.height = \"\".concat(maxSize, \"px\");\ncanvas.style.display = 'block';\nwindow.addEventListener('resize', function () {\n  var newMaxSize = Math.min(Math.min(window.innerWidth, window.innerHeight) - 16, 720);\n  renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);\n  canvas.style.width = \"\".concat(newMaxSize, \"px\");\n  canvas.style.height = \"\".concat(newMaxSize, \"px\");\n});\n\n// 添加场景\nvar scene = new three__WEBPACK_IMPORTED_MODULE_5__.Scene();\nscene.background = new three__WEBPACK_IMPORTED_MODULE_5__.Color(0x111111);\n\n// 配置摄像头\nvar camera = new three__WEBPACK_IMPORTED_MODULE_5__.PerspectiveCamera(60, 1.0, 0.01, 500);\ncamera.position.z = 120;\nvar isPersp = true;\n\n// 配置控制器\nvar controls = new three_addons_controls_TrackballControls_js__WEBPACK_IMPORTED_MODULE_6__.TrackballControls(camera, renderer.domElement);\ncontrols.dynamicDampingFactor = 0.8;\ncontrols.rotateSpeed = 4.0;\ncontrols.maxDistance = 150.0;\ncontrols.minDistance = 0.1;\ncontrols.noPan = true;\n\n// 渲染循环\nrenderer.setAnimationLoop(render);\nfunction render() {\n  controls.update();\n  renderer.render(scene, camera);\n}\n\n//添加坐标轴\nvar axisLength = 100;\nvar cylinderRadius = 0.5;\nvar coneRadius = 1;\nvar coneHeight = 3;\nvar textSize = 5;\nvar textOffset = 5;\n\n// 加载字体\nfunction loadFontAsync(url) {\n  return new Promise(function (resolve, reject) {\n    var loader = new three_addons_loaders_FontLoader_js__WEBPACK_IMPORTED_MODULE_7__.FontLoader();\n    loader.load(url, function (font) {\n      return resolve(font);\n    }, undefined, function (error) {\n      return reject(error);\n    });\n  });\n}\n\n// 创建材质\nfunction createMaterial(color) {\n  return new three__WEBPACK_IMPORTED_MODULE_5__.MeshPhongMaterial({\n    color: color,\n    shininess: 40\n  });\n}\n\n// 创建坐标轴圆柱\nfunction createAxis(color, rotationAxis, rotationAngle) {\n  var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.CylinderGeometry(cylinderRadius, cylinderRadius, axisLength, 32);\n  if (rotationAxis && rotationAngle) {\n    if (rotationAxis[0] === 1) geometry.rotateX(rotationAngle);else if (rotationAxis[1] === 1) geometry.rotateY(rotationAngle);else if (rotationAxis[2] === 1) geometry.rotateZ(rotationAngle);\n  }\n  return new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, createMaterial(color));\n}\n\n// 创建箭头\nfunction createArrow(color, position, rotation) {\n  var _mesh$position;\n  var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.ConeGeometry(coneRadius, coneHeight, 32);\n  var mesh = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, createMaterial(color));\n  (_mesh$position = mesh.position).set.apply(_mesh$position, _toConsumableArray(position));\n  if (rotation) mesh.setRotationFromEuler(_construct(three__WEBPACK_IMPORTED_MODULE_5__.Euler, _toConsumableArray(rotation)));\n  return mesh;\n}\n\n// 创建坐标轴标签\nfunction createAxisLabel(text, color, font, position, axisDirection) {\n  var _mesh$position2;\n  var geometry = new three_addons_geometries_TextGeometry_js__WEBPACK_IMPORTED_MODULE_8__.TextGeometry(text, {\n    font: font,\n    size: textSize,\n    depth: cylinderRadius * 2,\n    curveSegments: 12\n  });\n  geometry.computeBoundingBox();\n  geometry.center();\n  var mesh = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, createMaterial(color));\n  (_mesh$position2 = mesh.position).set.apply(_mesh$position2, _toConsumableArray(position));\n  if (axisDirection === 'y') {\n    mesh.rotation.y = Math.PI / 4;\n  } else if (axisDirection === 'z') {\n    mesh.rotation.y = Math.PI / 2;\n  }\n  return mesh;\n}\n\n// 创建完整坐标轴系统\nfunction createAxes(_x) {\n  return _createAxes.apply(this, arguments);\n}\nfunction _createAxes() {\n  _createAxes = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(scene) {\n    var font, container, xAxis, xArrow, xLabel, yAxis, yArrow, yLabel, zAxis, zArrow, zLabel;\n    return _regeneratorRuntime().wrap(function _callee3$(_context3) {\n      while (1) switch (_context3.prev = _context3.next) {\n        case 0:\n          _context3.next = 2;\n          return loadFontAsync(_assets_fonts_Sarasa_Mono_SC_Bold_typeface_json__WEBPACK_IMPORTED_MODULE_3__);\n        case 2:\n          font = _context3.sent;\n          container = new three__WEBPACK_IMPORTED_MODULE_5__.Group(); // X轴（红色）\n          xAxis = createAxis(0xff0000, [0, 0, 1], Math.PI / 2); // X轴箭头\n          xArrow = createArrow(0xff0000, [axisLength / 2, 0, 0], [0, 0, -Math.PI / 2]); // X轴标签\n          _context3.next = 8;\n          return createAxisLabel('X', 0xff0000, font, [axisLength / 2 + textOffset, 0, 0], 'x');\n        case 8:\n          xLabel = _context3.sent;\n          // Y轴（绿色）\n          yAxis = createAxis(0x00ff00); // Y轴箭头\n          yArrow = createArrow(0x00ff00, [0, axisLength / 2, 0]); // Y轴标签\n          _context3.next = 13;\n          return createAxisLabel('Y', 0x00ff00, font, [0, axisLength / 2 + textOffset, 0], 'y');\n        case 13:\n          yLabel = _context3.sent;\n          // Z轴（蓝色）\n          zAxis = createAxis(0x0000ff, [1, 0, 0], Math.PI / 2); // Z轴箭头\n          zArrow = createArrow(0x0000ff, [0, 0, axisLength / 2], [Math.PI / 2, 0, 0]); // Z轴标签\n          _context3.next = 18;\n          return createAxisLabel('Z', 0x0000ff, font, [0, 0, axisLength / 2 + textOffset], 'z');\n        case 18:\n          zLabel = _context3.sent;\n          container.add(xAxis, xArrow, xLabel);\n          container.add(yAxis, yArrow, yLabel);\n          container.add(zAxis, zArrow, zLabel);\n          scene.add(container);\n          return _context3.abrupt(\"return\", container);\n        case 24:\n        case \"end\":\n          return _context3.stop();\n      }\n    }, _callee3);\n  }));\n  return _createAxes.apply(this, arguments);\n}\n_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {\n  return _regeneratorRuntime().wrap(function _callee$(_context) {\n    while (1) switch (_context.prev = _context.next) {\n      case 0:\n        _context.next = 2;\n        return createAxes(scene);\n      case 2:\n        axis = _context.sent;\n      case 3:\n      case \"end\":\n        return _context.stop();\n    }\n  }, _callee);\n}))();\n\n// 添加光源\nvar directionalLight = new three__WEBPACK_IMPORTED_MODULE_5__.DirectionalLight(0xffffff);\ndirectionalLight.position.set(0.5, 0.6, 0.4).normalize();\ndirectionalLight.intensity = 7;\ndirectionalLight.castShadow = true;\ndirectionalLight.shadow.mapSize.width = 2048;\ndirectionalLight.shadow.mapSize.height = 2048;\nscene.add(directionalLight);\nvar ambientLight = new three__WEBPACK_IMPORTED_MODULE_5__.AmbientLight(0x222222);\nambientLight.intensity = 100;\nscene.add(ambientLight);\nvar backLight = new three__WEBPACK_IMPORTED_MODULE_5__.DirectionalLight(0xddddea, 0.9);\nbackLight.intensity = 8;\nbackLight.position.set(-0.5, -0.6, -0.4).normalize();\nbackLight.castShadow = true;\nbackLight.shadow.mapSize.width = 2048;\nbackLight.shadow.mapSize.height = 2048;\nscene.add(backLight);\n\n// 创建边和顶点\nfunction createWireframeAndVertices(edges) {\n  var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},\n    _ref2$cylinderRadius = _ref2.cylinderRadius,\n    cylinderRadius = _ref2$cylinderRadius === void 0 ? 1 : _ref2$cylinderRadius,\n    _ref2$sphereRadiusMul = _ref2.sphereRadiusMultiplier,\n    sphereRadiusMultiplier = _ref2$sphereRadiusMul === void 0 ? 2 : _ref2$sphereRadiusMul,\n    cylinderMaterial = _ref2.cylinderMaterial,\n    sphereMaterial = _ref2.sphereMaterial,\n    _ref2$cylinderColor = _ref2.cylinderColor,\n    cylinderColor = _ref2$cylinderColor === void 0 ? 0xC0C0C0 : _ref2$cylinderColor,\n    _ref2$sphereColor = _ref2.sphereColor,\n    sphereColor = _ref2$sphereColor === void 0 ? 0xffd700 : _ref2$sphereColor;\n  var defaultCylinderMaterial = cylinderMaterial || new three__WEBPACK_IMPORTED_MODULE_5__.MeshStandardMaterial({\n    color: cylinderColor,\n    metalness: 1.0,\n    roughness: 0.4\n  });\n  var defaultSphereMaterial = sphereMaterial || new three__WEBPACK_IMPORTED_MODULE_5__.MeshStandardMaterial({\n    color: sphereColor,\n    metalness: 1.0,\n    roughness: 0.5\n  });\n  var wireframeGroup = new three__WEBPACK_IMPORTED_MODULE_5__.Group();\n  var verticesGroup = new three__WEBPACK_IMPORTED_MODULE_5__.Group();\n  var uniquePoints = new Set();\n  var sphereRadius = cylinderRadius * sphereRadiusMultiplier;\n  edges.forEach(function (_ref3) {\n    var _ref4 = _slicedToArray(_ref3, 2),\n      start = _ref4[0],\n      end = _ref4[1];\n    var startKey = \"\".concat(start.x, \",\").concat(start.y, \",\").concat(start.z);\n    var endKey = \"\".concat(end.x, \",\").concat(end.y, \",\").concat(end.z);\n    var startVec = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(start.x, start.y, start.z);\n    var endVec = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(end.x, end.y, end.z);\n    var direction = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().subVectors(endVec, startVec);\n    var length = direction.length();\n    var cylinder = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(new three__WEBPACK_IMPORTED_MODULE_5__.CylinderGeometry(cylinderRadius, cylinderRadius, length, 8, 1, false), defaultCylinderMaterial);\n    cylinder.quaternion.setFromUnitVectors(new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(0, 1, 0), direction.clone().normalize());\n    cylinder.position.copy(new three__WEBPACK_IMPORTED_MODULE_5__.Vector3().addVectors(startVec, endVec).multiplyScalar(0.5));\n    wireframeGroup.add(cylinder);\n    if (!uniquePoints.has(startKey)) {\n      var sphere = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(new three__WEBPACK_IMPORTED_MODULE_5__.SphereGeometry(sphereRadius, 16, 16), defaultSphereMaterial);\n      sphere.position.copy(startVec);\n      verticesGroup.add(sphere);\n      uniquePoints.add(startKey);\n    }\n    if (!uniquePoints.has(endKey)) {\n      var _sphere = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(new three__WEBPACK_IMPORTED_MODULE_5__.SphereGeometry(sphereRadius, 16, 16), defaultSphereMaterial);\n      _sphere.position.copy(endVec);\n      verticesGroup.add(_sphere);\n      uniquePoints.add(endKey);\n    }\n  });\n  return {\n    wireframeGroup: wireframeGroup,\n    verticesGroup: verticesGroup\n  };\n}\nfunction create4DWireframeAndVertices(edges) {\n  var _ref5 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},\n    _ref5$cylinderRadius = _ref5.cylinderRadius,\n    cylinderRadius = _ref5$cylinderRadius === void 0 ? 1 : _ref5$cylinderRadius,\n    _ref5$sphereRadiusMul = _ref5.sphereRadiusMultiplier,\n    sphereRadiusMultiplier = _ref5$sphereRadiusMul === void 0 ? 2 : _ref5$sphereRadiusMul,\n    cylinderMaterial = _ref5.cylinderMaterial,\n    sphereMaterial = _ref5.sphereMaterial,\n    _ref5$cylinderColor = _ref5.cylinderColor,\n    cylinderColor = _ref5$cylinderColor === void 0 ? 0xC0C0C0 : _ref5$cylinderColor,\n    _ref5$sphereColor = _ref5.sphereColor,\n    sphereColor = _ref5$sphereColor === void 0 ? 0xffd700 : _ref5$sphereColor;\n  // const defaultCylinderMaterial = cylinderMaterial || new THREE.MeshStandardMaterial({\n  // color: cylinderColor,\n  // metalness: 1.0,\n  // roughness: 0.4\n  // });\n\n  var defaultSphereMaterial = sphereMaterial || new three__WEBPACK_IMPORTED_MODULE_5__.MeshStandardMaterial({\n    color: sphereColor,\n    metalness: 1.0,\n    roughness: 0.5\n  });\n\n  // const wireframeGroup = new THREE.Group();\n  var verticesGroup = new three__WEBPACK_IMPORTED_MODULE_5__.Group();\n  var uniquePoints = new Set();\n  var sphereRadius = cylinderRadius * sphereRadiusMultiplier;\n  edges.forEach(function (_ref6) {\n    var _ref7 = _slicedToArray(_ref6, 2),\n      start = _ref7[0],\n      end = _ref7[1];\n    var startKey = \"\".concat(start.x, \",\").concat(start.y, \",\").concat(start.z, \",\").concat(start.w);\n    var endKey = \"\".concat(end.x, \",\").concat(end.y, \",\").concat(end.z, \",\").concat(end.w);\n    var startVec = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(start.x, start.y, start.z);\n    var endVec = new three__WEBPACK_IMPORTED_MODULE_5__.Vector3(end.x, end.y, end.z);\n    if (!uniquePoints.has(startKey)) {\n      var sphere = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(new three__WEBPACK_IMPORTED_MODULE_5__.SphereGeometry(sphereRadius, 16, 16), defaultSphereMaterial);\n      sphere.position.copy(startVec);\n      verticesGroup.add(sphere);\n      uniquePoints.add(startKey);\n    }\n\n    // if (!uniquePoints.has(endKey)) {\n    // const sphere = new THREE.Mesh(\n    // new THREE.SphereGeometry(sphereRadius, 16, 16),\n    // defaultSphereMaterial\n    // );\n    // sphere.position.copy(endVec);\n    // verticesGroup.add(sphere);\n    // uniquePoints.add(endKey);\n    // }\n  });\n  return {\n    wireframeGroup: null,\n    verticesGroup: verticesGroup\n  };\n}\n\n// 修改材质属性\nfunction changeMaterialProperty(group, propertyName, newValue) {\n  if (!group) return;\n  group.traverse(function (child) {\n    if (child.isMesh && child.material) {\n      if (!Array.isArray(child.material)) {\n        child.material[propertyName] = newValue;\n        child.material.needsUpdate = true;\n      } else {\n        var _iterator = _createForOfIteratorHelper(child.material),\n          _step;\n        try {\n          for (_iterator.s(); !(_step = _iterator.n()).done;) {\n            var _material = _step.value;\n            _material[propertyName] = newValue;\n            _material.needsUpdate = true;\n          }\n        } catch (err) {\n          _iterator.e(err);\n        } finally {\n          _iterator.f();\n        }\n      }\n    }\n  });\n}\n\n// 修改球体半径\nfunction changeSpheresRadius(group, newRadius) {\n  if (!group) return;\n  group.children.forEach(function (child) {\n    if (child instanceof three__WEBPACK_IMPORTED_MODULE_5__.Mesh && child.geometry instanceof three__WEBPACK_IMPORTED_MODULE_5__.SphereGeometry) {\n      child.geometry.dispose();\n      child.geometry = new three__WEBPACK_IMPORTED_MODULE_5__.SphereGeometry(newRadius, child.geometry.parameters.widthSegments, child.geometry.parameters.heightSegments);\n    }\n  });\n}\n\n// 修改圆柱半径\nfunction changeCylindersRadius(group, newRadius) {\n  if (!group) return;\n  group.traverse(function (child) {\n    if (child.isMesh && child.geometry instanceof three__WEBPACK_IMPORTED_MODULE_5__.CylinderGeometry) {\n      var oldGeo = child.geometry;\n      child.geometry.dispose();\n      child.geometry = new three__WEBPACK_IMPORTED_MODULE_5__.CylinderGeometry(newRadius, newRadius, oldGeo.parameters.height, oldGeo.parameters.radialSegments, oldGeo.parameters.heightSegments, oldGeo.parameters.openEnded);\n    }\n  });\n}\n\n// 加载模型\nfunction loadMesh(meshData, material) {\n  var container = new three__WEBPACK_IMPORTED_MODULE_5__.Object3D();\n  var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry();\n  var vertices = new Float32Array(meshData.vertices.length * 3);\n  meshData.vertices.forEach(function (v, i) {\n    vertices[i * 3] = v.x;\n    vertices[i * 3 + 1] = v.y;\n    vertices[i * 3 + 2] = v.z;\n  });\n  geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_5__.BufferAttribute(vertices, 3));\n  var indices = [];\n  meshData.faces.forEach(function (face) {\n    if (face.length === 3) indices.push.apply(indices, _toConsumableArray(face));\n  });\n  geometry.setIndex(indices);\n  geometry.computeVertexNormals();\n  var mesh = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, material);\n  mesh.material.side = three__WEBPACK_IMPORTED_MODULE_5__.DoubleSide;\n  geometry.computeBoundingBox();\n  var aabb = geometry.boundingBox;\n  var objSize = aabb.max.sub(aabb.min).length();\n  var scaleFactor = 100 / objSize;\n  var _createWireframeAndVe = createWireframeAndVertices(meshData.edges, {\n      cylinderRadius: 0.5 / scaleFactor\n    }),\n    wireframeGroup = _createWireframeAndVe.wireframeGroup,\n    verticesGroup = _createWireframeAndVe.verticesGroup;\n  container.add(mesh);\n  container.add(wireframeGroup);\n  container.add(verticesGroup);\n  container.scale.setScalar(scaleFactor);\n  scene.add(container);\n  render();\n  return {\n    scaleFactor: scaleFactor,\n    solidGroup: container,\n    facesGroup: mesh,\n    wireframeGroup: wireframeGroup,\n    verticesGroup: verticesGroup\n  };\n}\nfunction load4DMesh(meshData, material) {\n  var container = new three__WEBPACK_IMPORTED_MODULE_5__.Object3D();\n  var geometry = new three__WEBPACK_IMPORTED_MODULE_5__.BufferGeometry();\n\n  // 这里 position 属性虽然没有实际作用，但是必须得写，防止着色器报错\n  var vertices = new Float32Array(meshData.vertices.length * 3);\n  meshData.vertices.forEach(function (v, i) {\n    vertices[i * 3] = v.x;\n    vertices[i * 3 + 1] = v.y;\n    vertices[i * 3 + 2] = v.z;\n  });\n  geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_5__.BufferAttribute(vertices, 3));\n  var vertices4D = new Float32Array(meshData.vertices.length * 4);\n  meshData.vertices.forEach(function (v, i) {\n    vertices4D[i * 4] = v.x;\n    vertices4D[i * 4 + 1] = v.y;\n    vertices4D[i * 4 + 2] = v.z;\n    vertices4D[i * 4 + 3] = v.w;\n  });\n  geometry.setAttribute('position4D', new three__WEBPACK_IMPORTED_MODULE_5__.BufferAttribute(vertices4D, 4));\n  var indices = [];\n  meshData.faces.forEach(function (face) {\n    if (face.length === 3) indices.push.apply(indices, _toConsumableArray(face));\n  });\n  geometry.setIndex(indices);\n  geometry.computeVertexNormals();\n  var mesh = new three__WEBPACK_IMPORTED_MODULE_5__.Mesh(geometry, material);\n  mesh.material.side = three__WEBPACK_IMPORTED_MODULE_5__.DoubleSide;\n  geometry.computeBoundingBox();\n  var aabb = geometry.boundingBox;\n  var objSize = aabb.max.sub(aabb.min).length();\n  var scaleFactor = 100 / objSize;\n  var _create4DWireframeAnd = create4DWireframeAndVertices(meshData.edges, {\n      cylinderRadius: 0.5 / scaleFactor\n    }),\n    wireframeGroup = _create4DWireframeAnd.wireframeGroup,\n    verticesGroup = _create4DWireframeAnd.verticesGroup;\n  container.add(mesh);\n  // container.add(wireframeGroup);\n  container.add(verticesGroup);\n  container.scale.setScalar(scaleFactor);\n  scene.add(container);\n  render();\n\n  // return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};\n  return {\n    scaleFactor: scaleFactor,\n    solidGroup: container,\n    facesGroup: mesh,\n    wireframeGroup: null,\n    verticesGroup: verticesGroup\n  };\n}\n\n// 加载 OFF\nfunction loadMeshFromOffData(data, material) {\n  var mesh = (0,_offProcessor_js__WEBPACK_IMPORTED_MODULE_0__.parseOFF)(data);\n  var processedMesh = (0,_offProcessor_js__WEBPACK_IMPORTED_MODULE_0__.processMeshData)(mesh);\n  var _loadMesh = loadMesh(processedMesh, material);\n  scaleFactor = _loadMesh.scaleFactor;\n  solidGroup = _loadMesh.solidGroup;\n  facesGroup = _loadMesh.facesGroup;\n  wireframeGroup = _loadMesh.wireframeGroup;\n  verticesGroup = _loadMesh.verticesGroup;\n}\nfunction loadMeshFrom4OffData(data, material) {\n  var mesh = (0,_offProcessor4D_js__WEBPACK_IMPORTED_MODULE_1__.parse4OFF)(data);\n  var processedMesh = (0,_offProcessor4D_js__WEBPACK_IMPORTED_MODULE_1__.process4DMeshData)(mesh);\n  var _load4DMesh = load4DMesh(processedMesh, material);\n  scaleFactor = _load4DMesh.scaleFactor;\n  solidGroup = _load4DMesh.solidGroup;\n  facesGroup = _load4DMesh.facesGroup;\n  wireframeGroup = _load4DMesh.wireframeGroup;\n  verticesGroup = _load4DMesh.verticesGroup;\n}\nfunction loadMeshFromUrl(url, material) {\n  return new Promise(function (resolve, reject) {\n    fetch(url).then(function (response) {\n      if (!response.ok) {\n        throw new Error('网络响应不正常');\n      }\n      return response.text();\n    }).then(function (data) {\n      loadMeshFromOffData(data, material);\n      resolve();\n    });\n  });\n}\n\n// 释放组\nfunction disposeGroup(group) {\n  group.traverse(function (child) {\n    if (child.isMesh) {\n      var _child$geometry, _child$material;\n      (_child$geometry = child.geometry) === null || _child$geometry === void 0 || _child$geometry.dispose();\n      (_child$material = child.material) === null || _child$material === void 0 || _child$material.dispose();\n    }\n  });\n  group.clear();\n}\nvar material = new three__WEBPACK_IMPORTED_MODULE_5__.MeshPhongMaterial({\n  color: 0x555555,\n  specular: 0x222222,\n  shininess: 50,\n  flatShading: true\n});\nloadMeshFromUrl(_assets_models_tri_off__WEBPACK_IMPORTED_MODULE_2__, material);\n\n// 事件监听\nfunction updateProperties() {\n  changeMaterialProperty(facesGroup, 'visible', faceVisibleSwitcher.checked);\n  changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked);\n  changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked);\n  changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked);\n  changeMaterialProperty(facesGroup, 'transparent', true);\n  changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value);\n  changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor);\n  changeSpheresRadius(verticesGroup, +wireframeAndVerticesDimSlider.value / scaleFactor * 2);\n}\nfaceVisibleSwitcher.addEventListener('change', updateProperties);\nwireframeVisibleSwitcher.addEventListener('change', updateProperties);\nverticesVisibleSwitcher.addEventListener('change', updateProperties);\naxisVisibleSwitcher.addEventListener('change', updateProperties);\nfacesOpacitySlider.addEventListener('input', updateProperties);\nwireframeAndVerticesDimSlider.addEventListener('input', updateProperties);\nfileInput.addEventListener('change', function (e) {\n  var file = e.target.files[0];\n  if (!file) return;\n  var reader = new FileReader();\n  reader.onload = /*#__PURE__*/function () {\n    var _ref8 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {\n      var data, material;\n      return _regeneratorRuntime().wrap(function _callee2$(_context2) {\n        while (1) switch (_context2.prev = _context2.next) {\n          case 0:\n            data = e.target.result;\n            if (solidGroup) {\n              disposeGroup(solidGroup);\n              scene.remove(solidGroup);\n            }\n            material = new three__WEBPACK_IMPORTED_MODULE_5__.MeshPhongMaterial({\n              color: 0x555555,\n              specular: 0x222222,\n              shininess: 50,\n              flatShading: true\n            });\n            material.onBeforeCompile = function (shader) {\n              shader.vertexShader = \"\\n            vec3 stereographicProjection(vec4 point4D) {\\n              return 3.0 * point4D.xyz / (3.0 - point4D.w);\\n            }\\n            attribute vec4 position4D;\\n            \".concat(shader.vertexShader, \"\\n          \");\n              shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', \"\\n            #include <begin_vertex>\\n            transformed = stereographicProjection(position4D);\\n            \");\n            };\n            loadMeshFrom4OffData(data, material);\n            updateProperties();\n          case 6:\n          case \"end\":\n            return _context2.stop();\n        }\n      }, _callee2);\n    }));\n    return function (_x2) {\n      return _ref8.apply(this, arguments);\n    };\n  }();\n  reader.readAsText(file);\n});\n\n//# sourceURL=webpack:///./src/viewer.js?");
 
 /***/ })
 
@@ -987,6 +193,17 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/publicPath */
 /******/ 	(() => {
 /******/ 		var scriptUrl;
@@ -1018,7 +235,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 /******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
-/******/ 			57: 0
+/******/ 			"index": 0
 /******/ 		};
 /******/ 		
 /******/ 		// no chunk on demand loading
@@ -1073,7 +290,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `body {
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [96], () => (__webpack_require__(73)))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["vendors"], () => (__webpack_require__("./src/index.js")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
