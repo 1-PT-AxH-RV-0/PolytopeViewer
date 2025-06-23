@@ -60,9 +60,84 @@ vec3 transformCylinderPoint(vec3 point, vec3 v1, vec3 v2) {
 `
 
 const schlegelProjection = `
+uniform float projectionDistance;
 vec3 schlegelProjection(vec4 point4D) {
-  return 3.0 * point4D.xyz / (3.0 - point4D.w);
+  return projectionDistance * point4D.xyz / (projectionDistance - point4D.w);
 }
 `
 
-export default { schlegelProjection, transformCylinderPoint};
+const create4DRotationMat = `
+mat4 create4DRotationMat(float xy_deg, float xz_deg, float xw_deg, 
+                         float yz_deg, float yw_deg, float zw_deg) {
+    // 将角度转换为弧度
+    float xy = radians(xy_deg);
+    float xz = radians(xz_deg);
+    float xw = radians(xw_deg);
+    float yz = radians(yz_deg);
+    float yw = radians(yw_deg);
+    float zw = radians(zw_deg);
+    
+    // 计算各旋转角度的正弦和余弦
+    float cxy = cos(xy), sxy = sin(xy);
+    float cxz = cos(xz), sxz = sin(xz);
+    float cxw = cos(xw), sxw = sin(xw);
+    float cyz = cos(yz), syz = sin(yz);
+    float cyw = cos(yw), syw = sin(yw);
+    float czw = cos(zw), szw = sin(zw);
+    
+    // 初始化六个基本旋转矩阵
+    mat4 Rxy = mat4(
+        cxy, -sxy, 0.0, 0.0,
+        sxy,  cxy, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    );
+    
+    mat4 Rxz = mat4(
+        cxz, 0.0, -sxz, 0.0,
+        0.0, 1.0,  0.0, 0.0,
+        sxz, 0.0,  cxz, 0.0,
+        0.0, 0.0,  0.0, 1.0
+    );
+    
+    mat4 Rxw = mat4(
+        cxw, 0.0, 0.0, -sxw,
+        0.0, 1.0, 0.0,  0.0,
+        0.0, 0.0, 1.0,  0.0,
+        sxw, 0.0, 0.0,  cxw
+    );
+    
+    mat4 Ryz = mat4(
+        1.0,  0.0, 0.0, 0.0,
+        0.0,  cyz, -syz, 0.0,
+        0.0,  syz,  cyz, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    );
+    
+    mat4 Ryw = mat4(
+        1.0, 0.0,  0.0, 0.0,
+        0.0, cyw,  0.0, -syw,
+        0.0, 0.0,  1.0, 0.0,
+        0.0, syw,  0.0, cyw
+    );
+    
+    mat4 Rzw = mat4(
+        1.0, 0.0, 0.0,  0.0,
+        0.0, 1.0, 0.0,  0.0,
+        0.0, 0.0, czw, -szw,
+        0.0, 0.0, szw,  czw
+    );
+    
+    // 组合所有旋转（顺序会影响最终结果）
+    return Rzw * Ryw * Ryz * Rxw * Rxz * Rxy;
+}
+
+mat4 create4DRotationMat(float rotation4D[6]) {
+    return create4DRotationMat(rotation4D[0], rotation4D[1], rotation4D[2], 
+                               rotation4D[3], rotation4D[4], rotation4D[5]);
+}
+`
+
+const rotationArrUni = 'uniform float rotation4D[6];'
+
+export default { schlegelProjection, create4DRotationMat, transformCylinderPoint, rotationArrUni };

@@ -5,6 +5,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 
 import shaderFuncs from './GLSLs.js'
+import { createSphereGeometry, createCylinderGeometry, create4DSphereMesh } from './geometries.js'
 import { processMeshData, parseOFF } from './offProcessor.js'
 import { process4DMeshData, parse4OFF } from './offProcessor4D.js'
 import url from '../assets/models/tri.off'
@@ -16,9 +17,12 @@ const verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher
 const axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher')
 const facesOpacitySlider = document.getElementById('facesOpacitySlider')
 const wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider')
+const projectionDistanceSlider = document.getElementById('projectionDistanceSlider')
 const fileInput = document.getElementById('fileInput')
 
-let scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup;
+const rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i => document.getElementById(`rot${i}Slider`));
+
+let scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup, facesMaterial, cylinderMaterial, sphereMaterial;
 
 // 初始化渲染器
 const dpr = window.devicePixelRatio || 1;
@@ -319,210 +323,6 @@ function createWireframeAndVertices(edges, {
     return { wireframeGroup, verticesGroup };
 }
 
-function create4DSphereGeometry(center, radius, widthSegments = 16, heightSegments = 16) {
-    const {x, y, z, w} = center;
-    const vertices = [];
-    const indices = [];
-    
-    // 生成顶点 (包含4D坐标)
-    for (let iy = 0; iy <= heightSegments; iy++) {
-        const v = iy / heightSegments;
-        const phi = v * Math.PI; // 纬度角度 [0, π]
-        
-        for (let ix = 0; ix <= widthSegments; ix++) {
-            const u = ix / widthSegments;
-            const theta = u * Math.PI * 2; // 经度角度 [0, 2π]
-            
-            // 球面坐标计算
-            const sinPhi = Math.sin(phi);
-            const cosPhi = Math.cos(phi);
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
-            
-            // 3D球面坐标 + 保持原始w坐标
-            vertices.push(
-                x + radius * sinPhi * cosTheta, // x
-                y + radius * cosPhi,            // y
-                z + radius * sinPhi * sinTheta, // z
-                w                               // w (保持4D中心点的w值)
-            );
-        }
-    }
-    
-    // 生成索引 (三角形面)
-    for (let iy = 0; iy < heightSegments; iy++) {
-        for (let ix = 0; ix < widthSegments; ix++) {
-            const a = iy * (widthSegments + 1) + ix;
-            const b = a + 1;
-            const c = (iy + 1) * (widthSegments + 1) + ix;
-            const d = c + 1;
-            
-            // 避免在极点生成退化三角形
-            if (iy > 0) {
-                indices.push(a, b, d);
-                indices.push(a, d, c);
-            }
-            // 处理南极区域
-            if (iy < heightSegments - 1) {
-                indices.push(b, d, a);
-                indices.push(d, c, a);
-            }
-        }
-    }
-    
-    // 创建BufferGeometry
-    const geometry = new THREE.BufferGeometry();
-    
-    // 这个 dummyVertices 是为了防上着色器报错，没有用但是必须要写
-    const dummyVertices = []
-    for (let i = 0; i < vertices.length; i += 4) {
-      dummyVertices.push(vertices[i]);
-      dummyVertices.push(vertices[i + 1]);
-      dummyVertices.push(vertices[i + 2]);
-    };
-    geometry.setAttribute(
-      'position',
-      new THREE.BufferAttribute(new Float32Array(dummyVertices), 3)
-    );
-    
-    // 设置4D位置属性 (x,y,z,w)
-    geometry.setAttribute(
-        'position4D',
-        new THREE.BufferAttribute(new Float32Array(vertices), 4)
-    );
-    
-    // 设置索引
-    geometry.setIndex(indices);
-    geometry.computeVertexNormals();
-    
-    return geometry;
-}
-
-function createCylinderGeometry(radius = 1, height = 1, radialSegments = 8) {
-    const geometry = new THREE.BufferGeometry();
-    
-    radialSegments = Math.floor(radialSegments);
-    const heightSegments = 1;
-    
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
-    
-    let index = 0;
-    const indexArray = [];
-    const halfHeight = height / 2;
-    
-    // 侧面
-    const normal = new THREE.Vector3();
-    const vertex = new THREE.Vector3();
-    
-    //  顶点、法线和 uv
-    for (let y = 0; y <= heightSegments; y++) {
-        const indexRow = [];
-        const v = y / heightSegments;
-        
-        for (let x = 0; x <= radialSegments; x++) {
-            const u = x / radialSegments;
-            const theta = u * Math.PI * 2;
-            
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
-            
-            // 顶点
-            vertex.x = radius * sinTheta;
-            vertex.y = -v * height + halfHeight;
-            vertex.z = radius * cosTheta;
-            vertices.push(vertex.x, vertex.y, vertex.z);
-            
-            // 法向量
-            normal.set(sinTheta, 0, cosTheta).normalize();
-            normals.push(normal.x, normal.y, normal.z);
-            
-            // uv
-            uvs.push(u, 1 - v);
-            
-            indexRow.push(index++);
-        }
-        
-        indexArray.push(indexRow);
-    }
-    
-    // 索引
-    for (let x = 0; x < radialSegments; x++) {
-        const a = indexArray[0][x];
-        const b = indexArray[1][x];
-        const c = indexArray[1][x + 1];
-        const d = indexArray[0][x + 1];
-        
-        // 面
-        indices.push(a, b, d);
-        indices.push(b, c, d);
-    }
-    
-    // 顶面与底面
-    const centerIndexStart = index;
-    const uv = new THREE.Vector2();
-    
-    // 顶面中心顶点
-    vertices.push(0, halfHeight, 0);
-    normals.push(0, 1, 0);
-    uvs.push(0.5, 0.5);
-    index++;
-    
-    // 底面中心顶点
-    vertices.push(0, -halfHeight, 0);
-    normals.push(0, -1, 0);
-    uvs.push(0.5, 0.5);
-    index++;
-    
-    const centerIndexEnd = index;
-    
-    // 顶面与底面的坐标
-    for (let x = 0; x <= radialSegments; x++) {
-        const u = x / radialSegments;
-        const theta = u * Math.PI * 2;
-        
-        const cosTheta = Math.cos(theta);
-        const sinTheta = Math.sin(theta);
-        
-        vertex.x = radius * sinTheta;
-        vertex.y = halfHeight;
-        vertex.z = radius * cosTheta;
-        vertices.push(vertex.x, vertex.y, vertex.z);
-        normals.push(0, 1, 0);
-        uv.x = (cosTheta * 0.5) + 0.5;
-        uv.y = (sinTheta * 0.5) + 0.5;
-        uvs.push(uv.x, uv.y);
-        index++;
-        
-        vertex.y = -halfHeight;
-        vertices.push(vertex.x, vertex.y, vertex.z);
-        normals.push(0, -1, 0);
-        uv.y = (-sinTheta * 0.5) + 0.5;
-        uvs.push(uv.x, uv.y);
-        index++;
-    }
-    
-    // 顶面与底面的索引
-    for (let x = 0; x < radialSegments; x++) {
-        const topCenter = centerIndexStart;
-        const topEdge = centerIndexEnd + x * 2;
-        indices.push(topEdge, topEdge + 2, topCenter);
-        
-        const bottomCenter = centerIndexStart + 1;
-        const bottomEdge = centerIndexEnd + x * 2 + 1;
-        indices.push(bottomEdge + 2, bottomEdge, bottomCenter);
-    }
-    
-    geometry.setIndex(indices);
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-    
-    return geometry;
-}
-
 function create4DWireframeAndVertices(edges, { 
     cylinderRadius = 1,
     sphereRadiusMultiplier = 2,
@@ -544,9 +344,16 @@ function create4DWireframeAndVertices(edges, {
     });
         
     defaultSphereMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.projectionDistance = { value: 2.0 }
+      shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
+      defaultSphereMaterial.userData.projectionDistance = shader.uniforms.projectionDistance;
+      defaultSphereMaterial.userData.rotation4D = shader.uniforms.rotation4D;
+    
       shader.vertexShader = `
-        attribute vec4 position4D;
+        attribute vec4 center4D;
         ${shaderFuncs.schlegelProjection}
+        ${shaderFuncs.create4DRotationMat}
+        ${shaderFuncs.rotationArrUni}
         ${shader.vertexShader}
       `;
       
@@ -554,16 +361,24 @@ function create4DWireframeAndVertices(edges, {
         '#include <begin_vertex>',
         `
         #include <begin_vertex>
-        transformed = schlegelProjection(position4D);
+        vec3 center3D = schlegelProjection(create4DRotationMat(rotation4D) * center4D);
+        transformed = transformed + center3D;
         `
       );
     };
     
     defaultCylinderMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.projectionDistance = { value: 2.0 }
+      shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
+      defaultCylinderMaterial.userData.projectionDistance = shader.uniforms.projectionDistance;
+      defaultCylinderMaterial.userData.rotation4D = shader.uniforms.rotation4D;
+      
       shader.vertexShader = `
         attribute vec4 v1;
         attribute vec4 v2;
         ${shaderFuncs.schlegelProjection}
+        ${shaderFuncs.create4DRotationMat}
+        ${shaderFuncs.rotationArrUni}
         ${shaderFuncs.transformCylinderPoint}
         ${shader.vertexShader}
       `;
@@ -572,8 +387,9 @@ function create4DWireframeAndVertices(edges, {
         '#include <begin_vertex>',
         `
         #include <begin_vertex>
-        vec3 pv1 = schlegelProjection(v1);
-        vec3 pv2 = schlegelProjection(v2);
+        mat4 rotMat = create4DRotationMat(rotation4D);
+        vec3 pv1 = schlegelProjection(rotMat * v1);
+        vec3 pv2 = schlegelProjection(rotMat * v2);
         transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), pv1, pv2);
         `
       );
@@ -591,12 +407,7 @@ function create4DWireframeAndVertices(edges, {
         
         const {x: x1, y: y1, z: z1, w: w1} = start;
         const {x: x2, y: y2, z: z2, w: w2} = end;
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const dz = z2 - z1;
-        const dw = w2 - w1;
-        const height = Math.sqrt(dx*dx + dy*dy + dz*dz + dw*dw);
-        
+
         const geometry = createCylinderGeometry(cylinderRadius)
         const vertexCount = geometry.attributes.position.count;
         const v1Arr = new Float32Array(vertexCount * 4)
@@ -615,29 +426,19 @@ function create4DWireframeAndVertices(edges, {
         wireframeGroup.add(cylinder);
         
         if (!uniquePoints.has(startKey)) {
-            const sphereGeometry = create4DSphereGeometry(start, sphereRadius)
-            
-            const sphere = new THREE.Mesh(
-                sphereGeometry,
-                defaultSphereMaterial
-            );
+            const sphere = create4DSphereMesh(start, sphereRadius, defaultSphereMaterial);
             verticesGroup.add(sphere);
             uniquePoints.add(startKey);
         }
         
         if (!uniquePoints.has(endKey)) {
-            const sphereGeometry = create4DSphereGeometry(end, sphereRadius)
-            
-            const sphere = new THREE.Mesh(
-                sphereGeometry,
-                defaultSphereMaterial
-            );
+            const sphere = create4DSphereMesh(end, sphereRadius, defaultSphereMaterial);
             verticesGroup.add(sphere);
             uniquePoints.add(endKey);
         }
     });
 
-    return { wireframeGroup, verticesGroup };
+    return { wireframeGroup, verticesGroup, cylinderMaterial: defaultCylinderMaterial, sphereMaterial: defaultSphereMaterial };
 }
 
 // 修改材质属性
@@ -670,6 +471,15 @@ function changeSpheresRadius(group, newRadius) {
         child.geometry.parameters.widthSegments,
         child.geometry.parameters.heightSegments
       );
+    } else if (child instanceof THREE.Mesh && child.geometry instanceof THREE.BufferGeometry) {
+      const centerAttr = child.geometry.getAttribute('center4D');
+      child.geometry.dispose();
+      child.geometry = createSphereGeometry(
+        newRadius,
+        child.geometry.parameters.widthSegments,
+        child.geometry.parameters.heightSegments
+      );
+      child.geometry.setAttribute('center4D', centerAttr)
     }
   });
 }
@@ -687,9 +497,21 @@ function changeCylindersRadius(group, newRadius) {
         newRadius,
         oldGeo.parameters.height,
         oldGeo.parameters.radialSegments,
-        oldGeo.parameters.heightSegments,
-        oldGeo.parameters.openEnded
+        oldGeo.parameters.heightSegments
       );
+    } else if (child instanceof THREE.Mesh && child.geometry instanceof THREE.BufferGeometry) {
+      const v1Attr = child.geometry.getAttribute('v1');
+      const v2Attr = child.geometry.getAttribute('v2');
+      
+      child.geometry.dispose();
+      child.geometry = createCylinderGeometry(
+        newRadius,
+        1,
+        child.geometry.parameters.radialSegments,
+        child.geometry.parameters.heightSegments
+      );
+      child.geometry.setAttribute('v1', v1Attr)
+      child.geometry.setAttribute('v2', v2Attr)
     }
   });
 }
@@ -772,7 +594,7 @@ function load4DMesh(meshData, material) {
   const objSize = aabb.max.sub(aabb.min).length();
   const scaleFactor = 100 / objSize;
   
-  const { wireframeGroup, verticesGroup } = create4DWireframeAndVertices(meshData.edges, { cylinderRadius: 0.5 / scaleFactor })
+  const { wireframeGroup, verticesGroup, cylinderMaterial, sphereMaterial } = create4DWireframeAndVertices(meshData.edges, { cylinderRadius: 0.5 / scaleFactor })
   
   container.add(mesh);
   container.add(wireframeGroup);
@@ -782,8 +604,7 @@ function load4DMesh(meshData, material) {
   scene.add(container);
   render();
   
-  // return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};
-  return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup };
+  return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup, cylinderMaterial, sphereMaterial };
 }
 
 // 加载 OFF
@@ -792,13 +613,41 @@ function loadMeshFromOffData(data, material) {
   const processedMesh = processMeshData(mesh);
 
   ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup } = loadMesh(processedMesh, material));
+  updateProperties()
 }
 
 function loadMeshFrom4OffData(data, material) {
   const mesh = parse4OFF(data)
   const processedMesh = process4DMeshData(mesh);
+  
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.projectionDistance = { value: 2.0 }
+    shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
+    material.userData.projectionDistance = shader.uniforms.projectionDistance;
+    material.userData.rotation4D = shader.uniforms.rotation4D;
+  
+    shader.vertexShader = `
+      attribute vec4 position4D;
+      ${shaderFuncs.schlegelProjection}
+      ${shaderFuncs.create4DRotationMat}
+      ${shaderFuncs.rotationArrUni}
+      ${shader.vertexShader}
+    `;
+    
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      `
+      #include <begin_vertex>
+      vec4 rotatedPosition4D = create4DRotationMat(rotation4D) * position4D;
+      transformed = schlegelProjection(rotatedPosition4D);
+      `
+    );
+  };
 
-  ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup } = load4DMesh(processedMesh, material));
+  ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup, cylinderMaterial, sphereMaterial } = load4DMesh(processedMesh, material));
+  facesMaterial = material;
+  updateProperties();
+  updateProjectionDistance();
 }
 
 function loadMeshFromUrl(url, material) {
@@ -832,7 +681,8 @@ const material = new THREE.MeshPhongMaterial({
     color: 0x555555,
     specular: 0x222222,
     shininess: 50,
-    flatShading: true
+    flatShading: true,
+    transparent: true
 });
 
 loadMeshFromUrl(url, material)
@@ -843,17 +693,39 @@ function updateProperties() {
   changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked)
   changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked)
   changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked)
-  changeMaterialProperty(facesGroup, 'transparent', true)
   changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value)
   changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor)
   changeSpheresRadius(verticesGroup, +wireframeAndVerticesDimSlider.value / scaleFactor * 2)
 }
-faceVisibleSwitcher.addEventListener('change', updateProperties)
-wireframeVisibleSwitcher.addEventListener('change', updateProperties)
-verticesVisibleSwitcher.addEventListener('change', updateProperties)
-axisVisibleSwitcher.addEventListener('change', updateProperties)
-facesOpacitySlider.addEventListener('input', updateProperties)
-wireframeAndVerticesDimSlider.addEventListener('input', updateProperties)
+faceVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(facesGroup, 'visible', faceVisibleSwitcher.checked))
+wireframeVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked))
+verticesVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked))
+axisVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked))
+facesOpacitySlider.addEventListener('input', () => changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value))
+wireframeAndVerticesDimSlider.addEventListener('input', () => {
+  changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor)
+  changeSpheresRadius(verticesGroup, +wireframeAndVerticesDimSlider.value / scaleFactor * 2)
+})
+
+function updateProjectionDistance() {
+  facesMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
+  cylinderMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
+  sphereMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
+}
+projectionDistanceSlider.addEventListener('input', updateProjectionDistance)
+function updateRotation() {
+  const rotations = rotationSliders.map(i => +i.value);
+  facesMaterial.userData.rotation4D.value = rotations;
+  cylinderMaterial.userData.rotation4D.value = rotations;
+  sphereMaterial.userData.rotation4D.value = rotations;
+}
+rotationSliders.forEach((slider, i) => {
+  slider.addEventListener('input', () => { 
+    facesMaterial.userData.rotation4D.value[i] = +slider.value;
+    cylinderMaterial.userData.rotation4D.value[i] = +slider.value;
+    sphereMaterial.userData.rotation4D.value[i] = +slider.value;
+  })
+})
 
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -872,27 +744,11 @@ fileInput.addEventListener('change', (e) => {
             color: 0x555555,
             specular: 0x222222,
             shininess: 50,
-            flatShading: true
+            flatShading: true,
+            transparent: true
         });
         
-        material.onBeforeCompile = (shader) => {
-          shader.vertexShader = `
-            attribute vec4 position4D;
-            ${shaderFuncs.schlegelProjection}
-            ${shader.vertexShader}
-          `;
-          
-          shader.vertexShader = shader.vertexShader.replace(
-            '#include <begin_vertex>',
-            `
-            #include <begin_vertex>
-            transformed = schlegelProjection(position4D);
-            `
-          );
-        };
-        
         loadMeshFrom4OffData(data, material)
-        updateProperties()
     };
     reader.readAsText(file);
 });
