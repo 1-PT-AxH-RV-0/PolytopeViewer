@@ -211,7 +211,7 @@ function createCylinderGeometry(radius = 1, height = 1, radialSegments = 8, heig
 }
 
 function create4DSphereMesh({x, y, z, w} = {x:0, y:0, z:0, w:0}, sphereRadius, material) {
-  const sphereGeometry = createSphereGeometry(sphereRadius)
+  const sphereGeometry = createSphereGeometry(sphereRadius, 16, 16);
   const vertexCount = sphereGeometry.attributes.position.count;
   const centerArr = new Float32Array(vertexCount * 4);
   for (let i = 0; i < vertexCount; i++) {
@@ -223,7 +223,6 @@ function create4DSphereMesh({x, y, z, w} = {x:0, y:0, z:0, w:0}, sphereRadius, m
       sphereGeometry,
       material
   );
-  
   return sphere;
 }
 

@@ -23,6 +23,7 @@ const fileInput = document.getElementById('fileInput')
 const rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i => document.getElementById(`rot${i}Slider`));
 
 let scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup, facesMaterial, cylinderMaterial, sphereMaterial;
+let is4D = false;
 
 // 初始化渲染器
 const dpr = window.devicePixelRatio || 1;
@@ -648,6 +649,7 @@ function loadMeshFrom4OffData(data, material) {
   facesMaterial = material;
   updateProperties();
   updateProjectionDistance();
+  updateRotation();
 }
 
 function loadMeshFromUrl(url, material) {
@@ -740,6 +742,8 @@ fileInput.addEventListener('change', (e) => {
           scene.remove(solidGroup)
         }
         
+        is4D = data.split('\n').filter(line => line.trim() !== '' && !line.startsWith('#'))[0].trim() === '4OFF';
+        
         const material = new THREE.MeshPhongMaterial({
             color: 0x555555,
             specular: 0x222222,
@@ -748,7 +752,17 @@ fileInput.addEventListener('change', (e) => {
             transparent: true
         });
         
-        loadMeshFrom4OffData(data, material)
+        if (is4D) {
+          loadMeshFrom4OffData(data, material)
+          rotationSliders[2].disabled = false;
+          rotationSliders[4].disabled = false;
+          rotationSliders[5].disabled = false;
+        } else {
+          loadMeshFromOffData(data, material)
+          rotationSliders[2].disabled = true;
+          rotationSliders[4].disabled = true;
+          rotationSliders[5].disabled = true;
+        }
     };
     reader.readAsText(file);
 });
