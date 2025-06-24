@@ -1,17 +1,14 @@
 import * as THREE from 'three';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
-import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-import { set } from 'lodash';
 
+import createAxes from './axesCreater.js'
 import shaderFuncs from './GLSLs.js'
 import shaderCompCallback from './shaderCompCallback.js'
+import {getFarthestPointDist, getFarthest4DPointDist, changeMaterialProperty, changeSpheresRadius, changeCylindersRadius, disposeGroup} from './helperFunc.js'
 import { create4DSphereMesh, toBufferGeometry } from './geometries.js'
 import { processMeshData, parseOFF } from './offProcessor.js'
 import { process4DMeshData, parse4OFF } from './offProcessor4D.js'
 import url from '../assets/models/tri.off'
-import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json'
 
 const faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher')
 const wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher')
@@ -86,152 +83,9 @@ function render() {
     renderer.render( scene, camera );
 }
 
-//添加坐标轴
-const axisLength = 100;
-const cylinderRadius = 0.5;
-const coneRadius = 2;
-const coneHeight = 6;
-const textSize = 5;
-const textOffset = 7;
-
-function createMaterial(color) {
-    return new THREE.MeshPhongMaterial({ 
-        color: color, 
-        shininess: 40 
-    });
-}
-
-// 加载字体
-function loadFontAsync(url) {
-  return new Promise((resolve, reject) => {
-    const loader = new FontLoader();
-    loader.load(
-      url,
-      (font) => resolve(font),
-      undefined,
-      (error) => reject(error)
-    );
-  });
-}
-
-function createAxisCylinderMesh(axis, color) {
-  const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1));
-  const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
-  for (let i = 0; i < vertexCount; i++) {
-    axisArr[i] = axis;
-    lenArr[i] = axisLength / 2;
-  }
-  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
-  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  
-  let material = createMaterial(color);
-  material = shaderCompCallback.axisMaterial(material, rotUni, projDistUni);
-  
-  const cylinder = new THREE.Mesh(
-      geometry,
-      material
-  );
-  
-  return cylinder;
-}
-
-function createAxisConeMesh(axis, color) {
-  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1))
-  const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
-  const heightArr = new Float32Array(vertexCount)
-  for (let i = 0; i < vertexCount; i++) {
-    axisArr[i] = axis;
-    lenArr[i] = axisLength / 2;
-    heightArr[i] = coneHeight;
-  }
-  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
-  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  geometry.setAttribute('height', new THREE.Float32BufferAttribute(heightArr, 1));
-  
-  let material = createMaterial(color);
-  material = shaderCompCallback.axisConeMaterial(material, rotUni, projDistUni);
-  
-  const cone = new THREE.Mesh(
-      geometry,
-      material
-  );
-  
-  return cone;
-}
-
-function createAxisLabelMesh(axis, color, text, font) {
-  const geometry = toBufferGeometry(new TextGeometry(text, {
-      font: font,
-      size: textSize,
-      depth: cylinderRadius * 2,
-      curveSegments: 12
-  }));
-
-  geometry.computeBoundingBox();
-  geometry.center();
-  
-  const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
-  const offsetArr = new Float32Array(vertexCount)
-  for (let i = 0; i < vertexCount; i++) {
-    axisArr[i] = axis;
-    lenArr[i] = axisLength / 2;
-    offsetArr[i] = coneHeight + textOffset;
-  }
-  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
-  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  geometry.setAttribute('offset', new THREE.Float32BufferAttribute(offsetArr, 1));
-  
-  let material = createMaterial(color);
-  material = shaderCompCallback.axisLabelMaterial(material, rotUni, projDistUni);
-  
-  const label = new THREE.Mesh(
-      geometry,
-      material
-  );
-  
-  return label;
-}
-
-async function createAxes() {
-  const font = await loadFontAsync(fontUrl)
-  const container = new THREE.Group();
-  
-  const cylinderX = createAxisCylinderMesh(0, 0xff0000)
-  const coneX = createAxisConeMesh(0, 0xff0000)
-  const labelX = createAxisLabelMesh(0, 0xff0000, 'X', font)
-  
-  const cylinderY = createAxisCylinderMesh(1, 0x00ff00)
-  const coneY = createAxisConeMesh(1, 0x00ff00)
-  const labelY = createAxisLabelMesh(1, 0x00ff00, 'Y', font)
-  
-  const cylinderZ = createAxisCylinderMesh(2, 0x0000ff)
-  const coneZ = createAxisConeMesh(2, 0x0000ff)
-  const labelZ = createAxisLabelMesh(2, 0x0000ff, 'Z', font)
-  
-  const cylinderW = createAxisCylinderMesh(3, 0xf07026)
-  const coneW = createAxisConeMesh(3, 0xf07026)
-  const labelW = createAxisLabelMesh(3, 0xf07026, 'W', font)
-  
-  container.add(cylinderX, coneX, labelX)
-  container.add(cylinderY, coneY, labelY)
-  container.add(cylinderZ, coneZ, labelZ)
-  container.add(cylinderW, coneW, labelW)
-  scene.add(container)
-  
-  return container;
-}
-
-
 (async () => {
-  axesGroup = await createAxes();
+  axesGroup = await createAxes(scene, rotUni, projDistUni);
 })()
-
 
 // 添加光源
 const directionalLight = new THREE.DirectionalLight(0xffffff);
@@ -362,7 +216,7 @@ function create4DWireframeAndVertices(edges, {
         const {x: x1, y: y1, z: z1, w: w1} = start;
         const {x: x2, y: y2, z: z2, w: w2} = end;
 
-        const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius));
+        const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 5));
         const vertexCount = geometry.attributes.position.count;
         const v1Arr = new Float32Array(vertexCount * 4)
         const v2Arr = new Float32Array(vertexCount * 4)
@@ -395,82 +249,6 @@ function create4DWireframeAndVertices(edges, {
     return { wireframeGroup, verticesGroup, cylinderMaterial: defaultCylinderMaterial, sphereMaterial: defaultSphereMaterial };
 }
 
-// 修改材质属性
-function changeMaterialProperty(group, propertyName, newValue) {
-    if (!group) return;
-    group.traverse((child) => {
-        if (child.isMesh && child.material) {
-            if (!Array.isArray(child.material)) {
-                set(child.material, propertyName, newValue);
-                child.material.needsUpdate = true;
-            } 
-            else {
-                for (let material of child.material) {
-                    set(material, propertyName, newValue);
-                    material.needsUpdate = true;
-                }
-            }
-        }
-    });
-}
-
-// 修改球体半径
-function changeSpheresRadius(group, newRadius) {
-  if (!group) return;
-  group.children.forEach(child => {
-    if (child instanceof THREE.Mesh && child.geometry instanceof THREE.SphereGeometry) {
-      child.geometry.dispose();
-      child.geometry = new THREE.SphereGeometry(
-        newRadius,
-        child.geometry.parameters.widthSegments,
-        child.geometry.parameters.heightSegments
-      );
-    } else if (child instanceof THREE.Mesh && child.geometry instanceof THREE.BufferGeometry) {
-      const centerAttr = child.geometry.getAttribute('center4D');
-      child.geometry.dispose();
-      child.geometry = toBufferGeometry(new THREE.SphereGeometry(
-        newRadius,
-        child.geometry.parameters.widthSegments,
-        child.geometry.parameters.heightSegments
-      ));
-      child.geometry.setAttribute('center4D', centerAttr)
-    }
-  });
-}
-
-// 修改圆柱半径
-function changeCylindersRadius(group, newRadius) {
-  if (!group) return;
-  group.traverse(child => {
-    if (child.isMesh && child.geometry instanceof THREE.CylinderGeometry) {
-      const oldGeo = child.geometry;
-
-      child.geometry.dispose();
-      child.geometry = new THREE.CylinderGeometry(
-        newRadius,
-        newRadius,
-        oldGeo.parameters.height,
-        oldGeo.parameters.radialSegments,
-        oldGeo.parameters.heightSegments
-      );
-    } else if (child instanceof THREE.Mesh && child.geometry instanceof THREE.BufferGeometry) {
-      const v1Attr = child.geometry.getAttribute('v1');
-      const v2Attr = child.geometry.getAttribute('v2');
-      
-      child.geometry.dispose();
-      child.geometry = toBufferGeometry(new THREE.CylinderGeometry(
-        newRadius,
-        newRadius,
-        1,
-        child.geometry.parameters.radialSegments,
-        child.geometry.parameters.heightSegments
-      ));
-      child.geometry.setAttribute('v1', v1Attr)
-      child.geometry.setAttribute('v2', v2Attr)
-    }
-  });
-}
-
 // 加载模型
 function loadMesh(meshData, material) {
   const container = new THREE.Object3D();
@@ -493,11 +271,7 @@ function loadMesh(meshData, material) {
   
   const mesh = new THREE.Mesh(geometry, material);
   mesh.material.side = THREE.DoubleSide;
-  geometry.computeBoundingBox();
-  
-  const aabb = geometry.boundingBox;
-  const objSize = aabb.max.sub(aabb.min).length();
-  const scaleFactor = 100 / objSize;
+  const scaleFactor = 40 / getFarthestPointDist(meshData.vertices);
   
   const { wireframeGroup, verticesGroup } = createWireframeAndVertices(meshData.edges, { cylinderRadius: 0.5 / scaleFactor })
   
@@ -510,14 +284,6 @@ function loadMesh(meshData, material) {
   render();
   
   return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};
-}
-
-function getFarthestPointDist(points) {
-    const getDist = p => Math.sqrt(p.x ** 2 + p.y ** 2 + p.z ** 2)
-    return getDist(points.reduce((farthest, point) => {
-      const dist = point.x ** 2 + point.y ** 2 + point.z ** 2;
-      return dist > (farthest.dist || -1) ? { point, dist } : farthest;
-    }, {}).point);
 }
 
 function load4DMesh(meshData, material) {
@@ -551,6 +317,8 @@ function load4DMesh(meshData, material) {
   
   const mesh = new THREE.Mesh(geometry, material);
   mesh.material.side = THREE.DoubleSide;
+  projectionDistanceSlider.value = getFarthest4DPointDist(meshData.vertices) * 1.1;
+  updateProjectionDistance()
   const scaleFactor = 40 / getFarthestPointDist(meshData.vertices.map(p => {
     const d = +projectionDistanceSlider.value;
     const s = d / (d + p.w)
@@ -607,17 +375,6 @@ function loadMeshFromUrl(url, material) {
         resolve()
       })
   })
-}
-
-// 释放组
-function disposeGroup(group) {
-    group.traverse((child) => {
-        if (child.isMesh) {
-            child.geometry?.dispose();
-            child.material?.dispose();
-        }
-    });
-    group.clear();
 }
 
 const material = new THREE.MeshPhongMaterial({
