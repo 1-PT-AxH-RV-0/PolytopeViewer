@@ -11,7 +11,7 @@ function toBufferGeometry(source) {
 };
 
 function create4DSphereMesh({x, y, z, w} = {x:0, y:0, z:0, w:0}, sphereRadius, material) {
-  const sphereGeometry = toBufferGeometry(new THREE.SphereGeometry(sphereRadius, 16, 16));
+  const sphereGeometry = toBufferGeometry(new THREE.SphereGeometry(sphereRadius, 5, 5));
   const vertexCount = sphereGeometry.attributes.position.count;
   const centerArr = new Float32Array(vertexCount * 4);
   for (let i = 0; i < vertexCount; i++) {
