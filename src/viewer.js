@@ -3,9 +3,11 @@ import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+import { set } from 'lodash';
 
 import shaderFuncs from './GLSLs.js'
-import { createSphereGeometry, createCylinderGeometry, create4DSphereMesh } from './geometries.js'
+import shaderCompCallback from './shaderCompCallback.js'
+import { create4DSphereMesh, toBufferGeometry } from './geometries.js'
 import { processMeshData, parseOFF } from './offProcessor.js'
 import { process4DMeshData, parse4OFF } from './offProcessor4D.js'
 import url from '../assets/models/tri.off'
@@ -21,8 +23,10 @@ const projectionDistanceSlider = document.getElementById('projectionDistanceSlid
 const fileInput = document.getElementById('fileInput')
 
 const rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i => document.getElementById(`rot${i}Slider`));
+const rotUni = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] };
+const projDistUni = { value: 2.0 };
 
-let scaleFactor, axis, solidGroup, facesGroup, wireframeGroup, verticesGroup, facesMaterial, cylinderMaterial, sphereMaterial;
+let scaleFactor, axesGroup, solidGroup, facesGroup, wireframeGroup, verticesGroup, facesMaterial, cylinderMaterial, sphereMaterial;
 let is4D = false;
 
 // 初始化渲染器
@@ -85,10 +89,17 @@ function render() {
 //添加坐标轴
 const axisLength = 100;
 const cylinderRadius = 0.5;
-const coneRadius = 1;
-const coneHeight = 3;
+const coneRadius = 2;
+const coneHeight = 6;
 const textSize = 5;
-const textOffset = 5;
+const textOffset = 7;
+
+function createMaterial(color) {
+    return new THREE.MeshPhongMaterial({ 
+        color: color, 
+        shininess: 40 
+    });
+}
 
 // 加载字体
 function loadFontAsync(url) {
@@ -103,131 +114,122 @@ function loadFontAsync(url) {
   });
 }
 
-// 创建材质
-function createMaterial(color) {
-    return new THREE.MeshPhongMaterial({ 
-        color: color, 
-        shininess: 40 
-    });
+function createAxisCylinderMesh(axis, color) {
+  const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1));
+  const vertexCount = geometry.attributes.position.count;
+  const axisArr = new Uint32Array(vertexCount)
+  const lenArr = new Float32Array(vertexCount)
+  for (let i = 0; i < vertexCount; i++) {
+    axisArr[i] = axis;
+    lenArr[i] = axisLength / 2;
+  }
+  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
+  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
+  
+  let material = createMaterial(color);
+  material = shaderCompCallback.axisMaterial(material, rotUni, projDistUni);
+  
+  const cylinder = new THREE.Mesh(
+      geometry,
+      material
+  );
+  
+  return cylinder;
 }
 
-// 创建坐标轴圆柱
-function createAxis(color, rotationAxis, rotationAngle) {
-    const geometry = new THREE.CylinderGeometry(
-        cylinderRadius,
-        cylinderRadius,
-        axisLength,
-        32
-    );
-    
-    if (rotationAxis && rotationAngle) {
-        if (rotationAxis[0] === 1) geometry.rotateX(rotationAngle);
-        else if (rotationAxis[1] === 1) geometry.rotateY(rotationAngle);
-        else if (rotationAxis[2] === 1) geometry.rotateZ(rotationAngle);
-    }
-    
-    return new THREE.Mesh(geometry, createMaterial(color));
+function createAxisConeMesh(axis, color) {
+  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1))
+  const vertexCount = geometry.attributes.position.count;
+  const axisArr = new Uint32Array(vertexCount)
+  const lenArr = new Float32Array(vertexCount)
+  const heightArr = new Float32Array(vertexCount)
+  for (let i = 0; i < vertexCount; i++) {
+    axisArr[i] = axis;
+    lenArr[i] = axisLength / 2;
+    heightArr[i] = coneHeight;
+  }
+  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
+  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
+  geometry.setAttribute('height', new THREE.Float32BufferAttribute(heightArr, 1));
+  
+  let material = createMaterial(color);
+  material = shaderCompCallback.axisConeMaterial(material, rotUni, projDistUni);
+  
+  const cone = new THREE.Mesh(
+      geometry,
+      material
+  );
+  
+  return cone;
 }
 
-// 创建箭头
-function createArrow(color, position, rotation) {
-    const geometry = new THREE.ConeGeometry(coneRadius, coneHeight, 32);
-    const mesh = new THREE.Mesh(geometry, createMaterial(color));
-    
-    mesh.position.set(...position);
-    if (rotation) mesh.setRotationFromEuler(new THREE.Euler(...rotation));
-    
-    return mesh;
+function createAxisLabelMesh(axis, color, text, font) {
+  const geometry = toBufferGeometry(new TextGeometry(text, {
+      font: font,
+      size: textSize,
+      depth: cylinderRadius * 2,
+      curveSegments: 12
+  }));
+
+  geometry.computeBoundingBox();
+  geometry.center();
+  
+  const vertexCount = geometry.attributes.position.count;
+  const axisArr = new Uint32Array(vertexCount)
+  const lenArr = new Float32Array(vertexCount)
+  const offsetArr = new Float32Array(vertexCount)
+  for (let i = 0; i < vertexCount; i++) {
+    axisArr[i] = axis;
+    lenArr[i] = axisLength / 2;
+    offsetArr[i] = coneHeight + textOffset;
+  }
+  geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
+  geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
+  geometry.setAttribute('offset', new THREE.Float32BufferAttribute(offsetArr, 1));
+  
+  let material = createMaterial(color);
+  material = shaderCompCallback.axisLabelMaterial(material, rotUni, projDistUni);
+  
+  const label = new THREE.Mesh(
+      geometry,
+      material
+  );
+  
+  return label;
 }
 
-// 创建坐标轴标签
-function createAxisLabel(text, color, font, position, axisDirection) {
-    const geometry = new TextGeometry(text, {
-        font: font,
-        size: textSize,
-        depth: cylinderRadius * 2,
-        curveSegments: 12
-    });
-
-    geometry.computeBoundingBox();
-    geometry.center();
-    
-    const mesh = new THREE.Mesh(geometry, createMaterial(color));
-    mesh.position.set(...position);
-    
-    if (axisDirection === 'y') {
-        mesh.rotation.y = Math.PI / 4;
-    } else if (axisDirection === 'z') {
-        mesh.rotation.y = Math.PI / 2;
-    }
-    
-    return mesh;
+async function createAxes() {
+  const font = await loadFontAsync(fontUrl)
+  const container = new THREE.Group();
+  
+  const cylinderX = createAxisCylinderMesh(0, 0xff0000)
+  const coneX = createAxisConeMesh(0, 0xff0000)
+  const labelX = createAxisLabelMesh(0, 0xff0000, 'X', font)
+  
+  const cylinderY = createAxisCylinderMesh(1, 0x00ff00)
+  const coneY = createAxisConeMesh(1, 0x00ff00)
+  const labelY = createAxisLabelMesh(1, 0x00ff00, 'Y', font)
+  
+  const cylinderZ = createAxisCylinderMesh(2, 0x0000ff)
+  const coneZ = createAxisConeMesh(2, 0x0000ff)
+  const labelZ = createAxisLabelMesh(2, 0x0000ff, 'Z', font)
+  
+  const cylinderW = createAxisCylinderMesh(3, 0xf07026)
+  const coneW = createAxisConeMesh(3, 0xf07026)
+  const labelW = createAxisLabelMesh(3, 0xf07026, 'W', font)
+  
+  container.add(cylinderX, coneX, labelX)
+  container.add(cylinderY, coneY, labelY)
+  container.add(cylinderZ, coneZ, labelZ)
+  container.add(cylinderW, coneW, labelW)
+  scene.add(container)
+  
+  return container;
 }
 
-// 创建完整坐标轴系统
-async function createAxes(scene) {
-    const font = await loadFontAsync(fontUrl)
-    const container = new THREE.Group();
-    
-    // X轴（红色）
-    const xAxis = createAxis(0xff0000, [0, 0, 1], Math.PI / 2);
-    // X轴箭头
-    const xArrow = createArrow(
-        0xff0000,
-        [axisLength / 2, 0, 0],
-        [0, 0, -Math.PI / 2]
-    );
-    // X轴标签
-    const xLabel = await createAxisLabel(
-        'X',
-        0xff0000,
-        font,
-        [axisLength / 2 + textOffset, 0, 0],
-        'x'
-    );
 
-    // Y轴（绿色）
-    const yAxis = createAxis(0x00ff00);
-    // Y轴箭头
-    const yArrow = createArrow(
-        0x00ff00,
-        [0, axisLength / 2, 0]
-    );
-    // Y轴标签
-    const yLabel = await createAxisLabel(
-        'Y',
-        0x00ff00,
-        font,
-        [0, axisLength / 2 + textOffset, 0],
-        'y'
-    );
-
-    // Z轴（蓝色）
-    const zAxis = createAxis(0x0000ff, [1, 0, 0], Math.PI / 2);
-    // Z轴箭头
-    const zArrow = createArrow(
-        0x0000ff,
-        [0, 0, axisLength / 2],
-        [Math.PI / 2, 0, 0]
-    );
-    // Z轴标签
-    const zLabel = await createAxisLabel(
-        'Z',
-        0x0000ff,
-        font,
-        [0, 0, axisLength / 2 + textOffset],
-        'z'
-    );
-    
-    container.add(xAxis, xArrow, xLabel)
-    container.add(yAxis, yArrow, yLabel)
-    container.add(zAxis, zArrow, zLabel)
-        
-    scene.add(container)
-    return container
-}
 (async () => {
-  axis = await createAxes(scene)
+  axesGroup = await createAxes();
 })()
 
 
@@ -332,70 +334,21 @@ function create4DWireframeAndVertices(edges, {
     cylinderColor = 0xC0C0C0,
     sphereColor = 0xffd700
 } = {}) {
-    const defaultCylinderMaterial = cylinderMaterial || new THREE.MeshStandardMaterial({
+    let defaultCylinderMaterial = cylinderMaterial || new THREE.MeshStandardMaterial({
         color: cylinderColor,
         metalness: 1.0,
         roughness: 0.4
     });
 
-    const defaultSphereMaterial = sphereMaterial || new THREE.MeshStandardMaterial({
+    let defaultSphereMaterial = sphereMaterial || new THREE.MeshStandardMaterial({
         color: sphereColor,
         metalness: 1.0,
         roughness: 0.5
     });
         
-    defaultSphereMaterial.onBeforeCompile = (shader) => {
-      shader.uniforms.projectionDistance = { value: 2.0 }
-      shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
-      defaultSphereMaterial.userData.projectionDistance = shader.uniforms.projectionDistance;
-      defaultSphereMaterial.userData.rotation4D = shader.uniforms.rotation4D;
+    defaultCylinderMaterial = shaderCompCallback.cylinderMaterial(defaultCylinderMaterial, rotUni, projDistUni)
+    defaultSphereMaterial = shaderCompCallback.sphereMaterial(defaultSphereMaterial, rotUni, projDistUni)
     
-      shader.vertexShader = `
-        attribute vec4 center4D;
-        ${shaderFuncs.schlegelProjection}
-        ${shaderFuncs.create4DRotationMat}
-        ${shaderFuncs.rotationArrUni}
-        ${shader.vertexShader}
-      `;
-      
-      shader.vertexShader = shader.vertexShader.replace(
-        '#include <begin_vertex>',
-        `
-        #include <begin_vertex>
-        vec3 center3D = schlegelProjection(create4DRotationMat(rotation4D) * center4D);
-        transformed = transformed + center3D;
-        `
-      );
-    };
-    
-    defaultCylinderMaterial.onBeforeCompile = (shader) => {
-      shader.uniforms.projectionDistance = { value: 2.0 }
-      shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
-      defaultCylinderMaterial.userData.projectionDistance = shader.uniforms.projectionDistance;
-      defaultCylinderMaterial.userData.rotation4D = shader.uniforms.rotation4D;
-      
-      shader.vertexShader = `
-        attribute vec4 v1;
-        attribute vec4 v2;
-        ${shaderFuncs.schlegelProjection}
-        ${shaderFuncs.create4DRotationMat}
-        ${shaderFuncs.rotationArrUni}
-        ${shaderFuncs.transformCylinderPoint}
-        ${shader.vertexShader}
-      `;
-      
-      shader.vertexShader = shader.vertexShader.replace(
-        '#include <begin_vertex>',
-        `
-        #include <begin_vertex>
-        mat4 rotMat = create4DRotationMat(rotation4D);
-        vec3 pv1 = schlegelProjection(rotMat * v1);
-        vec3 pv2 = schlegelProjection(rotMat * v2);
-        transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), pv1, pv2);
-        `
-      );
-    };
-
     const wireframeGroup = new THREE.Group();
     const verticesGroup = new THREE.Group();
     const uniquePoints = new Set();
@@ -409,7 +362,7 @@ function create4DWireframeAndVertices(edges, {
         const {x: x1, y: y1, z: z1, w: w1} = start;
         const {x: x2, y: y2, z: z2, w: w2} = end;
 
-        const geometry = createCylinderGeometry(cylinderRadius)
+        const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius));
         const vertexCount = geometry.attributes.position.count;
         const v1Arr = new Float32Array(vertexCount * 4)
         const v2Arr = new Float32Array(vertexCount * 4)
@@ -448,12 +401,12 @@ function changeMaterialProperty(group, propertyName, newValue) {
     group.traverse((child) => {
         if (child.isMesh && child.material) {
             if (!Array.isArray(child.material)) {
-                child.material[propertyName] = newValue;
+                set(child.material, propertyName, newValue);
                 child.material.needsUpdate = true;
             } 
             else {
                 for (let material of child.material) {
-                    material[propertyName] = newValue;
+                    set(material, propertyName, newValue);
                     material.needsUpdate = true;
                 }
             }
@@ -475,11 +428,11 @@ function changeSpheresRadius(group, newRadius) {
     } else if (child instanceof THREE.Mesh && child.geometry instanceof THREE.BufferGeometry) {
       const centerAttr = child.geometry.getAttribute('center4D');
       child.geometry.dispose();
-      child.geometry = createSphereGeometry(
+      child.geometry = toBufferGeometry(new THREE.SphereGeometry(
         newRadius,
         child.geometry.parameters.widthSegments,
         child.geometry.parameters.heightSegments
-      );
+      ));
       child.geometry.setAttribute('center4D', centerAttr)
     }
   });
@@ -505,12 +458,13 @@ function changeCylindersRadius(group, newRadius) {
       const v2Attr = child.geometry.getAttribute('v2');
       
       child.geometry.dispose();
-      child.geometry = createCylinderGeometry(
+      child.geometry = toBufferGeometry(new THREE.CylinderGeometry(
+        newRadius,
         newRadius,
         1,
         child.geometry.parameters.radialSegments,
         child.geometry.parameters.heightSegments
-      );
+      ));
       child.geometry.setAttribute('v1', v1Attr)
       child.geometry.setAttribute('v2', v2Attr)
     }
@@ -558,6 +512,14 @@ function loadMesh(meshData, material) {
   return {scaleFactor, solidGroup: container, facesGroup: mesh, wireframeGroup, verticesGroup};
 }
 
+function getFarthestPointDist(points) {
+    const getDist = p => Math.sqrt(p.x ** 2 + p.y ** 2 + p.z ** 2)
+    return getDist(points.reduce((farthest, point) => {
+      const dist = point.x ** 2 + point.y ** 2 + point.z ** 2;
+      return dist > (farthest.dist || -1) ? { point, dist } : farthest;
+    }, {}).point);
+}
+
 function load4DMesh(meshData, material) {
   const container = new THREE.Object3D();
   const geometry = new THREE.BufferGeometry();
@@ -589,11 +551,12 @@ function load4DMesh(meshData, material) {
   
   const mesh = new THREE.Mesh(geometry, material);
   mesh.material.side = THREE.DoubleSide;
-  geometry.computeBoundingBox();
-  
-  const aabb = geometry.boundingBox;
-  const objSize = aabb.max.sub(aabb.min).length();
-  const scaleFactor = 100 / objSize;
+  const scaleFactor = 40 / getFarthestPointDist(meshData.vertices.map(p => {
+    const d = +projectionDistanceSlider.value;
+    const s = d / (d + p.w)
+    
+    return {x: p.x * s, y: p.y *s, z: p.z * s}
+  }));
   
   const { wireframeGroup, verticesGroup, cylinderMaterial, sphereMaterial } = create4DWireframeAndVertices(meshData.edges, { cylinderRadius: 0.5 / scaleFactor })
   
@@ -621,29 +584,7 @@ function loadMeshFrom4OffData(data, material) {
   const mesh = parse4OFF(data)
   const processedMesh = process4DMeshData(mesh);
   
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = { value: 2.0 }
-    shader.uniforms.rotation4D = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] }
-    material.userData.projectionDistance = shader.uniforms.projectionDistance;
-    material.userData.rotation4D = shader.uniforms.rotation4D;
-  
-    shader.vertexShader = `
-      attribute vec4 position4D;
-      ${shaderFuncs.schlegelProjection}
-      ${shaderFuncs.create4DRotationMat}
-      ${shaderFuncs.rotationArrUni}
-      ${shader.vertexShader}
-    `;
-    
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `
-      #include <begin_vertex>
-      vec4 rotatedPosition4D = create4DRotationMat(rotation4D) * position4D;
-      transformed = schlegelProjection(rotatedPosition4D);
-      `
-    );
-  };
+  material = shaderCompCallback.faceMaterial(material, rotUni, projDistUni);
 
   ({ scaleFactor, solidGroup, facesGroup, wireframeGroup, verticesGroup, cylinderMaterial, sphereMaterial } = load4DMesh(processedMesh, material));
   facesMaterial = material;
@@ -694,7 +635,7 @@ function updateProperties() {
   changeMaterialProperty(facesGroup, 'visible', faceVisibleSwitcher.checked)
   changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked)
   changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked)
-  changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked)
+  changeMaterialProperty(axesGroup, 'visible', axisVisibleSwitcher.checked)
   changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value)
   changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor)
   changeSpheresRadius(verticesGroup, +wireframeAndVerticesDimSlider.value / scaleFactor * 2)
@@ -702,7 +643,7 @@ function updateProperties() {
 faceVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(facesGroup, 'visible', faceVisibleSwitcher.checked))
 wireframeVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(wireframeGroup, 'visible', wireframeVisibleSwitcher.checked))
 verticesVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(verticesGroup, 'visible', verticesVisibleSwitcher.checked))
-axisVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(axis, 'visible', axisVisibleSwitcher.checked))
+axisVisibleSwitcher.addEventListener('change', () => changeMaterialProperty(axesGroup, 'visible', axisVisibleSwitcher.checked))
 facesOpacitySlider.addEventListener('input', () => changeMaterialProperty(facesGroup, 'opacity', +facesOpacitySlider.value))
 wireframeAndVerticesDimSlider.addEventListener('input', () => {
   changeCylindersRadius(wireframeGroup, +wireframeAndVerticesDimSlider.value / scaleFactor)
@@ -710,22 +651,29 @@ wireframeAndVerticesDimSlider.addEventListener('input', () => {
 })
 
 function updateProjectionDistance() {
-  facesMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
-  cylinderMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
-  sphereMaterial.userData.projectionDistance.value = +projectionDistanceSlider.value;
+  projDistUni.value = +projectionDistanceSlider.value
 }
 projectionDistanceSlider.addEventListener('input', updateProjectionDistance)
+
 function updateRotation() {
   const rotations = rotationSliders.map(i => +i.value);
-  facesMaterial.userData.rotation4D.value = rotations;
-  cylinderMaterial.userData.rotation4D.value = rotations;
-  sphereMaterial.userData.rotation4D.value = rotations;
+  rotUni.value = rotations
+  
+  if (!is4D) {
+    solidGroup.rotation.x = rotations[3] * (Math.PI / -180)
+    solidGroup.rotation.y = rotations[1] * (Math.PI / 180)
+    solidGroup.rotation.z = rotations[0] * (Math.PI / -180)
+  };
 }
 rotationSliders.forEach((slider, i) => {
-  slider.addEventListener('input', () => { 
-    facesMaterial.userData.rotation4D.value[i] = +slider.value;
-    cylinderMaterial.userData.rotation4D.value[i] = +slider.value;
-    sphereMaterial.userData.rotation4D.value[i] = +slider.value;
+  slider.addEventListener('input', () => {
+    rotUni.value[i] = +slider.value
+    
+    if (!is4D) {
+      if (i === 3) solidGroup.rotation.x = +slider.value * (Math.PI / -180);
+      else if (i === 1) solidGroup.rotation.y = +slider.value * (Math.PI / 180);
+      else if (i === 0) solidGroup.rotation.z = +slider.value * (Math.PI / -180);
+    }; 
   })
 })
 
@@ -754,14 +702,20 @@ fileInput.addEventListener('change', (e) => {
         
         if (is4D) {
           loadMeshFrom4OffData(data, material)
+          projectionDistanceSlider.disabled = false;
           rotationSliders[2].disabled = false;
           rotationSliders[4].disabled = false;
           rotationSliders[5].disabled = false;
         } else {
           loadMeshFromOffData(data, material)
+          projectionDistanceSlider.disabled = true;
           rotationSliders[2].disabled = true;
           rotationSliders[4].disabled = true;
           rotationSliders[5].disabled = true;
+          rotationSliders[2].value = 0;
+          rotationSliders[4].value = 0;
+          rotationSliders[5].value = 0;
+          updateRotation();
         }
     };
     reader.readAsText(file);
