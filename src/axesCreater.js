@@ -18,8 +18,7 @@ function createMaterial(color) {
     color: color,
     roughness: 0.3,
     metalness: 0.0,
-    clearcoat: 0.5,
-    clearcoatRoughness: 0.1
+    flatShading: true
   });
 }
 
@@ -37,7 +36,7 @@ function loadFontAsync(url) {
 
 function createAxisCylinderMesh(axis, color, rotUni, projDistUni) {
   const geometry = toBufferGeometry(
-    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1)
+    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 10)
   );
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
@@ -58,7 +57,7 @@ function createAxisCylinderMesh(axis, color, rotUni, projDistUni) {
 }
 
 function createAxisConeMesh(axis, color, rotUni, projDistUni) {
-  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1));
+  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 10));
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
   const lenArr = new Float32Array(vertexCount);
