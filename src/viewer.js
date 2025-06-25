@@ -14,6 +14,7 @@ const faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher')
 const wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher')
 const verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher')
 const axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher')
+const perspSwitcher = document.getElementById('perspSwitcher')
 const facesOpacitySlider = document.getElementById('facesOpacitySlider')
 const wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider')
 const projectionDistanceSlider = document.getElementById('projectionDistanceSlider')
@@ -64,9 +65,11 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x111111);
 
 // 配置摄像头
-const camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
-camera.position.z = 120;
-let isPersp = true;
+const cameraPersp = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
+const cameraOrtho = new THREE.OrthographicCamera(-60, 60, 60, -60, 0.01, 500);
+cameraPersp.position.set(0, 0, 120);
+cameraOrtho.position.set(0, 0, 120);
+let camera = cameraPersp.clone();
 
 // 配置控制器
 const controls = new TrackballControls(camera, renderer.domElement);
@@ -74,7 +77,6 @@ controls.dynamicDampingFactor = 0.8;
 controls.rotateSpeed = 4.0;
 controls.maxDistance = 150.0;
 controls.minDistance = 0.1;
-controls.noPan = true;
 
 // 渲染循环
 renderer.setAnimationLoop(render);
@@ -433,6 +435,27 @@ rotationSliders.forEach((slider, i) => {
     }; 
   })
 })
+
+function toggleCamera() {
+  const isPersp = perspSwitcher.checked;
+  const oldCamera = camera.clone();
+  
+  if (isPersp) {
+    camera = cameraPersp.clone();
+    camera.position.copy(oldCamera.position);
+    camera.rotation.copy(oldCamera.rotation);
+    camera.quaternion.copy(oldCamera.quaternion);
+  } else {
+    camera = cameraOrtho.clone();
+    camera.position.copy(oldCamera.position);
+    camera.rotation.copy(oldCamera.rotation);
+    camera.quaternion.copy(oldCamera.quaternion);
+  }
+
+  controls.object = camera;
+}
+
+perspSwitcher.addEventListener('change', toggleCamera)
 
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
