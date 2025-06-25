@@ -76,11 +76,12 @@ class PolyhedronRendererApp {
       this.projDistUni
     );
 
-    const initialMaterial = new THREE.MeshPhongMaterial({
+    const initialMaterial = new THREE.MeshStandardMaterial({
       color: 0x555555,
-      specular: 0x222222,
-      shininess: 50,
-      flatShading: true,
+      roughness: 0.3,
+      metalness: 0.0,
+      clearcoat: 0.5,
+      clearcoatRoughness: 0.1,
       transparent: true
     });
 
@@ -829,11 +830,12 @@ class PolyhedronRendererApp {
           .filter(line => line.trim() !== '' && !line.startsWith('#'))[0]
           .trim() === '4OFF';
 
-      const material = new THREE.MeshPhongMaterial({
+      const material = new THREE.MeshStandardMaterial({
         color: 0x555555,
-        specular: 0x222222,
-        shininess: 50,
-        flatShading: true,
+        roughness: 0.3,
+        metalness: 0.0,
+        clearcoat: 0.5,
+        clearcoatRoughness: 0.1,
         transparent: true
       });
 
