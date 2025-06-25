@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-import shaderCompCallback from './shaderCompCallback.js'
-import { toBufferGeometry } from './geometries.js'
-import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json'
+import shaderCompCallback from './shaderCompCallback.js';
+import { toBufferGeometry } from './geometries.js';
+import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json';
 
 const axisLength = 100;
 const cylinderRadius = 0.5;
@@ -14,10 +14,10 @@ const textSize = 5;
 const textOffset = 7;
 
 function createMaterial(color) {
-    return new THREE.MeshPhongMaterial({ 
-        color: color, 
-        shininess: 40 
-    });
+  return new THREE.MeshPhongMaterial({
+    color: color,
+    shininess: 40
+  });
 }
 
 function loadFontAsync(url) {
@@ -25,42 +25,41 @@ function loadFontAsync(url) {
     const loader = new FontLoader();
     loader.load(
       url,
-      (font) => resolve(font),
+      font => resolve(font),
       undefined,
-      (error) => reject(error)
+      error => reject(error)
     );
   });
 }
 
 function createAxisCylinderMesh(axis, color, rotUni, projDistUni) {
-  const geometry = toBufferGeometry(new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1));
+  const geometry = toBufferGeometry(
+    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1)
+  );
   const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
+  const axisArr = new Uint32Array(vertexCount);
+  const lenArr = new Float32Array(vertexCount);
   for (let i = 0; i < vertexCount; i++) {
     axisArr[i] = axis;
     lenArr[i] = axisLength / 2;
   }
   geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
   geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  
+
   let material = createMaterial(color);
   material = shaderCompCallback.axisMaterial(material, rotUni, projDistUni);
-  
-  const cylinder = new THREE.Mesh(
-      geometry,
-      material
-  );
-  
+
+  const cylinder = new THREE.Mesh(geometry, material);
+
   return cylinder;
 }
 
 function createAxisConeMesh(axis, color, rotUni, projDistUni) {
-  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1))
+  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1));
   const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
-  const heightArr = new Float32Array(vertexCount)
+  const axisArr = new Uint32Array(vertexCount);
+  const lenArr = new Float32Array(vertexCount);
+  const heightArr = new Float32Array(vertexCount);
   for (let i = 0; i < vertexCount; i++) {
     axisArr[i] = axis;
     lenArr[i] = axisLength / 2;
@@ -68,34 +67,36 @@ function createAxisConeMesh(axis, color, rotUni, projDistUni) {
   }
   geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
   geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  geometry.setAttribute('height', new THREE.Float32BufferAttribute(heightArr, 1));
-  
+  geometry.setAttribute(
+    'height',
+    new THREE.Float32BufferAttribute(heightArr, 1)
+  );
+
   let material = createMaterial(color);
   material = shaderCompCallback.axisConeMaterial(material, rotUni, projDistUni);
-  
-  const cone = new THREE.Mesh(
-      geometry,
-      material
-  );
-  
+
+  const cone = new THREE.Mesh(geometry, material);
+
   return cone;
 }
 
 function createAxisLabelMesh(axis, color, text, font, rotUni, projDistUni) {
-  const geometry = toBufferGeometry(new TextGeometry(text, {
+  const geometry = toBufferGeometry(
+    new TextGeometry(text, {
       font: font,
       size: textSize,
       depth: cylinderRadius * 2,
       curveSegments: 12
-  }));
+    })
+  );
 
   geometry.computeBoundingBox();
   geometry.center();
-  
+
   const vertexCount = geometry.attributes.position.count;
-  const axisArr = new Uint32Array(vertexCount)
-  const lenArr = new Float32Array(vertexCount)
-  const offsetArr = new Float32Array(vertexCount)
+  const axisArr = new Uint32Array(vertexCount);
+  const lenArr = new Float32Array(vertexCount);
+  const offsetArr = new Float32Array(vertexCount);
   for (let i = 0; i < vertexCount; i++) {
     axisArr[i] = axis;
     lenArr[i] = axisLength / 2;
@@ -103,45 +104,77 @@ function createAxisLabelMesh(axis, color, text, font, rotUni, projDistUni) {
   }
   geometry.setAttribute('axis', new THREE.Uint32BufferAttribute(axisArr, 1));
   geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
-  geometry.setAttribute('offset', new THREE.Float32BufferAttribute(offsetArr, 1));
-  
-  let material = createMaterial(color);
-  material = shaderCompCallback.axisLabelMaterial(material, rotUni, projDistUni);
-  
-  const label = new THREE.Mesh(
-      geometry,
-      material
+  geometry.setAttribute(
+    'offset',
+    new THREE.Float32BufferAttribute(offsetArr, 1)
   );
-  
+
+  let material = createMaterial(color);
+  material = shaderCompCallback.axisLabelMaterial(
+    material,
+    rotUni,
+    projDistUni
+  );
+
+  const label = new THREE.Mesh(geometry, material);
+
   return label;
 }
 
 async function createAxes(scene, rotUni, projDistUni) {
-  const font = await loadFontAsync(fontUrl)
+  const font = await loadFontAsync(fontUrl);
   const container = new THREE.Group();
-  
-  const cylinderX = createAxisCylinderMesh(0, 0xff0000, rotUni, projDistUni)
-  const coneX = createAxisConeMesh(0, 0xff0000, rotUni, projDistUni)
-  const labelX = createAxisLabelMesh(0, 0xff0000, 'X', font, rotUni, projDistUni)
-  
-  const cylinderY = createAxisCylinderMesh(1, 0x00ff00, rotUni, projDistUni)
-  const coneY = createAxisConeMesh(1, 0x00ff00, rotUni, projDistUni)
-  const labelY = createAxisLabelMesh(1, 0x00ff00, 'Y', font, rotUni, projDistUni)
-  
-  const cylinderZ = createAxisCylinderMesh(2, 0x0000ff, rotUni, projDistUni)
-  const coneZ = createAxisConeMesh(2, 0x0000ff, rotUni, projDistUni)
-  const labelZ = createAxisLabelMesh(2, 0x0000ff, 'Z', font, rotUni, projDistUni)
-  
-  const cylinderW = createAxisCylinderMesh(3, 0xf07026, rotUni, projDistUni)
-  const coneW = createAxisConeMesh(3, 0xf07026, rotUni, projDistUni)
-  const labelW = createAxisLabelMesh(3, 0xf07026, 'W', font, rotUni, projDistUni)
-  
-  container.add(cylinderX, coneX, labelX)
-  container.add(cylinderY, coneY, labelY)
-  container.add(cylinderZ, coneZ, labelZ)
-  container.add(cylinderW, coneW, labelW)
-  scene.add(container)
-  
+
+  const cylinderX = createAxisCylinderMesh(0, 0xff0000, rotUni, projDistUni);
+  const coneX = createAxisConeMesh(0, 0xff0000, rotUni, projDistUni);
+  const labelX = createAxisLabelMesh(
+    0,
+    0xff0000,
+    'X',
+    font,
+    rotUni,
+    projDistUni
+  );
+
+  const cylinderY = createAxisCylinderMesh(1, 0x00ff00, rotUni, projDistUni);
+  const coneY = createAxisConeMesh(1, 0x00ff00, rotUni, projDistUni);
+  const labelY = createAxisLabelMesh(
+    1,
+    0x00ff00,
+    'Y',
+    font,
+    rotUni,
+    projDistUni
+  );
+
+  const cylinderZ = createAxisCylinderMesh(2, 0x0000ff, rotUni, projDistUni);
+  const coneZ = createAxisConeMesh(2, 0x0000ff, rotUni, projDistUni);
+  const labelZ = createAxisLabelMesh(
+    2,
+    0x0000ff,
+    'Z',
+    font,
+    rotUni,
+    projDistUni
+  );
+
+  const cylinderW = createAxisCylinderMesh(3, 0xf07026, rotUni, projDistUni);
+  const coneW = createAxisConeMesh(3, 0xf07026, rotUni, projDistUni);
+  const labelW = createAxisLabelMesh(
+    3,
+    0xf07026,
+    'W',
+    font,
+    rotUni,
+    projDistUni
+  );
+
+  container.add(cylinderX, coneX, labelX);
+  container.add(cylinderY, coneY, labelY);
+  container.add(cylinderZ, coneZ, labelZ);
+  container.add(cylinderW, coneW, labelW);
+  scene.add(container);
+
   return container;
 }
 

@@ -45,14 +45,14 @@ vec3 transformCylinderPoint(vec3 point, vec3 v1, vec3 v2) {
     // Step 3: Translate to v1
     return scaled_point + v1;
 }
-`
+`;
 
 const schlegelProjection = `
 uniform float projectionDistance;
 vec3 schlegelProjection(vec4 point4D) {
   return projectionDistance * point4D.xyz / (projectionDistance - point4D.w);
 }
-`
+`;
 
 const create4DRotationMat = `
 mat4 create4DRotationMat(float xy_deg, float xz_deg, float xw_deg, 
@@ -124,8 +124,13 @@ mat4 create4DRotationMat(float rotation4D[6]) {
     return create4DRotationMat(rotation4D[0], rotation4D[1], rotation4D[2], 
                                rotation4D[3], rotation4D[4], rotation4D[5]);
 }
-`
+`;
 
-const rotationArrUni = 'uniform float rotation4D[6];'
+const rotationArrUni = 'uniform float rotation4D[6];';
 
-export default { schlegelProjection, create4DRotationMat, transformCylinderPoint, rotationArrUni };
+export default {
+  schlegelProjection,
+  create4DRotationMat,
+  transformCylinderPoint,
+  rotationArrUni
+};

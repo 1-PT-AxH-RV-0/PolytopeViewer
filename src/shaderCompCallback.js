@@ -1,15 +1,14 @@
-import { createSphereGeometry, createCylinderGeometry, create4DSphereMesh } from './geometries.js'
-import shaderFuncs from './GLSLs.js'
+import shaderFuncs from './GLSLs.js';
 
 function sphereMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
     material.userData.projectionDistance = shader.uniforms.projectionDistance;
     material.userData.rotation4D = shader.uniforms.rotation4D;
-  
+
     shader.vertexShader = `
       attribute vec4 center4D;
       ${shaderFuncs.schlegelProjection}
@@ -17,7 +16,7 @@ function sphereMaterial(material, rotUni, projDistUni) {
       ${shaderFuncs.rotationArrUni}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -26,20 +25,20 @@ function sphereMaterial(material, rotUni, projDistUni) {
       transformed = transformed + center3D;
       `
     );
-  }
-  
+  };
+
   return material;
-};
+}
 
 function cylinderMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
     material.userData.projectionDistance = shader.uniforms.projectionDistance;
     material.userData.rotation4D = shader.uniforms.rotation4D;
-    
+
     shader.vertexShader = `
       attribute vec4 v1;
       attribute vec4 v2;
@@ -49,7 +48,7 @@ function cylinderMaterial(material, rotUni, projDistUni) {
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -60,20 +59,20 @@ function cylinderMaterial(material, rotUni, projDistUni) {
       transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), pv1, pv2);
       `
     );
-  }
-  
+  };
+
   return material;
-};
+}
 
 function faceMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
     material.userData.projectionDistance = shader.uniforms.projectionDistance;
     material.userData.rotation4D = shader.uniforms.rotation4D;
-  
+
     shader.vertexShader = `
       attribute vec4 position4D;
       ${shaderFuncs.schlegelProjection}
@@ -81,7 +80,7 @@ function faceMaterial(material, rotUni, projDistUni) {
       ${shaderFuncs.rotationArrUni}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -90,18 +89,18 @@ function faceMaterial(material, rotUni, projDistUni) {
       transformed = schlegelProjection(rotatedPosition4D);
       `
     );
-  }
-  
-  return material;
-};
+  };
 
-function axisMaterial(material, rotUni, projDistUni, axesRealLenUni) {
+  return material;
+}
+
+function axisMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
-    
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
+
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
@@ -112,7 +111,7 @@ function axisMaterial(material, rotUni, projDistUni, axesRealLenUni) {
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -130,21 +129,21 @@ function axisMaterial(material, rotUni, projDistUni, axesRealLenUni) {
       
       transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), -vProj, vProj);
       `
-    )
-  }
-  
+    );
+  };
+
   return material;
-};
+}
 
 function axisConeMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
     material.userData.projectionDistance = shader.uniforms.projectionDistance;
     material.userData.rotation4D = shader.uniforms.rotation4D;
-    
+
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
@@ -155,7 +154,7 @@ function axisConeMaterial(material, rotUni, projDistUni) {
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -176,20 +175,20 @@ function axisConeMaterial(material, rotUni, projDistUni) {
       transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1, vProj2);
       `
     );
-  }
-  
+  };
+
   return material;
-};
+}
 
 function axisLabelMaterial(material, rotUni, projDistUni) {
   material = material.clone();
-  
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectionDistance = projDistUni
-    shader.uniforms.rotation4D = rotUni
+
+  material.onBeforeCompile = shader => {
+    shader.uniforms.projectionDistance = projDistUni;
+    shader.uniforms.rotation4D = rotUni;
     material.userData.projectionDistance = shader.uniforms.projectionDistance;
     material.userData.rotation4D = shader.uniforms.rotation4D;
-    
+
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
@@ -200,7 +199,7 @@ function axisLabelMaterial(material, rotUni, projDistUni) {
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
-    
+
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `
@@ -221,9 +220,16 @@ function axisLabelMaterial(material, rotUni, projDistUni) {
       transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1, vProj2);
       `
     );
-  }
-  
-  return material;
-};
+  };
 
-export default { sphereMaterial, cylinderMaterial, faceMaterial, axisMaterial, axisConeMaterial, axisLabelMaterial }
+  return material;
+}
+
+export default {
+  sphereMaterial,
+  cylinderMaterial,
+  faceMaterial,
+  axisMaterial,
+  axisConeMaterial,
+  axisLabelMaterial
+};
