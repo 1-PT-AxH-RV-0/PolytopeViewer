@@ -14,9 +14,12 @@ const textSize = 5;
 const textOffset = 7;
 
 function createMaterial(color) {
-  return new THREE.MeshPhongMaterial({
+  return new THREE.MeshStandardMaterial({
     color: color,
-    shininess: 40
+    roughness: 0.3,
+    metalness: 0.0,
+    clearcoat: 0.5,
+    clearcoatRoughness: 0.1
   });
 }
 
