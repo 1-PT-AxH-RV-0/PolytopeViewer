@@ -1,6 +1,12 @@
 import shaderFuncs from './GLSLs.js';
 
-function sphereMaterial(material, sphereRadiusUni, rotUni, projDistUni, isOrthoUni) {
+function sphereMaterial(
+  material,
+  sphereRadiusUni,
+  rotUni,
+  projDistUni,
+  isOrthoUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
@@ -31,7 +37,13 @@ function sphereMaterial(material, sphereRadiusUni, rotUni, projDistUni, isOrthoU
   return material;
 }
 
-function cylinderMaterial(material, cylinderRadiusUni, rotUni, projDistUni, isOrthoUni) {
+function cylinderMaterial(
+  material,
+  cylinderRadiusUni,
+  rotUni,
+  projDistUni,
+  isOrthoUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {

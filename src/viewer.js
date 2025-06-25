@@ -510,14 +510,15 @@ class PolyhedronRendererApp {
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
-      getFarthestPointDist(
-        meshData.vertices.map(p => {
-          const d = +this.projectionDistanceSlider.value;
-          const s = d / (d + p.w);
+        getFarthestPointDist(
+          meshData.vertices.map(p => {
+            if (!this.schleSwitcher.checked) return { x: p.x, y: p.y, z: p.z };
+            const d = +this.projectionDistanceSlider.value;
+            const s = d / (d + p.w);
 
-          return { x: p.x * s, y: p.y * s, z: p.z * s };
-        })
-      )
+            return { x: p.x * s, y: p.y * s, z: p.z * s };
+          })
+        )
     );
 
     const { wireframeGroup, verticesGroup } = this.create4DWireframeAndVertices(
@@ -660,7 +661,7 @@ class PolyhedronRendererApp {
     this.cylinderRadiusUni.value =
       +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
     this.sphereRadiusUni.value =
-      +this.wireframeAndVerticesDimSlider.value / this.scaleFactor * 2;
+      (+this.wireframeAndVerticesDimSlider.value / this.scaleFactor) * 2;
   }
 
   /**
@@ -686,7 +687,7 @@ class PolyhedronRendererApp {
       }
     }
   }
-  
+
   /**
    * 更新缩放因子。
    * @param {number} scaleFactor - 缩放因子。
@@ -695,10 +696,10 @@ class PolyhedronRendererApp {
     this.scaleFactor = scaleFactor;
     this.scaleFactorSlider.value = scaleFactor;
     this.cylinderRadiusUni.value =
-     +this.wireframeAndVerticesDimSlider.value / scaleFactor;
+      +this.wireframeAndVerticesDimSlider.value / scaleFactor;
     this.sphereRadiusUni.value =
-     +this.wireframeAndVerticesDimSlider.value / scaleFactor * 2;
-    if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor)
+      (+this.wireframeAndVerticesDimSlider.value / scaleFactor) * 2;
+    if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
   }
 
   /**
@@ -756,7 +757,9 @@ class PolyhedronRendererApp {
         this.axisVisibleSwitcher.checked
       )
     );
-    this.scaleFactorSlider.addEventListener('input', () => this.updateScaleFactor(+this.scaleFactorSlider.value))
+    this.scaleFactorSlider.addEventListener('input', () =>
+      this.updateScaleFactor(+this.scaleFactorSlider.value)
+    );
     this.facesOpacitySlider.addEventListener('input', () =>
       changeMaterialProperty(
         this.facesGroup,
@@ -768,7 +771,7 @@ class PolyhedronRendererApp {
       this.cylinderRadiusUni.value =
         +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
       this.sphereRadiusUni.value =
-        +this.wireframeAndVerticesDimSlider.value / this.scaleFactor * 2;
+        (+this.wireframeAndVerticesDimSlider.value / this.scaleFactor) * 2;
     });
 
     this.projectionDistanceSlider.addEventListener(
@@ -781,18 +784,21 @@ class PolyhedronRendererApp {
         this.rotUni.value[i] = +slider.value;
 
         if (!this.is4D && this.solidGroup) {
-            if (i === 3)
-              this.solidGroup.rotation.x = +slider.value * (Math.PI / -180);
-            else if (i === 1)
-              this.solidGroup.rotation.y = +slider.value * (Math.PI / 180);
-            else if (i === 0)
-              this.solidGroup.rotation.z = +slider.value * (Math.PI / -180);
+          if (i === 3)
+            this.solidGroup.rotation.x = +slider.value * (Math.PI / -180);
+          else if (i === 1)
+            this.solidGroup.rotation.y = +slider.value * (Math.PI / 180);
+          else if (i === 0)
+            this.solidGroup.rotation.z = +slider.value * (Math.PI / -180);
         }
       });
     });
 
     this.perspSwitcher.addEventListener('change', this.toggleCamera.bind(this));
-    this.schleSwitcher.addEventListener('change', () => this.isOrthoUni.value = +!this.schleSwitcher.checked);
+    this.schleSwitcher.addEventListener(
+      'change',
+      () => (this.isOrthoUni.value = +!this.schleSwitcher.checked)
+    );
 
     this.fileInput.addEventListener(
       'change',
