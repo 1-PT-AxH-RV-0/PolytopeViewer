@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-import { toBufferGeometry } from './geometries.js';
 import { set } from 'lodash';
 
 function getFarthestPointDist(points) {
