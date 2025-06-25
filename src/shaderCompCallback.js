@@ -1,12 +1,13 @@
 import shaderFuncs from './GLSLs.js';
 
-function sphereMaterial(material, sphereRadiusUni, rotUni, projDistUni) {
+function sphereMaterial(material, sphereRadiusUni, rotUni, projDistUni, isOrthoUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
     shader.uniforms.radius = sphereRadiusUni;
+    shader.uniforms.isOrtho = isOrthoUni;
 
     shader.vertexShader = `
       attribute vec4 center4D;
@@ -30,13 +31,14 @@ function sphereMaterial(material, sphereRadiusUni, rotUni, projDistUni) {
   return material;
 }
 
-function cylinderMaterial(material, cylinderRadiusUni, rotUni, projDistUni) {
+function cylinderMaterial(material, cylinderRadiusUni, rotUni, projDistUni, isOrthoUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
     shader.uniforms.radius = cylinderRadiusUni;
+    shader.uniforms.isOrtho = isOrthoUni;
 
     shader.vertexShader = `
       attribute vec4 v1;
@@ -113,12 +115,13 @@ function cylinderMaterial3D(material, cylinderRadiusUni) {
   return material;
 }
 
-function faceMaterial(material, rotUni, projDistUni) {
+function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.isOrtho = isOrthoUni;
 
     shader.vertexShader = `
       attribute vec4 position4D;

@@ -26,6 +26,8 @@ class PolyhedronRendererApp {
     this.verticesVisibleSwitcher = null;
     this.axisVisibleSwitcher = null;
     this.perspSwitcher = null;
+    this.schleSwitcher = null;
+    this.scaleFactorSlider = null;
     this.facesOpacitySlider = null;
     this.wireframeAndVerticesDimSlider = null;
     this.projectionDistanceSlider = null;
@@ -43,6 +45,7 @@ class PolyhedronRendererApp {
 
     this.rotUni = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] };
     this.projDistUni = { value: 2.0 };
+    this.isOrthoUni = { value: 0 };
     this.cylinderRadiusUni = { value: 0.5 };
     this.sphereRadiusUni = { value: 1.0 };
 
@@ -101,6 +104,8 @@ class PolyhedronRendererApp {
     );
     this.axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher');
     this.perspSwitcher = document.getElementById('perspSwitcher');
+    this.schleSwitcher = document.getElementById('schleSwitcher');
+    this.scaleFactorSlider = document.getElementById('scaleFactorSlider');
     this.facesOpacitySlider = document.getElementById('facesOpacitySlider');
     this.wireframeAndVerticesDimSlider = document.getElementById(
       'wireframeAndVerticesDimSlider'
@@ -355,13 +360,15 @@ class PolyhedronRendererApp {
       defaultCylinderMaterial,
       this.cylinderRadiusUni,
       this.rotUni,
-      this.projDistUni
+      this.projDistUni,
+      this.isOrthoUni
     );
     defaultSphereMaterial = shaderCompCallback.sphereMaterial(
       defaultSphereMaterial,
       this.sphereRadiusUni,
       this.rotUni,
-      this.projDistUni
+      this.projDistUni,
+      this.isOrthoUni
     );
 
     const wireframeGroup = new THREE.Group();
@@ -435,7 +442,7 @@ class PolyhedronRendererApp {
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
-    this.scaleFactor = 40 / getFarthestPointDist(meshData.vertices);
+    this.updateScaleFactor(40 / getFarthestPointDist(meshData.vertices));
 
     const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
       meshData.edges
@@ -501,7 +508,7 @@ class PolyhedronRendererApp {
     this.projectionDistanceSlider.value =
       getFarthest4DPointDist(meshData.vertices) * 1.1;
     this.updateProjectionDistance();
-    this.scaleFactor =
+    this.updateScaleFactor(
       40 /
       getFarthestPointDist(
         meshData.vertices.map(p => {
@@ -510,7 +517,8 @@ class PolyhedronRendererApp {
 
           return { x: p.x * s, y: p.y * s, z: p.z * s };
         })
-      );
+      )
+    );
 
     const { wireframeGroup, verticesGroup } = this.create4DWireframeAndVertices(
       meshData.edges
@@ -571,7 +579,8 @@ class PolyhedronRendererApp {
     material = shaderCompCallback.faceMaterial(
       material,
       this.rotUni,
-      this.projDistUni
+      this.projDistUni,
+      this.isOrthoUni
     );
 
     const {
@@ -651,7 +660,7 @@ class PolyhedronRendererApp {
     this.cylinderRadiusUni.value =
       +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
     this.sphereRadiusUni.value =
-      (+this.wireframeAndVerticesDimSlider.value * 2) / this.scaleFactor;
+      +this.wireframeAndVerticesDimSlider.value / this.scaleFactor * 2;
   }
 
   /**
@@ -676,6 +685,20 @@ class PolyhedronRendererApp {
         this.solidGroup.rotation.z = rotations[0] * (Math.PI / -180);
       }
     }
+  }
+  
+  /**
+   * 更新缩放因子。
+   * @param {number} scaleFactor - 缩放因子。
+   */
+  updateScaleFactor(scaleFactor) {
+    this.scaleFactor = scaleFactor;
+    this.scaleFactorSlider.value = scaleFactor;
+    this.cylinderRadiusUni.value =
+     +this.wireframeAndVerticesDimSlider.value / scaleFactor;
+    this.sphereRadiusUni.value =
+     +this.wireframeAndVerticesDimSlider.value / scaleFactor * 2;
+    if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor)
   }
 
   /**
@@ -733,6 +756,7 @@ class PolyhedronRendererApp {
         this.axisVisibleSwitcher.checked
       )
     );
+    this.scaleFactorSlider.addEventListener('input', () => this.updateScaleFactor(+this.scaleFactorSlider.value))
     this.facesOpacitySlider.addEventListener('input', () =>
       changeMaterialProperty(
         this.facesGroup,
@@ -744,7 +768,7 @@ class PolyhedronRendererApp {
       this.cylinderRadiusUni.value =
         +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
       this.sphereRadiusUni.value =
-        (+this.wireframeAndVerticesDimSlider.value * 2) / this.scaleFactor;
+        +this.wireframeAndVerticesDimSlider.value / this.scaleFactor * 2;
     });
 
     this.projectionDistanceSlider.addEventListener(
@@ -756,21 +780,19 @@ class PolyhedronRendererApp {
       slider.addEventListener('input', () => {
         this.rotUni.value[i] = +slider.value;
 
-        if (!this.is4D) {
-          if (this.solidGroup) {
-            // 确保 solidGroup 存在
+        if (!this.is4D && this.solidGroup) {
             if (i === 3)
               this.solidGroup.rotation.x = +slider.value * (Math.PI / -180);
             else if (i === 1)
               this.solidGroup.rotation.y = +slider.value * (Math.PI / 180);
             else if (i === 0)
               this.solidGroup.rotation.z = +slider.value * (Math.PI / -180);
-          }
         }
       });
     });
 
     this.perspSwitcher.addEventListener('change', this.toggleCamera.bind(this));
+    this.schleSwitcher.addEventListener('change', () => this.isOrthoUni.value = +!this.schleSwitcher.checked);
 
     this.fileInput.addEventListener(
       'change',
@@ -812,12 +834,14 @@ class PolyhedronRendererApp {
       if (this.is4D) {
         this.loadMeshFrom4OffData(data, material);
         this.projectionDistanceSlider.disabled = false;
+        this.schleSwitcher.disabled = false;
         this.rotationSliders[2].disabled = false;
         this.rotationSliders[4].disabled = false;
         this.rotationSliders[5].disabled = false;
       } else {
         this.loadMeshFromOffData(data, material);
         this.projectionDistanceSlider.disabled = true;
+        this.schleSwitcher.disabled = true;
         this.rotationSliders[2].disabled = true;
         this.rotationSliders[4].disabled = true;
         this.rotationSliders[5].disabled = true;
