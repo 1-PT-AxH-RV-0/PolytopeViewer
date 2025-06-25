@@ -40,76 +40,6 @@ function changeMaterialProperty(group, propertyName, newValue) {
   });
 }
 
-// 修改球体半径
-function changeSpheresRadius(group, newRadius) {
-  if (!group) return;
-  group.children.forEach(child => {
-    if (
-      child instanceof THREE.Mesh &&
-      child.geometry instanceof THREE.SphereGeometry
-    ) {
-      child.geometry.dispose();
-      child.geometry = new THREE.SphereGeometry(
-        newRadius,
-        child.geometry.parameters.widthSegments,
-        child.geometry.parameters.heightSegments
-      );
-    } else if (
-      child instanceof THREE.Mesh &&
-      child.geometry instanceof THREE.BufferGeometry
-    ) {
-      const centerAttr = child.geometry.getAttribute('center4D');
-      child.geometry.dispose();
-      child.geometry = toBufferGeometry(
-        new THREE.SphereGeometry(
-          newRadius,
-          child.geometry.parameters.widthSegments,
-          child.geometry.parameters.heightSegments
-        )
-      );
-      child.geometry.setAttribute('center4D', centerAttr);
-    }
-  });
-}
-
-// 修改圆柱半径
-function changeCylindersRadius(group, newRadius) {
-  if (!group) return;
-  group.traverse(child => {
-    if (child.isMesh && child.geometry instanceof THREE.CylinderGeometry) {
-      const oldGeo = child.geometry;
-
-      child.geometry.dispose();
-      child.geometry = new THREE.CylinderGeometry(
-        newRadius,
-        newRadius,
-        oldGeo.parameters.height,
-        oldGeo.parameters.radialSegments,
-        oldGeo.parameters.heightSegments
-      );
-    } else if (
-      child instanceof THREE.Mesh &&
-      child.geometry instanceof THREE.BufferGeometry
-    ) {
-      const v1Attr = child.geometry.getAttribute('v1');
-      const v2Attr = child.geometry.getAttribute('v2');
-
-      child.geometry.dispose();
-      child.geometry = toBufferGeometry(
-        new THREE.CylinderGeometry(
-          newRadius,
-          newRadius,
-          1,
-          child.geometry.parameters.radialSegments,
-          child.geometry.parameters.heightSegments
-        )
-      );
-      child.geometry.setAttribute('v1', v1Attr);
-      child.geometry.setAttribute('v2', v2Attr);
-    }
-  });
-}
-
 // 释放组
 function disposeGroup(group) {
   group.traverse(child => {
@@ -125,7 +55,5 @@ export {
   getFarthestPointDist,
   getFarthest4DPointDist,
   changeMaterialProperty,
-  changeSpheresRadius,
-  changeCylindersRadius,
   disposeGroup
 };
