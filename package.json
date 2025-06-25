@@ -3,9 +3,16 @@
     "@babel/preset-env": "^7.26.9",
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.0",
+    "globals": "^16.2.0",
     "html-webpack-plugin": "^5.6.3",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14"
+  },
+  "scripts": {
+    "format": "npx eslint --fix . && npx prettier --write \"**/*.html\" && npx prettier --write \"**/*.css\""
   },
   "dependencies": {
     "lodash": "^4.17.21",

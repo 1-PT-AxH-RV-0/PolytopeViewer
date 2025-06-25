@@ -1,2 +1,2 @@
-import './style.css'
-import './viewer.js'
+import './style.css';
+import './viewer.js';

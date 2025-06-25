@@ -1,70 +1,70 @@
 body {
-    margin: 8px;
+  margin: 8px;
 }
 
 .button {
-    background-color: #049DD9;
-    border: none;
-    color: white;
-    padding: 8px 12px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 18px;
-    border-radius: 6px;
-    user-select: none;
-    border: 1px solid black;
-    font-family: Verdana, sans-serif;
-    margin: 4px;
-    width: 120px;
+  background-color: #049dd9;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 18px;
+  border-radius: 6px;
+  user-select: none;
+  border: 1px solid black;
+  font-family: Verdana, sans-serif;
+  margin: 4px;
+  width: 120px;
 }
 .button:hover {
-    background-color: #0477BF;
+  background-color: #0477bf;
 }
 .button:active {
-    background-color: #0468BF;
-    transform: translateY(1px);
+  background-color: #0468bf;
+  transform: translateY(1px);
 }
 
 .dropdown {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 }
 .dropdown:hover .dropdown-content {
-    display: block;
+  display: block;
 }
 .dropdown-content {
-    display: none;
-    bottom: 100%;
-    position: absolute;
-    margin: -4px 4px;
-    border-radius: 8px;
-    border: 1px solid black;
-    text-align: center;
-    background-color: #049DD9;
-    min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+  display: none;
+  bottom: 100%;
+  position: absolute;
+  margin: -4px 4px;
+  border-radius: 8px;
+  border: 1px solid black;
+  text-align: center;
+  background-color: #049dd9;
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
 .dropdown-content div {
-    padding: 4px 8px;
-    color: white;
-    font-size: 18px;
-    font-family: Verdana, sans-serif;
-    text-decoration: none;
-    display: block;
-    user-select: none;
+  padding: 4px 8px;
+  color: white;
+  font-size: 18px;
+  font-family: Verdana, sans-serif;
+  text-decoration: none;
+  display: block;
+  user-select: none;
 }
 .dropdown-content div:hover {
-    background-color: #0477BF;
-    border-radius: 8px;
+  background-color: #0477bf;
+  border-radius: 8px;
 }
 
 #mapText {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    color: white;
-    font-size: 20px;
-    user-select: none;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: white;
+  font-size: 20px;
+  user-select: none;
 }
