@@ -76,12 +76,11 @@ class PolyhedronRendererApp {
       this.projDistUni
     );
 
-    const initialMaterial = new THREE.MeshStandardMaterial({
+    const initialMaterial = new THREE.MeshPhongMaterial({
       color: 0x555555,
-      roughness: 0.3,
-      metalness: 0.0,
-      clearcoat: 0.5,
-      clearcoatRoughness: 0.1,
+      specular: 0x222222,
+      shininess: 50,
+      flatShading: true,
       transparent: true
     });
 
@@ -346,7 +345,8 @@ class PolyhedronRendererApp {
       new THREE.MeshStandardMaterial({
         color: cylinderColor,
         metalness: 1.0,
-        roughness: 0.4
+        roughness: 0.4,
+        side: THREE.DoubleSide
       });
 
     let defaultSphereMaterial =
@@ -830,12 +830,11 @@ class PolyhedronRendererApp {
           .filter(line => line.trim() !== '' && !line.startsWith('#'))[0]
           .trim() === '4OFF';
 
-      const material = new THREE.MeshStandardMaterial({
+      const material = new THREE.MeshPhongMaterial({
         color: 0x555555,
-        roughness: 0.3,
-        metalness: 0.0,
-        clearcoat: 0.5,
-        clearcoatRoughness: 0.1,
+        specular: 0x222222,
+        shininess: 50,
+        flatShading: true,
         transparent: true
       });
 
