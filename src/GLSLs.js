@@ -48,10 +48,8 @@ vec3 transformCylinderPoint(vec3 point, vec3 v1, vec3 v2) {
 `;
 
 const schlegelProjection = `
-uniform float projectionDistance;
-uniform uint isOrtho;
 vec3 schlegelProjection(vec4 point4D) {
-  if (isOrtho == 1u) return point4D.xyz;
+  if (isOrtho) return point4D.xyz;
   return projectionDistance * point4D.xyz / (projectionDistance - point4D.w);
 }
 `;
@@ -128,11 +126,8 @@ mat4 create4DRotationMat(float rotation4D[6]) {
 }
 `;
 
-const rotationArrUni = 'uniform float rotation4D[6];';
-
 export default {
   schlegelProjection,
   create4DRotationMat,
-  transformCylinderPoint,
-  rotationArrUni
+  transformCylinderPoint
 };
