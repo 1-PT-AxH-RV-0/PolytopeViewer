@@ -73,7 +73,6 @@ class PolyhedronRendererApp {
     this.axesGroup = await createAxes(
       this.scene,
       this.rotUni,
-      this.projDistUni
     );
 
     const initialMaterial = new THREE.MeshPhongMaterial({
@@ -81,7 +80,6 @@ class PolyhedronRendererApp {
       specular: 0x222222,
       shininess: 50,
       flatShading: true,
-      transparent: true
     });
 
     await this.loadMeshFromUrl(url, initialMaterial);
@@ -658,6 +656,11 @@ class PolyhedronRendererApp {
       'opacity',
       +this.facesOpacitySlider.value
     );
+    changeMaterialProperty(
+      this.facesGroup,
+      'transparent',
+      (+this.facesOpacitySlider.value) !== 1
+    )
 
     this.cylinderRadiusUni.value =
       +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
@@ -761,13 +764,18 @@ class PolyhedronRendererApp {
     this.scaleFactorSlider.addEventListener('input', () =>
       this.updateScaleFactor(+this.scaleFactorSlider.value)
     );
-    this.facesOpacitySlider.addEventListener('input', () =>
+    this.facesOpacitySlider.addEventListener('input', () => {
       changeMaterialProperty(
         this.facesGroup,
         'opacity',
         +this.facesOpacitySlider.value
       )
-    );
+      changeMaterialProperty(
+        this.facesGroup,
+        'transparent',
+        (+this.facesOpacitySlider.value) !== 1
+      )
+    });
     this.wireframeAndVerticesDimSlider.addEventListener('input', () => {
       this.cylinderRadiusUni.value =
         +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
@@ -798,7 +806,7 @@ class PolyhedronRendererApp {
     this.perspSwitcher.addEventListener('change', this.toggleCamera.bind(this));
     this.schleSwitcher.addEventListener(
       'change',
-      () => (this.isOrthoUni.value = +!this.schleSwitcher.checked)
+      () => (this.isOrthoUni.value = !this.schleSwitcher.checked)
     );
 
     this.fileInput.addEventListener(
@@ -835,7 +843,6 @@ class PolyhedronRendererApp {
         specular: 0x222222,
         shininess: 50,
         flatShading: true,
-        transparent: true
       });
 
       if (this.is4D) {
