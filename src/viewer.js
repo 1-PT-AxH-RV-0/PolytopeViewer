@@ -26,6 +26,7 @@ class PolyhedronRendererApp {
     this.wireframeAndVerticesDimSlider = null;
     this.projectionDistanceSlider = null;
     this.fileInput = null;
+    this.infoDis = null;
 
     this.rotationSliders = [];
 
@@ -84,25 +85,20 @@ class PolyhedronRendererApp {
    * 获取所有必要的 DOM 元素并将其赋值给类属性。
    */
   _initializeDomElements() {
+    /* eslint-disable */
     this.faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');
-    this.wireframeVisibleSwitcher = document.getElementById(
-      'wireframeVisibleSwitcher'
-    );
-    this.verticesVisibleSwitcher = document.getElementById(
-      'verticesVisibleSwitcher'
-    );
+    this.wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');
+    this.verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher');
     this.axisVisibleSwitcher = document.getElementById('axisVisibleSwitcher');
     this.perspSwitcher = document.getElementById('perspSwitcher');
     this.schleSwitcher = document.getElementById('schleSwitcher');
     this.scaleFactorSlider = document.getElementById('scaleFactorSlider');
     this.facesOpacitySlider = document.getElementById('facesOpacitySlider');
-    this.wireframeAndVerticesDimSlider = document.getElementById(
-      'wireframeAndVerticesDimSlider'
-    );
-    this.projectionDistanceSlider = document.getElementById(
-      'projectionDistanceSlider'
-    );
+    this.wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');
+    this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
     this.fileInput = document.getElementById('fileInput');
+    this.infoDis = document.getElementById('info');
+    /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
       document.getElementById(`rot${i}Slider`)
@@ -583,6 +579,13 @@ class PolyhedronRendererApp {
     const mesh = parseOFF(data);
     const processedMesh = processMeshData(mesh);
 
+    const info = `
+    顶点数：${mesh.vertices.length}
+    边数：${mesh.edges.length}
+    面数：${mesh.faces.length}
+    `.replace(' ', '');
+    this.infoDis.innerText = info;
+
     const {
       scaleFactor,
       solidGroup,
@@ -608,6 +611,14 @@ class PolyhedronRendererApp {
   loadMeshFrom4OffData(data, material) {
     const mesh = parse4OFF(data);
     const processedMesh = process4DMeshData(mesh);
+    
+    const info = `
+    顶点数：${mesh.vertices.length}
+    边数：${mesh.edges.length}
+    面数：${mesh.faces.length}
+    胞数：${mesh.cells.length}
+    `.replace(' ', '');
+    this.infoDis.innerText = info;
 
     material = shaderCompCallback.faceMaterial(
       material,
