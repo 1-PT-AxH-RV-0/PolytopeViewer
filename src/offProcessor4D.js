@@ -185,7 +185,7 @@ function parse4OFF(data) {
     const count = parseInt(parts[0]);
     cells.push(parts.slice(1, count + 1).map(Number));
   }
-  
+
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])
   );
@@ -233,7 +233,7 @@ function process4DMeshData({ vertices, faces, edges, cells }) {
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
     if (face.length === 3) {
-      facesMap[faceIndex] = [processedFaces.length, processedFaces.length]
+      facesMap[faceIndex] = [processedFaces.length, processedFaces.length];
       processedFaces.push(face);
       return;
     }
