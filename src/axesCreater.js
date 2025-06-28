@@ -3,7 +3,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import shaderCompCallback from './shaderCompCallback.js';
-import { toBufferGeometry } from './geometries.js';
+import { toBufferGeometry } from './helperFunc.js';
 import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json';
 
 const axisLength = 100;
@@ -125,43 +125,19 @@ async function createAxes(scene, rotUni) {
 
   const cylinderX = createAxisCylinderMesh(0, 0xff0000, rotUni);
   const coneX = createAxisConeMesh(0, 0xff0000, rotUni);
-  const labelX = createAxisLabelMesh(
-    0,
-    0xff0000,
-    'X',
-    font,
-    rotUni
-  );
+  const labelX = createAxisLabelMesh(0, 0xff0000, 'X', font, rotUni);
 
   const cylinderY = createAxisCylinderMesh(1, 0x00ff00, rotUni);
   const coneY = createAxisConeMesh(1, 0x00ff00, rotUni);
-  const labelY = createAxisLabelMesh(
-    1,
-    0x00ff00,
-    'Y',
-    font,
-    rotUni
-  );
+  const labelY = createAxisLabelMesh(1, 0x00ff00, 'Y', font, rotUni);
 
   const cylinderZ = createAxisCylinderMesh(2, 0x0000ff, rotUni);
   const coneZ = createAxisConeMesh(2, 0x0000ff, rotUni);
-  const labelZ = createAxisLabelMesh(
-    2,
-    0x0000ff,
-    'Z',
-    font,
-    rotUni
-  );
+  const labelZ = createAxisLabelMesh(2, 0x0000ff, 'Z', font, rotUni);
 
   const cylinderW = createAxisCylinderMesh(3, 0xf07026, rotUni);
   const coneW = createAxisConeMesh(3, 0xf07026, rotUni);
-  const labelW = createAxisLabelMesh(
-    3,
-    0xf07026,
-    'W',
-    font,
-    rotUni
-  );
+  const labelW = createAxisLabelMesh(3, 0xf07026, 'W', font, rotUni);
 
   container.add(cylinderX, coneX, labelX);
   container.add(cylinderY, coneY, labelY);
