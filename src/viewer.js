@@ -7,13 +7,13 @@ import shaderCompCallback from './shaderCompCallback.js';
 import * as helperFunc from './helperFunc.js';
 import { processMeshData, parseOFF } from './offProcessor.js';
 import { process4DMeshData, parse4OFF } from './offProcessor4D.js';
-import url from '../assets/models/tri.off'; // 默认加载的模型URL
+import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
 
 /**
- * PolyhedronRendererApp 类用于管理 THREE.js 场景、模型加载、用户交互和渲染循环。
+ * PolytopeRendererApp 类用于管理 THREE.js 场景、模型加载、用户交互和渲染循环。
  * 它将应用程序的所有状态和逻辑封装在一个单一的实例中。
  */
-class PolyhedronRendererApp {
+class PolytopeRendererApp {
   constructor() {
     this.faceVisibleSwitcher = null;
     this.wireframeVisibleSwitcher = null;
@@ -910,6 +910,4 @@ class PolyhedronRendererApp {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  new PolyhedronRendererApp();
-});
+document.addEventListener('DOMContentLoaded', () => new PolytopeRendererApp());
