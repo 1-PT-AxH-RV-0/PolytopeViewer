@@ -4,13 +4,7 @@ import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 // 导入外部辅助函数和模块
 import createAxes from './axesCreater.js';
 import shaderCompCallback from './shaderCompCallback.js';
-import {
-  getFarthestPointDist,
-  getFarthest4DPointDist,
-  changeMaterialProperty,
-  disposeGroup
-} from './helperFunc.js';
-import { create4DSphereMesh, toBufferGeometry } from './geometries.js';
+import * as helperFunc from './helperFunc.js';
 import { processMeshData, parseOFF } from './offProcessor.js';
 import { process4DMeshData, parse4OFF } from './offProcessor4D.js';
 import url from '../assets/models/tri.off'; // 默认加载的模型URL
@@ -70,16 +64,13 @@ class PolyhedronRendererApp {
     this._initializeLights();
     this._initializeControls();
 
-    this.axesGroup = await createAxes(
-      this.scene,
-      this.rotUni,
-    );
+    this.axesGroup = await createAxes(this.scene, this.rotUni);
 
     const initialMaterial = new THREE.MeshPhongMaterial({
       color: 0x555555,
       specular: 0x222222,
       shininess: 50,
-      flatShading: true,
+      flatShading: true
     });
 
     await this.loadMeshFromUrl(url, initialMaterial);
@@ -268,11 +259,25 @@ class PolyhedronRendererApp {
       this.sphereRadiusUni
     );
 
-    const wireframeGroup = new THREE.Group();
-    const verticesGroup = new THREE.Group();
-    const uniquePoints = new Set();
+    const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
+    const cylinderInstances = new THREE.InstancedMesh(
+      cylinderGeometry,
+      defaultCylinderMaterial,
+      edges.length
+    );
 
-    edges.forEach(([start, end]) => {
+    const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
+    const sphereInstances = new THREE.InstancedMesh(
+      sphereGeometry,
+      defaultSphereMaterial,
+      edges.length * 2
+    ); // 最多可能需要边数×2的顶点
+    sphereInstances.count = 0; // 初始为0，后面会递增
+
+    const uniquePoints = new Set();
+    const dummy = new THREE.Object3D();
+
+    edges.forEach(([start, end], index) => {
       const startKey = `${start.x},${start.y},${start.z}`;
       const endKey = `${end.x},${end.y},${end.z}`;
 
@@ -281,40 +286,43 @@ class PolyhedronRendererApp {
       const direction = new THREE.Vector3().subVectors(endVec, startVec);
       const length = direction.length();
 
-      const cylinder = new THREE.Mesh(
-        new THREE.CylinderGeometry(1, 1, length, 8, 1, false),
-        defaultCylinderMaterial
+      dummy.position.copy(
+        new THREE.Vector3().addVectors(startVec, endVec).multiplyScalar(0.5)
       );
-
-      cylinder.quaternion.setFromUnitVectors(
+      dummy.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
         direction.clone().normalize()
       );
-      cylinder.position.copy(
-        new THREE.Vector3().addVectors(startVec, endVec).multiplyScalar(0.5)
-      );
-      wireframeGroup.add(cylinder);
+      dummy.scale.set(1, length, 1); // 通过缩放Y轴来调整长度
+      dummy.updateMatrix();
+      cylinderInstances.setMatrixAt(index, dummy.matrix);
 
       if (!uniquePoints.has(startKey)) {
-        const sphere = new THREE.Mesh(
-          new THREE.SphereGeometry(1, 16, 16),
-          defaultSphereMaterial
-        );
-        sphere.position.copy(startVec);
-        verticesGroup.add(sphere);
+        dummy.position.copy(startVec);
+        dummy.scale.set(1, 1, 1);
+        dummy.quaternion.identity();
+        dummy.updateMatrix();
+        sphereInstances.setMatrixAt(sphereInstances.count++, dummy.matrix);
         uniquePoints.add(startKey);
       }
 
       if (!uniquePoints.has(endKey)) {
-        const sphere = new THREE.Mesh(
-          new THREE.SphereGeometry(1, 16, 16),
-          defaultSphereMaterial
-        );
-        sphere.position.copy(new THREE.Vector3(end.x, end.y, end.z));
-        verticesGroup.add(sphere);
+        dummy.position.copy(endVec);
+        dummy.scale.set(1, 1, 1);
+        dummy.quaternion.identity();
+        dummy.updateMatrix();
+        sphereInstances.setMatrixAt(sphereInstances.count++, dummy.matrix);
         uniquePoints.add(endKey);
       }
     });
+
+    cylinderInstances.instanceMatrix.needsUpdate = true;
+    sphereInstances.instanceMatrix.needsUpdate = true;
+
+    const wireframeGroup = new THREE.Group();
+    const verticesGroup = new THREE.Group();
+    wireframeGroup.add(cylinderInstances);
+    verticesGroup.add(sphereInstances);
 
     return { wireframeGroup, verticesGroup };
   }
@@ -374,39 +382,62 @@ class PolyhedronRendererApp {
     const verticesGroup = new THREE.Group();
     const uniquePoints = new Set();
 
-    edges.forEach(([start, end]) => {
+    const v1Arr = new Float32Array(edges.length * 4);
+    const v2Arr = new Float32Array(edges.length * 4);
+    const vertexSpheresPosArr = [];
+
+    edges.forEach(([start, end], i) => {
       const startKey = `${start.x},${start.y},${start.z},${start.w}`;
       const endKey = `${end.x},${end.y},${end.z},${end.w}`;
 
-      const { x: x1, y: y1, z: z1, w: w1 } = start;
-      const { x: x2, y: y2, z: z2, w: w2 } = end;
-
-      const geometry = toBufferGeometry(new THREE.CylinderGeometry(1, 1, 1, 5));
-      const vertexCount = geometry.attributes.position.count;
-      const v1Arr = new Float32Array(vertexCount * 4);
-      const v2Arr = new Float32Array(vertexCount * 4);
-      for (let i = 0; i < vertexCount; i++) {
-        v1Arr.set([x1, y1, z1, w1], i * 4);
-        v2Arr.set([x2, y2, z2, w2], i * 4);
-      }
-      geometry.setAttribute('v1', new THREE.Float32BufferAttribute(v1Arr, 4));
-      geometry.setAttribute('v2', new THREE.Float32BufferAttribute(v2Arr, 4));
-
-      const cylinder = new THREE.Mesh(geometry, defaultCylinderMaterial);
-      wireframeGroup.add(cylinder);
+      v1Arr.set(Object.values(start), i * 4);
+      v2Arr.set(Object.values(end), i * 4);
 
       if (!uniquePoints.has(startKey)) {
-        const sphere = create4DSphereMesh(start, defaultSphereMaterial);
-        verticesGroup.add(sphere);
+        vertexSpheresPosArr.push(Object.values(start));
         uniquePoints.add(startKey);
       }
 
       if (!uniquePoints.has(endKey)) {
-        const sphere = create4DSphereMesh(end, defaultSphereMaterial);
-        verticesGroup.add(sphere);
+        vertexSpheresPosArr.push(Object.values(end));
         uniquePoints.add(endKey);
       }
     });
+
+    const cylinderGeometry = helperFunc.toBufferGeometry(
+      new THREE.CylinderGeometry(1, 1, 1, 5)
+    );
+    cylinderGeometry.setAttribute(
+      'v1',
+      new THREE.InstancedBufferAttribute(v1Arr, 4)
+    );
+    cylinderGeometry.setAttribute(
+      'v2',
+      new THREE.InstancedBufferAttribute(v2Arr, 4)
+    );
+    const instancedCylinderMesh = new THREE.InstancedMesh(
+      cylinderGeometry,
+      defaultCylinderMaterial,
+      edges.length
+    );
+    wireframeGroup.add(instancedCylinderMesh);
+
+    const sphereGeometry = helperFunc.toBufferGeometry(
+      new THREE.SphereGeometry(1, 5, 5)
+    );
+    sphereGeometry.setAttribute(
+      'center4D',
+      new THREE.InstancedBufferAttribute(
+        new Float32Array(vertexSpheresPosArr.flat()),
+        4
+      )
+    );
+    const instancedSphereMesh = new THREE.InstancedMesh(
+      sphereGeometry,
+      defaultSphereMaterial,
+      vertexSpheresPosArr.length
+    );
+    verticesGroup.add(instancedSphereMesh);
 
     return {
       wireframeGroup,
@@ -441,7 +472,9 @@ class PolyhedronRendererApp {
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
-    this.updateScaleFactor(40 / getFarthestPointDist(meshData.vertices));
+    this.updateScaleFactor(
+      40 / helperFunc.getFarthestPointDist(meshData.vertices)
+    );
 
     const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
       meshData.edges
@@ -505,11 +538,11 @@ class PolyhedronRendererApp {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
     this.projectionDistanceSlider.value =
-      getFarthest4DPointDist(meshData.vertices) * 1.1;
+      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.1;
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
-        getFarthestPointDist(
+        helperFunc.getFarthestPointDist(
           meshData.vertices.map(p => {
             if (!this.schleSwitcher.checked) return { x: p.x, y: p.y, z: p.z };
             const d = +this.projectionDistanceSlider.value;
@@ -628,39 +661,36 @@ class PolyhedronRendererApp {
    * 根据 UI 控件的状态更新模型的可见性、不透明度以及线框和顶点的尺寸。
    */
   updateProperties() {
-    changeMaterialProperty(
+    helperFunc.changeMaterialProperty(
       this.facesGroup,
       'visible',
       this.faceVisibleSwitcher.checked
     );
-    changeMaterialProperty(
+    helperFunc.changeMaterialProperty(
       this.wireframeGroup,
       'visible',
       this.wireframeVisibleSwitcher.checked
     );
-    changeMaterialProperty(
+    helperFunc.changeMaterialProperty(
       this.verticesGroup,
       'visible',
       this.verticesVisibleSwitcher.checked
     );
-    if (this.axesGroup) {
-      // 确保 axesGroup 已加载
-      changeMaterialProperty(
-        this.axesGroup,
-        'visible',
-        this.axisVisibleSwitcher.checked
-      );
-    }
-    changeMaterialProperty(
+    helperFunc.changeMaterialProperty(
+      this.axesGroup,
+      'visible',
+      this.axisVisibleSwitcher.checked
+    );
+    helperFunc.changeMaterialProperty(
       this.facesGroup,
       'opacity',
       +this.facesOpacitySlider.value
     );
-    changeMaterialProperty(
+    helperFunc.changeMaterialProperty(
       this.facesGroup,
       'transparent',
-      (+this.facesOpacitySlider.value) !== 1
-    )
+      +this.facesOpacitySlider.value !== 1
+    );
 
     this.cylinderRadiusUni.value =
       +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
@@ -734,28 +764,28 @@ class PolyhedronRendererApp {
    */
   setupEventListeners() {
     this.faceVisibleSwitcher.addEventListener('change', () =>
-      changeMaterialProperty(
+      helperFunc.changeMaterialProperty(
         this.facesGroup,
         'visible',
         this.faceVisibleSwitcher.checked
       )
     );
     this.wireframeVisibleSwitcher.addEventListener('change', () =>
-      changeMaterialProperty(
+      helperFunc.changeMaterialProperty(
         this.wireframeGroup,
         'visible',
         this.wireframeVisibleSwitcher.checked
       )
     );
     this.verticesVisibleSwitcher.addEventListener('change', () =>
-      changeMaterialProperty(
+      helperFunc.changeMaterialProperty(
         this.verticesGroup,
         'visible',
         this.verticesVisibleSwitcher.checked
       )
     );
     this.axisVisibleSwitcher.addEventListener('change', () =>
-      changeMaterialProperty(
+      helperFunc.changeMaterialProperty(
         this.axesGroup,
         'visible',
         this.axisVisibleSwitcher.checked
@@ -765,16 +795,16 @@ class PolyhedronRendererApp {
       this.updateScaleFactor(+this.scaleFactorSlider.value)
     );
     this.facesOpacitySlider.addEventListener('input', () => {
-      changeMaterialProperty(
+      helperFunc.changeMaterialProperty(
         this.facesGroup,
         'opacity',
         +this.facesOpacitySlider.value
-      )
-      changeMaterialProperty(
+      );
+      helperFunc.changeMaterialProperty(
         this.facesGroup,
         'transparent',
-        (+this.facesOpacitySlider.value) !== 1
-      )
+        +this.facesOpacitySlider.value !== 1
+      );
     });
     this.wireframeAndVerticesDimSlider.addEventListener('input', () => {
       this.cylinderRadiusUni.value =
@@ -828,7 +858,7 @@ class PolyhedronRendererApp {
       const data = e.target.result;
 
       if (this.solidGroup) {
-        disposeGroup(this.solidGroup);
+        helperFunc.disposeGroup(this.solidGroup);
         this.scene.remove(this.solidGroup);
       }
 
@@ -842,7 +872,7 @@ class PolyhedronRendererApp {
         color: 0x555555,
         specular: 0x222222,
         shininess: 50,
-        flatShading: true,
+        flatShading: true
       });
 
       if (this.is4D) {

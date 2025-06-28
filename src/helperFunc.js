@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { set } from 'lodash';
 
 function getFarthestPointDist(points) {
@@ -49,9 +50,23 @@ function disposeGroup(group) {
   group.clear();
 }
 
+function toBufferGeometry(source) {
+  const geo = new THREE.BufferGeometry();
+  ['position', 'normal', 'uv'].forEach(
+    k =>
+      source.attributes[k] && geo.setAttribute(k, source.attributes[k].clone())
+  );
+  source.index && geo.setIndex(source.index.clone());
+  source.parameters && (geo.parameters = { ...source.parameters });
+
+  source.dispose();
+  return geo;
+}
+
 export {
   getFarthestPointDist,
   getFarthest4DPointDist,
   changeMaterialProperty,
-  disposeGroup
+  disposeGroup,
+  toBufferGeometry
 };
