@@ -152,7 +152,7 @@ function apply4DInverseRotation(rotatedPoint, rotationMatrix) {
 /**
  * 解析 4OFF 格式的四维网格数据。
  * @param {string} data - 4OFF 格式的字符串数据。
- * @returns {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, cells: Array<Array<number>>}} 包含顶点、面和胞的对象。
+ * @returns {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} 包含顶点、面、边和胞的对象。
  * @throws {Error} 当文件格式无效时抛出错误。
  */
 function parse4OFF(data) {
@@ -185,8 +185,12 @@ function parse4OFF(data) {
     const count = parseInt(parts[0]);
     cells.push(parts.slice(1, count + 1).map(Number));
   }
+  
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
+  );
 
-  return { vertices, faces, cells };
+  return { vertices, faces, edges, cells };
 }
 
 /**
@@ -218,20 +222,18 @@ function range(start, stop) {
 
 /**
  * 处理四维网格数据，包括面的三角化和胞重构。
- * @param {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, cells: Array<Array<number>>}} data - 四维网格数据对象。
+ * @param {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} data - 四维网格数据对象。
  * @returns {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} 处理后的网格数据，包含新增顶点、三角化面片、边和重构胞。
  */
-function process4DMeshData({ vertices, faces, cells }) {
+function process4DMeshData({ vertices, faces, edges, cells }) {
   const processedVertices = [...vertices];
   const processedFaces = [];
   const processedCells = [];
-  const edges = getUniqueSortedPairs(faces).map(edge =>
-    edge.map(index => vertices[index])
-  );
 
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
     if (face.length === 3) {
+      facesMap[faceIndex] = [processedFaces.length, processedFaces.length]
       processedFaces.push(face);
       return;
     }

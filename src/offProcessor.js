@@ -31,7 +31,7 @@ function decomposeSelfIntersectingPolygon(originalPoints) {
 /**
  * 解析 OFF 格式的 3D 模型数据。
  * @param {string} data - OFF 格式的字符串数据。
- * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>}} 包含顶点和面的对象。
+ * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 包含顶点、边和面的对象。
  * @throws {Error} 当文件格式无效时抛出错误。
  */
 function parseOFF(data) {
@@ -54,8 +54,12 @@ function parseOFF(data) {
     const count = parseInt(parts[0]);
     faces.push(parts.slice(1, count + 1).map(Number));
   }
+  
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
+  );
 
-  return { vertices, faces };
+  return { vertices, faces, edges };
 }
 
 /**
@@ -174,15 +178,12 @@ function getUniqueSortedPairs(arrays) {
 
 /**
  * 处理网格数据，包括顶点和面的三角化。
- * @param {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>}} meshData - 网格数据对象。
+ * @param {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} meshData - 网格数据对象。
  * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 处理后的网格数据。
  */
-function processMeshData({ vertices, faces }) {
+function processMeshData({ vertices, faces, edges }) {
   const processedVertices = [...vertices];
   const processedFaces = [];
-  const edges = getUniqueSortedPairs(faces).map(edge =>
-    edge.map(index => vertices[index])
-  );
 
   faces.forEach(face => {
     if (face.length === 3) {
