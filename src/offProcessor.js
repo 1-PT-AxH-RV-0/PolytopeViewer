@@ -1,6 +1,12 @@
 import * as poly2tri from 'poly2tri';
 import * as polygonClipping from 'polygon-clipping';
 
+
+/**
+ * 将自相交多边形分解为多个非自相交多边形。
+ * @param {Array<{x: number, y: number}>} originalPoints - 原始多边形点集。
+ * @returns {Array<Array<poly2tri.Point>>} 分解后的多边形数组。
+ */
 function decomposeSelfIntersectingPolygon(originalPoints) {
   const coords = originalPoints.map(p => [+p.x.toFixed(6), +p.y.toFixed(6)]);
   if (coords.length > 0) {
@@ -22,6 +28,12 @@ function decomposeSelfIntersectingPolygon(originalPoints) {
   return decomposed;
 }
 
+/**
+ * 解析 OFF 格式的 3D 模型数据。
+ * @param {string} data - OFF 格式的字符串数据。
+ * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>}} 包含顶点和面的对象。
+ * @throws {Error} 当文件格式无效时抛出错误。
+ */
 function parseOFF(data) {
   const lines = data
     .split('\n')
@@ -46,6 +58,11 @@ function parseOFF(data) {
   return { vertices, faces };
 }
 
+/**
+ * 计算三个点所在平面的法向量。
+ * @param {Array<{x: number, y: number, z: number}>} points - 三个点的数组。
+ * @returns {{x: number, y: number, z: number}} 单位法向量。
+ */
 function computeNormal(points) {
   const v1 = {
     x: points[1].x - points[0].x,
@@ -66,6 +83,13 @@ function computeNormal(points) {
   return { x: nx / length, y: ny / length, z: nz / length };
 }
 
+/**
+ * 按照给定的 theta 和 phi 角度旋转 3D 点。
+ * @param {{x: number, y: number, z: number}} p - 要旋转的点。
+ * @param {number} theta - 绕 X 轴的旋转角度（弧度）。
+ * @param {number} phi - 绕 Y 轴的旋转角度（弧度）。
+ * @returns {{x: number, y: number, z: number, orig: object}} 旋转后的点，包含原始点引用。
+ */
 function rotatePoint(p, theta, phi) {
   const cosT = Math.cos(theta),
     sinT = Math.sin(theta);
@@ -80,6 +104,13 @@ function rotatePoint(p, theta, phi) {
   return { x: x2, y: y1, z: z2, orig: p };
 }
 
+/**
+ * 按照给定的 theta 和 phi 角度反向旋转 3D 点。
+ * @param {{x: number, y: number, z: number}} p - 要反向旋转的点。
+ * @param {number} theta - 绕 X 轴的反向旋转角度（弧度）。
+ * @param {number} phi - 绕 Y 轴的反向旋转角度（弧度）。
+ * @returns {{x: number, y: number, z: number}} 反向旋转后的点。
+ */
 function inverseRotatePoint(p, theta, phi) {
   const cosT = Math.cos(-theta),
     sinT = Math.sin(-theta);
@@ -95,6 +126,11 @@ function inverseRotatePoint(p, theta, phi) {
   return { x: x1, y: y2, z: z2 };
 }
 
+/**
+ * 将点集旋转到 XY 平面。
+ * @param {Array<{x: number, y: number, z: number}>} points - 要旋转的点集。
+ * @returns {{rotated: Array<{x: number, y: number, z: number}>, theta: number, phi: number, z: number}} 旋转结果和旋转参数。
+ */
 function rotateToXY(points) {
   const normal = computeNormal(points);
 
@@ -106,6 +142,13 @@ function rotateToXY(points) {
   return { rotated, theta, phi, z: rotated[0].z };
 }
 
+/**
+ * 判断两个 3D 点是否在允许误差范围内接近。
+ * @param {{x: number, y: number, z: number}} point1 - 第一个点。
+ * @param {{x: number, y: number, z: number}} point2 - 第二个点。
+ * @param {number} [epsilon=Number.EPSILON] - 允许的误差范围。
+ * @returns {boolean} 如果点在误差范围内接近则返回 true。
+ */
 function arePointsClose(point1, point2, epsilon = Number.EPSILON) {
   const dx = Math.abs(point1.x - point2.x);
   const dy = Math.abs(point1.y - point2.y);
@@ -114,6 +157,11 @@ function arePointsClose(point1, point2, epsilon = Number.EPSILON) {
   return dx <= epsilon && dy <= epsilon && dz <= epsilon;
 }
 
+/**
+ * 从面数组中提取唯一且排序过的边对。
+ * @param {Array<Array<number>>} arrays - 面的索引数组。
+ * @returns {Array<Array<number>>} 唯一且排序过的边对数组。
+ */
 function getUniqueSortedPairs(arrays) {
   const pairs = arrays.flatMap(arr =>
     arr.map((v, i) => [
@@ -124,6 +172,11 @@ function getUniqueSortedPairs(arrays) {
   return [...new Set(pairs.map(JSON.stringify))].map(JSON.parse);
 }
 
+/**
+ * 处理网格数据，包括顶点和面的三角化。
+ * @param {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>}} meshData - 网格数据对象。
+ * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 处理后的网格数据。
+ */
 function processMeshData({ vertices, faces }) {
   const processedVertices = [...vertices];
   const processedFaces = [];
