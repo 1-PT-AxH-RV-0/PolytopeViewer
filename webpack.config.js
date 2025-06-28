@@ -14,7 +14,7 @@ module.exports = {
     minimizer: [new TerserPlugin()],
     splitChunks: {
       chunks: 'all',
-      minSize: 5000,
+      minSize: 4 * 1024,
       minChunks: 1,
       cacheGroups: {
         vendors: {
@@ -62,11 +62,11 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: '多面体查看器',
+      title: '多胞形预览器',
       template: './src/index.html',
       filename: 'index.html',
       chunks: ['index']
     })
   ],
-  mode: 'development'
+  mode: 'production'
 };
