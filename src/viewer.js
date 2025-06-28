@@ -583,7 +583,7 @@ class PolyhedronRendererApp {
     顶点数：${mesh.vertices.length}
     边数：${mesh.edges.length}
     面数：${mesh.faces.length}
-    `.replace(' ', '');
+    `.trim().replace(' ', '');
     this.infoDis.innerText = info;
 
     const {
@@ -611,13 +611,13 @@ class PolyhedronRendererApp {
   loadMeshFrom4OffData(data, material) {
     const mesh = parse4OFF(data);
     const processedMesh = process4DMeshData(mesh);
-    
+
     const info = `
     顶点数：${mesh.vertices.length}
     边数：${mesh.edges.length}
     面数：${mesh.faces.length}
     胞数：${mesh.cells.length}
-    `.replace(' ', '');
+    `.trim().replace(' ', '');
     this.infoDis.innerText = info;
 
     material = shaderCompCallback.faceMaterial(

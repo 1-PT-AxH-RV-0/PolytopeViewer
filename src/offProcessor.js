@@ -1,7 +1,6 @@
 import * as poly2tri from 'poly2tri';
 import * as polygonClipping from 'polygon-clipping';
 
-
 /**
  * 将自相交多边形分解为多个非自相交多边形。
  * @param {Array<{x: number, y: number}>} originalPoints - 原始多边形点集。
@@ -54,7 +53,7 @@ function parseOFF(data) {
     const count = parseInt(parts[0]);
     faces.push(parts.slice(1, count + 1).map(Number));
   }
-  
+
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])
   );

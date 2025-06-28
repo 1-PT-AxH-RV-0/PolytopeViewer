@@ -1,3 +1,12 @@
 body {
   margin: 8px;
+  font-family: monospace, system-ui;
+}
+
+.info {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 0.5rem;
+  color: white;
 }
