@@ -9,4 +9,16 @@ body {
   top: 12px;
   font-size: 0.5rem;
   color: white;
+  pointer-events: none;
+}
+
+.prog {
+  position: absolute;
+  left: 50vw;
+  top: 50vw;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+  pointer-events: none;
 }

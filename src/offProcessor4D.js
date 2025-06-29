@@ -225,10 +225,13 @@ function range(start, stop) {
  * @param {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} data - 四维网格数据对象。
  * @returns {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} 处理后的网格数据，包含新增顶点、三角化面片、边和重构胞。
  */
-function process4DMeshData({ vertices, faces, edges, cells }) {
+function process4DMeshData({ vertices, faces, edges, cells }, progressCallback) {
   const processedVertices = [...vertices];
   const processedFaces = [];
   const processedCells = [];
+  
+  const totalItems = faces.length;
+  let processedItems = 0;
 
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
@@ -267,6 +270,11 @@ function process4DMeshData({ vertices, faces, edges, cells }) {
         );
 
         triangles.push(...subTriangles);
+      }
+      
+      processedItems++;
+      if (progressCallback && processedItems % 100 === 0) {
+        progressCallback(processedItems, totalItems);
       }
 
       return triangles;
