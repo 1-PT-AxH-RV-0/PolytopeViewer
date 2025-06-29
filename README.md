@@ -17,6 +17,7 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
   - `index.js`: 入口 js.
   - `offProcessor.js`：解析 OFF 的工具。
   - `offProcessor4D.js`：解析 4OFF 的工具。
+  - `processMeshData.worker.js`：用 WebWorker 处理网格数据。
   - `axesCreater.js`：创建坐标轴。
   - `helperFunc.js`：一些辅助函数。
   - `GLSLs.js`：在 GLSL 中的辅助函数。

@@ -27,6 +27,7 @@ class PolytopeRendererApp {
     this.projectionDistanceSlider = null;
     this.fileInput = null;
     this.infoDis = null;
+    this.progDis = null;
 
     this.rotationSliders = [];
 
@@ -98,6 +99,7 @@ class PolytopeRendererApp {
     this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
     this.fileInput = document.getElementById('fileInput');
     this.infoDis = document.getElementById('info');
+    this.progDis = document.getElementById('prog');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
@@ -569,15 +571,48 @@ class PolytopeRendererApp {
       verticesGroup
     };
   }
+  
+  /**
+   * 使用 WebWorker 异步处理网格数据。
+   * @param {Object} meshData - 网格数据。
+   * @param {Bool} is4D - 是否为 4D 网格。
+   */
+  async processMeshData(meshData, is4D=false) {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(new URL('./processMeshData.worker.js', import.meta.url));
+  
+      worker.postMessage({ meshData, is4D });
+  
+      worker.addEventListener('message', event => {
+        const { type, data } = event.data;
+        
+        switch (type) {
+          case 'progress':
+            this.progDis.innerText = `加载进度：${data.toFixed(2)}%`
+            break;
+          case 'complete':
+            worker.terminate();
+            this.progDis.innerText = '';
+            resolve(data);
+            break;
+          case 'error':
+            worker.terminate();
+            this.progDis.innerText = '';
+            reject(data);
+            break;
+        }
+      });
+    });
+  };
 
   /**
    * 从 OFF 格式的字符串数据加载 3D 网格模型。
    * @param {string} data - OFF 格式的字符串数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
-  loadMeshFromOffData(data, material) {
+  async loadMeshFromOffData(data, material) {
     const mesh = parseOFF(data);
-    const processedMesh = processMeshData(mesh);
+    const processedMesh = await this.processMeshData(mesh);
 
     const info = `
     顶点数：${mesh.vertices.length}
@@ -608,9 +643,9 @@ class PolytopeRendererApp {
    * @param {string} data - 4OFF 格式的字符串数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
-  loadMeshFrom4OffData(data, material) {
+  async loadMeshFrom4OffData(data, material) {
     const mesh = parse4OFF(data);
-    const processedMesh = process4DMeshData(mesh);
+    const processedMesh = await this.processMeshData(mesh, true);
 
     const info = `
     顶点数：${mesh.vertices.length}
@@ -661,8 +696,8 @@ class PolytopeRendererApp {
           }
           return response.text();
         })
-        .then(data => {
-          this.loadMeshFromOffData(data, material);
+        .then(async data => {
+          await this.loadMeshFromOffData(data, material);
           resolve();
         });
     });
@@ -894,7 +929,7 @@ class PolytopeRendererApp {
         this.rotationSliders[4].disabled = false;
         this.rotationSliders[5].disabled = false;
       } else {
-        this.loadMeshFromOffData(data, material);
+        await this.loadMeshFromOffData(data, material);
         this.projectionDistanceSlider.disabled = true;
         this.schleSwitcher.disabled = true;
         this.rotationSliders[2].disabled = true;

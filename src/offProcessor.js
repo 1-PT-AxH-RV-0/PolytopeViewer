@@ -180,9 +180,12 @@ function getUniqueSortedPairs(arrays) {
  * @param {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} meshData - 网格数据对象。
  * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 处理后的网格数据。
  */
-function processMeshData({ vertices, faces, edges }) {
+function processMeshData({ vertices, faces, edges }, progressCallback) {
   const processedVertices = [...vertices];
   const processedFaces = [];
+  
+  const totalItems = faces.length;
+  let processedItems = 0;
 
   faces.forEach(face => {
     if (face.length === 3) {
@@ -218,6 +221,11 @@ function processMeshData({ vertices, faces, edges }) {
         );
 
         triangles.push(...subTriangles);
+      }
+      
+      processedItems++;
+      if (progressCallback && processedItems % 100 === 0) {
+        progressCallback(processedItems, totalItems);
       }
 
       return triangles;
