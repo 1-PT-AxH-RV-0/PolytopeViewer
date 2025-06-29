@@ -225,25 +225,22 @@ function range(start, stop) {
  * @param {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} data - 四维网格数据对象。
  * @returns {{vertices: Array<{x: number, y: number, z: number, w: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number, w: number}>>, cells: Array<Array<number>>}} 处理后的网格数据，包含新增顶点、三角化面片、边和重构胞。
  */
-function process4DMeshData({ vertices, faces, edges, cells }, progressCallback) {
+function process4DMeshData(
+  { vertices, faces, edges, cells },
+  progressCallback
+) {
   const processedVertices = [...vertices];
   const processedFaces = [];
   const processedCells = [];
-  
+
   const totalItems = faces.length;
   let processedItems = 0;
 
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
-    if (face.length === 3) {
-      facesMap[faceIndex] = [processedFaces.length, processedFaces.length];
-      processedFaces.push(face);
-      return;
-    }
-
-    const faceVertices = face.map(idx => vertices[idx]);
-
     function triangulateFace(vertices4D) {
+      if (vertices4D.length === 3) return [face];
+
       const { rotated, rotationMatrix, z, w } = rotate4DPointsToXY(vertices4D);
       const contour = rotated.map(p => new poly2tri.Point(p.x, p.y));
 
@@ -271,25 +268,24 @@ function process4DMeshData({ vertices, faces, edges, cells }, progressCallback) 
 
         triangles.push(...subTriangles);
       }
-      
-      processedItems++;
-      if (progressCallback && processedItems % 100 === 0) {
-        progressCallback(processedItems, totalItems);
-      }
-
       return triangles;
     }
 
     const trianglesForFaceStartIndex = processedFaces.length;
+    const faceVertices = face.map(idx => vertices[idx]);
     const triangles = triangulateFace(faceVertices);
-    triangles.forEach(t => {
-      if (t.length === 3) processedFaces.push(t);
-    });
+    console.log(triangles);
+    triangles.forEach(t => processedFaces.push(t));
     const trianglesForFaceEndIndex = processedFaces.length - 1;
     facesMap[faceIndex] = [
       trianglesForFaceStartIndex,
       trianglesForFaceEndIndex
     ];
+
+    processedItems++;
+    if (progressCallback && processedItems % 100 === 0) {
+      progressCallback(processedItems, totalItems);
+    }
   });
 
   for (const cell of cells) {
