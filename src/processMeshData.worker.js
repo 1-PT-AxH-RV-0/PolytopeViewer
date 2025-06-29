@@ -11,7 +11,10 @@ self.addEventListener('message', event => {
 
     const result = func(meshData, (current, total) => {
       progress = (current / total) * 100;
-      self.postMessage({ type: 'progress', data: { progress, current, total }});
+      self.postMessage({
+        type: 'progress',
+        data: { progress, current, total }
+      });
     });
 
     self.postMessage({ type: 'complete', data: result });

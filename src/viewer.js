@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import Nanobar from 'nanobar';
 
 // 导入外部辅助函数和模块
 import createAxes from './axesCreater.js';
@@ -27,6 +28,7 @@ class PolytopeRendererApp {
     this.projectionDistanceSlider = null;
     this.fileInput = null;
     this.infoDis = null;
+    this.progCon = null;
     this.progDis = null;
 
     this.rotationSliders = [];
@@ -51,6 +53,8 @@ class PolytopeRendererApp {
     this.cameraOrtho = null;
     this.camera = null;
     this.controls = null;
+
+    this.loadMeshPromise = null;
 
     this.init();
   }
@@ -99,6 +103,7 @@ class PolytopeRendererApp {
     this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
     this.fileInput = document.getElementById('fileInput');
     this.infoDis = document.getElementById('info');
+    this.progCon = document.getElementById('progContainer');
     this.progDis = document.getElementById('prog');
     /* eslint-enable */
 
@@ -572,13 +577,18 @@ class PolytopeRendererApp {
    * 使用 WebWorker 异步处理网格数据。
    * @param {Object} meshData - 网格数据。
    * @param {Bool} is4D - 是否为 4D 网格。
+   * @returns {Object} 包含 Promise 和 abort 方法的对象。
+   * @property {Promise} promise - 处理结果的 Promise，成功时返回处理完成的数据，失败时返回错误信息。
+   * @property {Function} abort - 中止处理的方法，会终止 Worker 并清理资源。
    */
-  async processMeshData(meshData, is4D = false) {
-    return new Promise((resolve, reject) => {
-      const worker = new Worker(
-        new URL('./processMeshData.worker.js', import.meta.url)
-      );
+  processMeshData(meshData, is4D = false) {
+    const bar = new Nanobar({ target: this.progCon });
+    const controller = new AbortController();
+    const worker = new Worker(
+      new URL('./processMeshData.worker.js', import.meta.url)
+    );
 
+    const promise = new Promise((resolve, reject) => {
       worker.postMessage({ meshData, is4D });
 
       worker.addEventListener('message', event => {
@@ -587,20 +597,36 @@ class PolytopeRendererApp {
         switch (type) {
           case 'progress':
             this.progDis.innerHTML = `${data.progress.toFixed(2)}%<br />（${data.current}/${data.total}）`;
+            bar.go(data.progress);
             break;
           case 'complete':
             worker.terminate();
             this.progDis.innerText = '';
+            bar.el.remove();
+            this.loadMeshPromise = null;
             resolve(data);
             break;
           case 'error':
             worker.terminate();
             this.progDis.innerText = '';
+            bar.el.remove();
+            this.loadMeshPromise = null;
             reject(data);
             break;
         }
       });
     });
+
+    return {
+      promise,
+      abort: () => {
+        controller.abort();
+        worker.terminate();
+        this.progDis.innerText = '';
+        bar.el.remove();
+        this.loadMeshPromise = null;
+      }
+    };
   }
 
   /**
@@ -609,8 +635,10 @@ class PolytopeRendererApp {
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
   async loadMeshFromOffData(data, material) {
+    if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = parseOFF(data);
-    const processedMesh = await this.processMeshData(mesh);
+    this.loadMeshPromise = this.processMeshData(mesh);
+    const processedMesh = await this.loadMeshPromise.promise;
 
     const info = `
     顶点数：${mesh.vertices.length}
@@ -644,8 +672,10 @@ class PolytopeRendererApp {
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
   async loadMeshFrom4OffData(data, material) {
+    if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = parse4OFF(data);
-    const processedMesh = await this.processMeshData(mesh, true);
+    this.loadMeshPromise = this.processMeshData(mesh, true);
+    const processedMesh = await this.loadMeshPromise.promise;
 
     const info = `
     顶点数：${mesh.vertices.length}

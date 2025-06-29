@@ -13,12 +13,25 @@ body {
 }
 
 .prog {
+  text-align: center;
+  font-size: 2rem;
+  color: white;
+}
+
+.prog-container {
   position: absolute;
   left: 50vw;
   top: 50vw;
   transform: translate(-50%, -50%);
-  text-align: center;
-  font-size: 2rem;
-  color: white;
   pointer-events: none;
+}
+
+.nanobar {
+  width: 70vw;
+  border: solid 1px white;
+  height: 12px;
+}
+
+.bar {
+  background-color: #25c4d3;
 }
