@@ -183,19 +183,13 @@ function getUniqueSortedPairs(arrays) {
 function processMeshData({ vertices, faces, edges }, progressCallback) {
   const processedVertices = [...vertices];
   const processedFaces = [];
-  
+
   const totalItems = faces.length;
   let processedItems = 0;
 
   faces.forEach(face => {
-    if (face.length === 3) {
-      processedFaces.push(face);
-      return;
-    }
-
-    const faceVertices = face.map(idx => vertices[idx]);
-
     function triangulateFace(vertices3D) {
+      if (vertices3D.length === 3) return [face];
       const { rotated, theta, phi, z } = rotateToXY(vertices3D);
       const contour = rotated.map(p => new poly2tri.Point(p.x, p.y));
 
@@ -222,19 +216,18 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
 
         triangles.push(...subTriangles);
       }
-      
-      processedItems++;
-      if (progressCallback && processedItems % 100 === 0) {
-        progressCallback(processedItems, totalItems);
-      }
 
       return triangles;
     }
 
+    const faceVertices = face.map(idx => vertices[idx]);
     const triangles = triangulateFace(faceVertices);
-    triangles.forEach(t => {
-      if (t.length === 3) processedFaces.push(t);
-    });
+    triangles.forEach(t => processedFaces.push(t));
+
+    processedItems++;
+    if (progressCallback && processedItems % 100 === 0) {
+      progressCallback(processedItems, totalItems);
+    }
   });
 
   return { vertices: processedVertices, faces: processedFaces, edges };

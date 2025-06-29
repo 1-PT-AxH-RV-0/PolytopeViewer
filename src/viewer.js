@@ -5,8 +5,8 @@ import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import createAxes from './axesCreater.js';
 import shaderCompCallback from './shaderCompCallback.js';
 import * as helperFunc from './helperFunc.js';
-import { processMeshData, parseOFF } from './offProcessor.js';
-import { process4DMeshData, parse4OFF } from './offProcessor4D.js';
+import { parseOFF } from './offProcessor.js';
+import { parse4OFF } from './offProcessor4D.js';
 import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
 
 /**
@@ -462,9 +462,7 @@ class PolytopeRendererApp {
     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 
     const indices = [];
-    meshData.faces.forEach(face => {
-      if (face.length === 3) indices.push(...face);
-    });
+    meshData.faces.forEach(face => indices.push(...face));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
 
@@ -527,9 +525,7 @@ class PolytopeRendererApp {
     );
 
     const indices = [];
-    meshData.faces.forEach(face => {
-      if (face.length === 3) indices.push(...face);
-    });
+    meshData.faces.forEach(face => indices.push(...face));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
 
@@ -571,24 +567,26 @@ class PolytopeRendererApp {
       verticesGroup
     };
   }
-  
+
   /**
    * 使用 WebWorker 异步处理网格数据。
    * @param {Object} meshData - 网格数据。
    * @param {Bool} is4D - 是否为 4D 网格。
    */
-  async processMeshData(meshData, is4D=false) {
+  async processMeshData(meshData, is4D = false) {
     return new Promise((resolve, reject) => {
-      const worker = new Worker(new URL('./processMeshData.worker.js', import.meta.url));
-  
+      const worker = new Worker(
+        new URL('./processMeshData.worker.js', import.meta.url)
+      );
+
       worker.postMessage({ meshData, is4D });
-  
+
       worker.addEventListener('message', event => {
         const { type, data } = event.data;
-        
+
         switch (type) {
           case 'progress':
-            this.progDis.innerText = `加载进度：${data.toFixed(2)}%`
+            this.progDis.innerText = `加载进度：${data.toFixed(2)}%`;
             break;
           case 'complete':
             worker.terminate();
@@ -603,7 +601,7 @@ class PolytopeRendererApp {
         }
       });
     });
-  };
+  }
 
   /**
    * 从 OFF 格式的字符串数据加载 3D 网格模型。
@@ -618,7 +616,9 @@ class PolytopeRendererApp {
     顶点数：${mesh.vertices.length}
     边数：${mesh.edges.length}
     面数：${mesh.faces.length}
-    `.trim().replace(' ', '');
+    `
+      .trim()
+      .replace(' ', '');
     this.infoDis.innerText = info;
 
     const {
@@ -652,7 +652,9 @@ class PolytopeRendererApp {
     边数：${mesh.edges.length}
     面数：${mesh.faces.length}
     胞数：${mesh.cells.length}
-    `.trim().replace(' ', '');
+    `
+      .trim()
+      .replace(' ', '');
     this.infoDis.innerText = info;
 
     material = shaderCompCallback.faceMaterial(
