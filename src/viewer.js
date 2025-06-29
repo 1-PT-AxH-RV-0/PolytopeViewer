@@ -586,7 +586,7 @@ class PolytopeRendererApp {
 
         switch (type) {
           case 'progress':
-            this.progDis.innerText = `加载进度：${data.toFixed(2)}%`;
+            this.progDis.innerHTML = `${data.progress.toFixed(2)}%<br />（${data.current}/${data.total}）`;
             break;
           case 'complete':
             worker.terminate();

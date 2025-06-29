@@ -235,6 +235,7 @@ function process4DMeshData(
 
   const totalItems = faces.length;
   let processedItems = 0;
+  let prevPostTime = performance.now();
 
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
@@ -283,7 +284,9 @@ function process4DMeshData(
     ];
 
     processedItems++;
-    if (progressCallback && processedItems % 100 === 0) {
+    // 每隔 200ms 发送一次进度。
+    if (progressCallback && performance.now() - prevPostTime >= 200) {
+      prevPostTime = performance.now();
       progressCallback(processedItems, totalItems);
     }
   });

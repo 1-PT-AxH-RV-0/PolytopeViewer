@@ -186,6 +186,7 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
 
   const totalItems = faces.length;
   let processedItems = 0;
+  let prevPostTime = performance.now();
 
   faces.forEach(face => {
     function triangulateFace(vertices3D) {
@@ -225,7 +226,9 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
     triangles.forEach(t => processedFaces.push(t));
 
     processedItems++;
-    if (progressCallback && processedItems % 100 === 0) {
+    // 每隔 200ms 发送一次进度。
+    if (progressCallback && performance.now() - prevPostTime >= 200) {
+      prevPostTime = performance.now();
       progressCallback(processedItems, totalItems);
     }
   });
