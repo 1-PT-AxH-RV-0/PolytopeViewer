@@ -275,7 +275,6 @@ function process4DMeshData(
     const trianglesForFaceStartIndex = processedFaces.length;
     const faceVertices = face.map(idx => vertices[idx]);
     const triangles = triangulateFace(faceVertices);
-    console.log(triangles);
     triangles.forEach(t => processedFaces.push(t));
     const trianglesForFaceEndIndex = processedFaces.length - 1;
     facesMap[faceIndex] = [

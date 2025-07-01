@@ -3,6 +3,10 @@ body {
   font-family: monospace, system-ui;
 }
 
+.polytope-renderer {
+  display: block;
+}
+
 .info {
   position: absolute;
   left: 12px;
@@ -12,24 +16,22 @@ body {
   pointer-events: none;
 }
 
+.prog-container {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 .prog {
   text-align: center;
   font-size: 2rem;
   color: white;
 }
 
-.prog-container {
-  position: absolute;
-  left: 50vw;
-  top: 50vw;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
 .nanobar {
-  width: 70vw;
   border: solid 1px white;
   height: 12px;
+  margin: 0 auto;
 }
 
 .bar {
