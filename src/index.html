@@ -8,111 +8,28 @@
   </head>
   <body>
     <canvas class="polytope-renderer" id="polytopeRenderer"></canvas>
-    <label><input type="checkbox" id="perspSwitcher" checked />透视投影</label
-    ><br />
-    <label
-      ><input
-        disabled
-        type="checkbox"
-        id="schleSwitcher"
-        checked />施莱格尔投影</label
-    ><br />
-    <label
-      ><input type="checkbox" id="faceVisibleSwitcher" checked />显示面</label
-    ><br />
-    <label
-      ><input
-        type="checkbox"
-        id="wireframeVisibleSwitcher"
-        checked />显示边</label
-    ><br />
-    <label
-      ><input
-        type="checkbox"
-        id="verticesVisibleSwitcher"
-        checked />显示顶点</label
-    ><br />
-    <label
-      ><input
-        type="checkbox"
-        id="axisVisibleSwitcher"
-        checked />显示坐标轴</label
-    ><br />
-    缩放：<input
-      type="range"
-      min="0.1"
-      max="100"
-      value="1"
-      step="0.01"
-      id="scaleFactorSlider" /><br />
-    面不透明度：<input
-      type="range"
-      min="0.1"
-      max="1"
-      value="1"
-      step="0.01"
-      id="facesOpacitySlider" /><br />
-    边和顶点尺寸：<input
-      type="range"
-      min="0.1"
-      max="2"
-      value="0.5"
-      step="0.01"
-      id="wireframeAndVerticesDimSlider" /><br />
-    投影距离：<input
-      disabled
-      type="range"
-      min="0.1"
-      max="100"
-      value="3"
-      step="0.01"
-      id="projectionDistanceSlider" /><br />
-    XY 旋转：<input
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotXYSlider" /><br />
-    XZ 旋转：<input
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotXZSlider" /><br />
-    XW 旋转：<input
-      disabled
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotXWSlider" /><br />
-    YZ 旋转：<input
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotYZSlider" /><br />
-    YW 旋转：<input
-      disabled
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotYWSlider" /><br />
-    ZW 旋转：<input
-      disabled
-      type="range"
-      min="-360"
-      max="360"
-      value="0"
-      step="0.01"
-      id="rotZWSlider" /><br />
-    <input type="file" id="fileInput" />
+
+    <!-- prettier-ignore -->
+    <div class="controls">
+      <div><label><input type="checkbox" id="perspSwitcher" checked />透视投影</label></div>
+      <div><label><input disabled type="checkbox" id="schleSwitcher" checked />施莱格尔投影</label></div>
+      <div><label><input type="checkbox" id="faceVisibleSwitcher" checked />显示面</label></div>
+      <div><label><input type="checkbox" id="wireframeVisibleSwitcher" checked />显示边</label></div>
+      <div><label><input type="checkbox" id="verticesVisibleSwitcher" checked />显示顶点</label></div>
+      <div><label><input type="checkbox" id="axisVisibleSwitcher" checked />显示坐标轴</label></div>
+      <div>缩放：<input type="range" min="0.1" max="100" value="1" step="0.01" id="scaleFactorSlider" /></div>
+      <div>面不透明度：<input type="range" min="0.1" max="1" value="1" step="0.01" id="facesOpacitySlider" /></div>
+      <div>边和顶点尺寸：<input type="range" min="0.1" max="2" value="0.5" step="0.01" id="wireframeAndVerticesDimSlider" /></div>
+      <div>投影距离：<input disabled type="range" min="0.1" max="100" value="3" step="0.01" id="projectionDistanceSlider" /></div>
+      <div>XY 旋转：<input type="range" min="-360" max="360" value="0" step="0.01" id="rotXYSlider" /></div>
+      <div>XZ 旋转：<input type="range" min="-360" max="360" value="0" step="0.01" id="rotXZSlider" /></div>
+      <div>XW 旋转：<input disabled type="range" min="-360" max="360" value="0" step="0.01" id="rotXWSlider" /></div>
+      <div>YZ 旋转：<input type="range" min="-360" max="360" value="0" step="0.01" id="rotYZSlider" /></div>
+      <div>YW 旋转：<input disabled type="range" min="-360" max="360" value="0" step="0.01" id="rotYWSlider" /></div>
+      <div>ZW 旋转：<input disabled type="range" min="-360" max="360" value="0" step="0.01" id="rotZWSlider" /></div>
+      <div><input type="file" id="fileInput" /></div>
+    </div>
+
     <div id="info" class="info"></div>
     <div id="progContainer" class="prog-container"
       ><div id="prog" class="prog"></div
