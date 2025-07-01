@@ -127,7 +127,7 @@ class PolytopeRendererApp {
     });
 
     const maxSize = Math.min(
-      Math.min(window.innerWidth, window.innerHeight) - 16,
+      Math.min(window.innerWidth, window.innerHeight),
       720
     );
     this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
@@ -139,7 +139,7 @@ class PolytopeRendererApp {
 
     window.addEventListener('resize', () => {
       const newMaxSize = Math.min(
-        Math.min(window.innerWidth, window.innerHeight) - 16,
+        Math.min(window.innerWidth, window.innerHeight),
         720
       );
       this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
