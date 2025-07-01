@@ -30,6 +30,7 @@ class PolytopeRendererApp {
     this.infoDis = null;
     this.progCon = null;
     this.progDis = null;
+    this.nanobar = null;
 
     this.rotationSliders = [];
 
@@ -117,7 +118,7 @@ class PolytopeRendererApp {
    */
   _initializeRenderer() {
     const dpr = window.devicePixelRatio || 1;
-    const canvas = document.getElementById('polyhedronRenderer');
+    const canvas = document.getElementById('polytopeRenderer');
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -132,7 +133,9 @@ class PolytopeRendererApp {
     this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
     canvas.style.width = `${maxSize}px`;
     canvas.style.height = `${maxSize}px`;
-    canvas.style.display = 'block';
+    this.progCon.style.left = `${maxSize / 2 + 8}px`;
+    this.progCon.style.top = `${maxSize / 2 + 8}px`;
+    if (this.nanobar) this.nanobar.style.width = `${maxSize * 0.7}px`;
 
     window.addEventListener('resize', () => {
       const newMaxSize = Math.min(
@@ -142,6 +145,9 @@ class PolytopeRendererApp {
       this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
       canvas.style.width = `${newMaxSize}px`;
       canvas.style.height = `${newMaxSize}px`;
+      this.progCon.style.left = `${newMaxSize / 2 + 8}px`;
+      this.progCon.style.top = `${newMaxSize / 2 + 8}px`;
+      if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
     });
   }
 
@@ -587,6 +593,8 @@ class PolytopeRendererApp {
     const worker = new Worker(
       new URL('./processMeshData.worker.js', import.meta.url)
     );
+    this.nanobar = bar.el;
+    bar.el.style.position = 'static';
 
     const promise = new Promise((resolve, reject) => {
       worker.postMessage({ meshData, is4D });
@@ -604,6 +612,7 @@ class PolytopeRendererApp {
             this.progDis.innerText = '';
             bar.el.remove();
             this.loadMeshPromise = null;
+            this.nanobar = null;
             resolve(data);
             break;
           case 'error':
@@ -611,6 +620,7 @@ class PolytopeRendererApp {
             this.progDis.innerText = '';
             bar.el.remove();
             this.loadMeshPromise = null;
+            this.nanobar = null;
             reject(data);
             break;
         }
@@ -625,6 +635,7 @@ class PolytopeRendererApp {
         this.progDis.innerText = '';
         bar.el.remove();
         this.loadMeshPromise = null;
+        this.nanobar = null;
       }
     };
   }
