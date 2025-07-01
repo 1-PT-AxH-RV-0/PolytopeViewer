@@ -543,7 +543,7 @@ class PolytopeRendererApp {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
     this.projectionDistanceSlider.value =
-      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.1;
+      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.01;
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
