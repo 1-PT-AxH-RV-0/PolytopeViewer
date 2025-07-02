@@ -1,36 +1,18 @@
-import * as poly2tri from 'poly2tri';
-import * as polygonClipping from 'polygon-clipping';
+import poly2tri from 'poly2tri';
 
-/**
- * 将自相交多边形分解为多个非自相交多边形。
- * @param {Array<{x: number, y: number}>} originalPoints - 原始多边形点集。
- * @returns {Array<Array<poly2tri.Point>>} 分解后的多边形数组。
- */
-function decomposeSelfIntersectingPolygon(originalPoints) {
-  const coords = originalPoints.map(p => [+p.x.toFixed(6), +p.y.toFixed(6)]);
-  if (coords.length > 0) {
-    coords.push([coords[0][0], coords[0][1]]);
-  }
-
-  const result = polygonClipping.union([coords]);
-
-  const decomposed = [];
-  for (const polygon of result) {
-    for (const ring of polygon) {
-      if (ring.length === 0) continue;
-      const ringPoints = ring.slice(0, -1);
-      const points = ringPoints.map(([x, y]) => new poly2tri.Point(x, y));
-      decomposed.push(points);
-    }
-  }
-
-  return decomposed;
-}
+import {
+  decomposeSelfIntersectingPolygon,
+  inverseRotatePoint,
+  rotateToXY,
+  arePointsClose,
+  getUniqueSortedPairs
+} from './helperFunc.js';
+import * as type from './type.js';
 
 /**
  * 解析 OFF 格式的 3D 模型数据。
  * @param {string} data - OFF 格式的字符串数据。
- * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 包含顶点、边和面的对象。
+ * @returns {type.Mesh3D} 包含顶点、边和面的对象。
  * @throws {Error} 当文件格式无效时抛出错误。
  */
 function parseOFF(data) {
@@ -62,123 +44,10 @@ function parseOFF(data) {
 }
 
 /**
- * 计算三个点所在平面的法向量。
- * @param {Array<{x: number, y: number, z: number}>} points - 三个点的数组。
- * @returns {{x: number, y: number, z: number}} 单位法向量。
- */
-function computeNormal(points) {
-  const v1 = {
-    x: points[1].x - points[0].x,
-    y: points[1].y - points[0].y,
-    z: points[1].z - points[0].z
-  };
-  const v2 = {
-    x: points[2].x - points[0].x,
-    y: points[2].y - points[0].y,
-    z: points[2].z - points[0].z
-  };
-
-  const nx = v1.y * v2.z - v1.z * v2.y;
-  const ny = v1.z * v2.x - v1.x * v2.z;
-  const nz = v1.x * v2.y - v1.y * v2.x;
-
-  const length = Math.sqrt(nx ** 2 + ny ** 2 + nz ** 2);
-  return { x: nx / length, y: ny / length, z: nz / length };
-}
-
-/**
- * 按照给定的 theta 和 phi 角度旋转 3D 点。
- * @param {{x: number, y: number, z: number}} p - 要旋转的点。
- * @param {number} theta - 绕 X 轴的旋转角度（弧度）。
- * @param {number} phi - 绕 Y 轴的旋转角度（弧度）。
- * @returns {{x: number, y: number, z: number, orig: object}} 旋转后的点，包含原始点引用。
- */
-function rotatePoint(p, theta, phi) {
-  const cosT = Math.cos(theta),
-    sinT = Math.sin(theta);
-  const cosP = Math.cos(phi),
-    sinP = Math.sin(phi);
-  const y1 = p.y * cosT - p.z * sinT;
-  const z1 = p.y * sinT + p.z * cosT;
-
-  const x2 = p.x * cosP + z1 * sinP;
-  const z2 = -p.x * sinP + z1 * cosP;
-
-  return { x: x2, y: y1, z: z2, orig: p };
-}
-
-/**
- * 按照给定的 theta 和 phi 角度反向旋转 3D 点。
- * @param {{x: number, y: number, z: number}} p - 要反向旋转的点。
- * @param {number} theta - 绕 X 轴的反向旋转角度（弧度）。
- * @param {number} phi - 绕 Y 轴的反向旋转角度（弧度）。
- * @returns {{x: number, y: number, z: number}} 反向旋转后的点。
- */
-function inverseRotatePoint(p, theta, phi) {
-  const cosT = Math.cos(-theta),
-    sinT = Math.sin(-theta);
-  const cosP = Math.cos(-phi),
-    sinP = Math.sin(-phi);
-
-  const x1 = p.x * cosP + p.z * sinP;
-  const z1 = -p.x * sinP + p.z * cosP;
-
-  const y2 = p.y * cosT - z1 * sinT;
-  const z2 = p.y * sinT + z1 * cosT;
-
-  return { x: x1, y: y2, z: z2 };
-}
-
-/**
- * 将点集旋转到 XY 平面。
- * @param {Array<{x: number, y: number, z: number}>} points - 要旋转的点集。
- * @returns {{rotated: Array<{x: number, y: number, z: number}>, theta: number, phi: number, z: number}} 旋转结果和旋转参数。
- */
-function rotateToXY(points) {
-  const normal = computeNormal(points);
-
-  const theta = Math.atan2(normal.y, normal.z);
-  const phi = Math.atan2(-normal.x, Math.sqrt(normal.y ** 2 + normal.z ** 2));
-
-  const rotated = points.map(p => rotatePoint(p, theta, phi));
-
-  return { rotated, theta, phi, z: rotated[0].z };
-}
-
-/**
- * 判断两个 3D 点是否在允许误差范围内接近。
- * @param {{x: number, y: number, z: number}} point1 - 第一个点。
- * @param {{x: number, y: number, z: number}} point2 - 第二个点。
- * @param {number} [epsilon=Number.EPSILON] - 允许的误差范围。
- * @returns {boolean} 如果点在误差范围内接近则返回 true。
- */
-function arePointsClose(point1, point2, epsilon = Number.EPSILON) {
-  const dx = Math.abs(point1.x - point2.x);
-  const dy = Math.abs(point1.y - point2.y);
-  const dz = Math.abs(point1.z - point2.z);
-
-  return dx <= epsilon && dy <= epsilon && dz <= epsilon;
-}
-
-/**
- * 从面数组中提取唯一且排序过的边对。
- * @param {Array<Array<number>>} arrays - 面的索引数组。
- * @returns {Array<Array<number>>} 唯一且排序过的边对数组。
- */
-function getUniqueSortedPairs(arrays) {
-  const pairs = arrays.flatMap(arr =>
-    arr.map((v, i) => [
-      Math.min(v, arr[(i + 1) % arr.length]),
-      Math.max(v, arr[(i + 1) % arr.length])
-    ])
-  );
-  return [...new Set(pairs.map(JSON.stringify))].map(JSON.parse);
-}
-
-/**
  * 处理网格数据，包括顶点和面的三角化。
- * @param {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} meshData - 网格数据对象。
- * @returns {{vertices: Array<{x: number, y: number, z: number}>, faces: Array<Array<number>>, edges: Array<Array<{x: number, y: number, z: number}>>}} 处理后的网格数据。
+ * @param {type.NonTriMesh3D} meshData - 网格数据对象。
+ * @param {import('lodash').Function2<number, number, any>} progressCallback - 处理面时每隔 200ms 执行的回调。
+ * @returns {type.Mesh3D} 处理后的网格数据。
  */
 function processMeshData({ vertices, faces, edges }, progressCallback) {
   const processedVertices = [...vertices];
@@ -189,6 +58,11 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
   let prevPostTime = performance.now();
 
   faces.forEach(face => {
+    /**
+     * 三角剖分单个面。
+     * @param {Array<type.Point3D>} vertices3D - 顶点数组。
+     * @returns {Array<[number, number, number]>} - 三角剖分出来的三角形。
+     */
     function triangulateFace(vertices3D) {
       if (vertices3D.length === 3) return [face];
       const { rotated, theta, phi, z } = rotateToXY(vertices3D);
@@ -236,9 +110,4 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
   return { vertices: processedVertices, faces: processedFaces, edges };
 }
 
-export {
-  processMeshData,
-  parseOFF,
-  decomposeSelfIntersectingPolygon,
-  getUniqueSortedPairs
-};
+export { processMeshData, parseOFF };

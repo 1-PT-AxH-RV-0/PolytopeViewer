@@ -9,6 +9,7 @@ import * as helperFunc from './helperFunc.js';
 import { parseOFF } from './offProcessor.js';
 import { parse4OFF } from './offProcessor4D.js';
 import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
+import * as type from './type.js';
 
 /**
  * PolytopeRendererApp 类用于管理 THREE.js 场景、模型加载、用户交互和渲染循环。
@@ -226,12 +227,12 @@ class PolytopeRendererApp {
 
   /**
    * 为 3D 模型创建线框（圆柱体）和顶点（球体）的可视化表示。
-   * @param {Array<[{x: number, y: number, z: number}, {x: number, y: number, z: number}]>} edges - 边的数据，每个元素是一个包含起点和终点 THREE.Vector3 结构的对象数组。
+   * @param {Array<type.Edge3D>} edges - 边的数据，每个元素是一个包含起点和终点 THREE.Vector3 结构的对象数组。
    * @param {object} options - 配置选项。
    * @param {THREE.Material} [options.cylinderMaterial] - 用于圆柱体的 THREE.Material 实例。如果未提供，将使用默认材质。
    * @param {THREE.Material} [options.sphereMaterial] - 用于球体的 THREE.Material 实例。如果未提供，将使用默认材质。
-   * @param {number} [options.cylinderColor=0xc0c0c0] - 如果未提供 `cylinderMaterial`，圆柱体的十六进制颜色。
-   * @param {number} [options.sphereColor=0xffd700] - 如果未提供 `sphereMaterial`，球体的十六进制颜色。
+   * @param {number} [options.cylinderColor] - 如果未提供 `cylinderMaterial`，圆柱体的十六进制颜色。
+   * @param {number} [options.sphereColor] - 如果未提供 `sphereMaterial`，球体的十六进制颜色。
    * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含线框组和顶点组的对象。
    */
   createWireframeAndVertices(
@@ -338,12 +339,12 @@ class PolytopeRendererApp {
 
   /**
    * 为 4D 模型创建线框（圆柱体）和顶点（球体）的可视化表示。
-   * @param {Array<[{x: number, y: number, z: number, w: number}, {x: number, y: number, z: number, w: number}]>} edges - 边的数据，每个元素是一个包含起点和终点（带有w坐标）的对象数组。
+   * @param {Array<type.Edge4D>} edges - 边的数据，每个元素是一个包含起点和终点（带有 w 坐标）的对象数组。
    * @param {object} options - 配置选项。
    * @param {THREE.Material} [options.cylinderMaterial] - 用于圆柱体的 THREE.Material 实例。如果未提供，将使用默认材质。
    * @param {THREE.Material} [options.sphereMaterial] - 用于球体的 THREE.Material 实例。如果未提供，将使用默认材质。
-   * @param {number} [options.cylinderColor=0xc0c0c0] - 如果未提供 `cylinderMaterial`，圆柱体的十六进制颜色。
-   * @param {number} [options.sphereColor=0xffd700] - 如果未提供 `sphereMaterial`，球体的十六进制颜色。
+   * @param {number} [options.cylinderColor] - 如果未提供 `cylinderMaterial`，圆柱体的十六进制颜色。
+   * @param {number} [options.sphereColor] - 如果未提供 `sphereMaterial`，球体的十六进制颜色。
    * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含线框组和顶点组的对象。
    */
   create4DWireframeAndVertices(
@@ -456,7 +457,7 @@ class PolytopeRendererApp {
 
   /**
    * 加载并显示 3D 网格模型。
-   * @param {object} meshData - 包含 `vertices` (THREE.Vector3 数组)、`faces` (索引数组) 和 `edges` (边对数组) 的网格数据。
+   * @param {type.Mesh3D} meshData - 3D 网格数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    * @returns {{scaleFactor: number, solidGroup: THREE.Object3D, facesGroup: THREE.Mesh, wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含模型相关 THREE.js 对象的引用和计算出的缩放因子。
    */
@@ -506,7 +507,7 @@ class PolytopeRendererApp {
 
   /**
    * 加载并显示 4D 网格模型。
-   * @param {object} meshData - 包含 `vertices` (带有w坐标的对象数组)、`faces` (索引数组) 和 `edges` (边对数组) 的网格数据。
+   * @param {type.Mesh4D} meshData - 4D 网格数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    * @returns {{scaleFactor: number, solidGroup: THREE.Object3D, facesGroup: THREE.Mesh, wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含模型相关 THREE.js 对象的引用和计算出的缩放因子。
    */
@@ -581,10 +582,10 @@ class PolytopeRendererApp {
 
   /**
    * 使用 WebWorker 异步处理网格数据。
-   * @param {Object} meshData - 网格数据。
-   * @param {Bool} is4D - 是否为 4D 网格。
-   * @returns {Object} 包含 Promise 和 abort 方法的对象。
-   * @property {Promise} promise - 处理结果的 Promise，成功时返回处理完成的数据，失败时返回错误信息。
+   * @param {(type.NonTriMesh3D|type.NonTriMesh4D)} meshData - 3D / 4D 网格数据。
+   * @param {boolean} is4D - 是否为 4D 网格。
+   * @returns {object} 包含 Promise 和 abort 方法的对象。
+   * @property {Promise<(type.Mesh3D|type.Mesh4D)>} promise - 处理结果的 Promise，成功时返回处理完成的数据，失败时返回错误信息。
    * @property {Function} abort - 中止处理的方法，会终止 Worker 并清理资源。
    */
   processMeshData(meshData, is4D = false) {

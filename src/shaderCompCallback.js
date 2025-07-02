@@ -1,16 +1,15 @@
+import * as THREE from 'three';
 import shaderFuncs from './GLSLs.js';
 
 /**
  * 创建一个可以在顶点着色器中将网格顶点映射到4D球面的材质。
- * 过程：克隆材质，注入 Schlegel 投影、4D 旋转矩阵等 GLSL 片段，
- * 并在顶点阶段根据旋转和投影计算出 3D 坐标。
- *
- * @param {THREE.Material} material - 原始 Three.js 材质
- * @param {THREE.IUniform} sphereRadiusUni - 球体半径 uniform
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform (长度为 16 的数组)
- * @param {THREE.IUniform} projDistUni - 投影距离 uniform
- * @param {THREE.IUniform} isOrthoUni - 是否正交投影 uniform（bool）
- * @returns {THREE.Material} 新的材质实例
+ * 过程：克隆材质，注入 Schlegel 投影、4D 旋转矩阵等 GLSL 片段，并在顶点阶段根据旋转和投影计算出 3D 坐标。
+ * @param {THREE.Material} material - 原始 Three.js 材质。
+ * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
+ * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
+ * @returns {THREE.Material} 新的材质实例。
  */
 function sphereMaterial(
   material,
@@ -58,15 +57,13 @@ function sphereMaterial(
 
 /**
  * 创建一个可以在顶点着色器中将网格顶点映射到 4D 圆柱面的材质。
- * 过程：克隆材质，注入 Schlegel 投影 & 4D 旋转等工具函数，
- * 并在顶点阶段通过 transformCylinderPoint 计算圆柱表面点。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} cylinderRadiusUni - 圆柱半径 uniform
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform
- * @param {THREE.IUniform} projDistUni - 投影距离 uniform
- * @param {THREE.IUniform} isOrthoUni - 是否正交投影 uniform
- * @returns {THREE.Material} 新材质实例
+ * 过程：克隆材质，注入 Schlegel 投影 & 4D 旋转等工具函数，并在顶点阶段通过 transformCylinderPoint 计算圆柱表面点。
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
+ * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
+ * @returns {THREE.Material} 新材质实例。
  */
 function cylinderMaterial(
   material,
@@ -119,10 +116,9 @@ function cylinderMaterial(
 
 /**
  * 3D 空间球体材质：在顶点阶段简单地按 radius 缩放顶点。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} sphereRadiusUni - 球体半径 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function sphereMaterial3D(material, sphereRadiusUni) {
   material = material.clone();
@@ -150,10 +146,9 @@ function sphereMaterial3D(material, sphereRadiusUni) {
 
 /**
  * 3D 空间圆柱材质：在顶点阶段按 x, z 方向缩放至所需半径。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} cylinderRadiusUni - 圆柱半径 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function cylinderMaterial3D(material, cylinderRadiusUni) {
   material = material.clone();
@@ -182,12 +177,11 @@ function cylinderMaterial3D(material, cylinderRadiusUni) {
 
 /**
  * 面片材质：将面的位置从 4D 空间经旋转后投影到 3D。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform
- * @param {THREE.IUniform} projDistUni - 投影距离 uniform
- * @param {THREE.IUniform} isOrthoUni - 是否正交投影 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
+ * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
   material = material.clone();
@@ -224,10 +218,9 @@ function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
 
 /**
  * 轴线材质：在四维空间中选择某一坐标轴，映射为三维的一根圆柱。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function axisMaterial(material, rotUni) {
   material = material.clone();
@@ -271,10 +264,9 @@ function axisMaterial(material, rotUni) {
 
 /**
  * 轴锥材质：在四维空间中选择轴线，并生成一个锥体。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function axisConeMaterial(material, rotUni) {
   material = material.clone();
@@ -319,10 +311,9 @@ function axisConeMaterial(material, rotUni) {
 
 /**
  * 轴标签材质：在轴线上添加文本标签。
- *
- * @param {THREE.Material} material - 原始材质
- * @param {THREE.IUniform} rotUni - 4D 旋转矩阵 uniform
- * @returns {THREE.Material}
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角 uniform.
+ * @returns {THREE.Material} - 新材质实例。
  */
 function axisLabelMaterial(material, rotUni) {
   material = material.clone();
