@@ -22,6 +22,7 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
   - `helperFunc.js`：一些辅助函数。
   - `GLSLs.js`：在 GLSL 中的辅助函数。
   - `shaderCompCallback.js`：为 Three.js 的内置材质注入四维或其他功能。
+  - `type.js`：类型定义。
   - `viewer.js`：主要功能。
   - `style.css`：样式。
   - `index.html`：主页。
