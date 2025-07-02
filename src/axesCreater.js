@@ -14,9 +14,9 @@ const textSize = 5;
 const textOffset = 7;
 
 /**
- * 创建标准材质
- * @param {number} color - 材质颜色
- * @returns {THREE.MeshStandardMaterial} 标准材质对象
+ * 创建标准材质。
+ * @param {number} color - 材质颜色。
+ * @returns {THREE.MeshStandardMaterial} 标准材质对象。
  */
 function createMaterial(color) {
   return new THREE.MeshStandardMaterial({
@@ -28,9 +28,9 @@ function createMaterial(color) {
 }
 
 /**
- * 异步加载字体
- * @param {string} url - 字体文件URL
- * @returns {Promise<THREE.Font>} 返回加载完成的字体对象
+ * 异步加载字体。
+ * @param {string} url - 字体文件URL。
+ * @returns {Promise<THREE.Font>} 返回加载完成的字体对象。
  */
 function loadFontAsync(url) {
   return new Promise((resolve, reject) => {
@@ -45,10 +45,10 @@ function loadFontAsync(url) {
 }
 
 /**
- * 创建坐标轴圆柱体网格
- * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)
- * @param {number} color - 圆柱体颜色
- * @param {THREE.IUniform} rotUni - 旋转参数的 Uniform
+ * 创建坐标轴圆柱体网格。
+ * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)。
+ * @param {number} color - 圆柱体颜色。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
  * @returns {THREE.Mesh} 圆柱体网格对象
  */
 function createAxisCylinderMesh(axis, color, rotUni) {
@@ -75,10 +75,10 @@ function createAxisCylinderMesh(axis, color, rotUni) {
 
 /**
  * 创建坐标轴圆锥体网格
- * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)
- * @param {number} color - 圆锥体颜色
- * @param {THREE.IUniform} rotUni - 旋转参数的 Uniform
- * @returns {THREE.Mesh} 圆锥体网格对象
+ * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)。
+ * @param {number} color - 圆锥体颜色。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @returns {THREE.Mesh} 圆锥体网格对象。
  */
 function createAxisConeMesh(axis, color, rotUni) {
   const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 10));
@@ -108,12 +108,12 @@ function createAxisConeMesh(axis, color, rotUni) {
 
 /**
  * 创建坐标轴标签网格
- * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)
- * @param {number} color - 标签颜色
- * @param {string} text - 标签文本
- * @param {THREE.Font} font - 字体对象
- * @param {THREE.IUniform} rotUni - 旋转参数的 Uniform
- * @returns {THREE.Mesh} 标签网格对象
+ * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)。
+ * @param {number} color - 标签颜色。
+ * @param {string} text - 标签文本。
+ * @param {THREE.Font} font - 字体对象。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @returns {THREE.Mesh} 标签网格对象。
  */
 function createAxisLabelMesh(axis, color, text, font, rotUni) {
   const geometry = toBufferGeometry(
@@ -153,10 +153,10 @@ function createAxisLabelMesh(axis, color, text, font, rotUni) {
 }
 
 /**
- * 创建坐标轴系统
- * @param {THREE.Scene} scene - 场景对象
- * @param {THREE.IUniform} rotUni - 旋转参数的 Uniform
- * @returns {Promise<THREE.Group>} 包含所有坐标轴元素的组对象
+ * 创建坐标轴系统。
+ * @param {THREE.Scene} scene - 场景对象。
+ * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @returns {Promise<THREE.Group>} 包含所有坐标轴元素的组对象。
  */
 async function createAxes(scene, rotUni) {
   const font = await loadFontAsync(fontUrl);
