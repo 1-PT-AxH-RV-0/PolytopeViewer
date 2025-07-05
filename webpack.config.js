@@ -68,5 +68,5 @@ module.exports = {
       chunks: ['index']
     })
   ],
-  mode: 'production'
+  mode: 'development'
 };

@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Nanobar from 'nanobar';
+import CCapture from 'ccapture.js/build/CCapture.min.js';
+import WebMWriter from 'webm-writer';
 
 // 导入外部辅助函数和模块
 import createAxes from './axesCreater.js';
@@ -11,12 +13,96 @@ import { parse4OFF } from './offProcessor4D.js';
 import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
 import * as type from './type.js';
 
+window.WebMWriter = WebMWriter;
+window.download = function(data, filename, mimeType) {
+  const blob = new Blob([data], {type: mimeType});
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+};
+
+function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
+    // 将角度转换为弧度
+    const xy = THREE.MathUtils.degToRad(xy_deg);
+    const xz = THREE.MathUtils.degToRad(xz_deg);
+    const xw = THREE.MathUtils.degToRad(xw_deg);
+    const yz = THREE.MathUtils.degToRad(yz_deg);
+    const yw = THREE.MathUtils.degToRad(yw_deg);
+    const zw = THREE.MathUtils.degToRad(zw_deg);
+    
+    // 计算各旋转角度的正弦和余弦
+    const cxy = Math.cos(xy), sxy = Math.sin(xy);
+    const cxz = Math.cos(xz), sxz = Math.sin(xz);
+    const cxw = Math.cos(xw), sxw = Math.sin(xw);
+    const cyz = Math.cos(yz), syz = Math.sin(yz);
+    const cyw = Math.cos(yw), syw = Math.sin(yw);
+    const czw = Math.cos(zw), szw = Math.sin(zw);
+    
+    // 初始化六个基本旋转矩阵
+    const Rxy = new THREE.Matrix4().set(
+        cxy, -sxy, 0.0, 0.0,
+        sxy,  cxy, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    );
+    
+    const Rxz = new THREE.Matrix4().set(
+        cxz, 0.0, -sxz, 0.0,
+        0.0, 1.0,  0.0, 0.0,
+        sxz, 0.0,  cxz, 0.0,
+        0.0, 0.0,  0.0, 1.0
+    );
+    
+    const Rxw = new THREE.Matrix4().set(
+        cxw, 0.0, 0.0, -sxw,
+        0.0, 1.0, 0.0,  0.0,
+        0.0, 0.0, 1.0,  0.0,
+        sxw, 0.0, 0.0,  cxw
+    );
+    
+    const Ryz = new THREE.Matrix4().set(
+        1.0,  0.0, 0.0, 0.0,
+        0.0,  cyz, -syz, 0.0,
+        0.0,  syz,  cyz, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    );
+    
+    const Ryw = new THREE.Matrix4().set(
+        1.0, 0.0,  0.0, 0.0,
+        0.0, cyw,  0.0, -syw,
+        0.0, 0.0,  1.0, 0.0,
+        0.0, syw,  0.0, cyw
+    );
+    
+    const Rzw = new THREE.Matrix4().set(
+        1.0, 0.0, 0.0,  0.0,
+        0.0, 1.0, 0.0,  0.0,
+        0.0, 0.0, czw, -szw,
+        0.0, 0.0, szw,  czw
+    );
+    
+    // 组合所有旋转（顺序会影响最终结果）
+    const result = new THREE.Matrix4();
+    result.multiply(Rzw);
+    result.multiply(Ryw);
+    result.multiply(Ryz);
+    result.multiply(Rxw);
+    result.multiply(Rxz);
+    result.multiply(Rxy);
+    
+    return result;
+}
+
 /**
  * PolytopeRendererApp 类用于管理 THREE.js 场景、模型加载、用户交互和渲染循环。
  * 它将应用程序的所有状态和逻辑封装在一个单一的实例中。
  */
 class PolytopeRendererApp {
   constructor() {
+    this.canvas = null;
     this.faceVisibleSwitcher = null;
     this.wireframeVisibleSwitcher = null;
     this.verticesVisibleSwitcher = null;
@@ -32,6 +118,7 @@ class PolytopeRendererApp {
     this.progCon = null;
     this.progDis = null;
     this.nanobar = null;
+    this.startRecordBtn = null;
 
     this.rotationSliders = [];
 
@@ -43,20 +130,23 @@ class PolytopeRendererApp {
     this.verticesGroup = null;
     this.is4D = false;
 
-    this.rotUni = { value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0] };
+    this.rotAngles = [0, 0, 0, 0, 0, 0]
+    this.rotUni = { value: new THREE.Matrix4() };
     this.projDistUni = { value: 2.0 };
     this.isOrthoUni = { value: 0 };
     this.cylinderRadiusUni = { value: 0.5 };
     this.sphereRadiusUni = { value: 1.0 };
 
     this.renderer = null;
+    this.isRenderingFlag = false;
     this.scene = null;
-    this.cameraPersp = null;
-    this.cameraOrtho = null;
     this.camera = null;
     this.controls = null;
 
     this.loadMeshPromise = null;
+    this.capturer = null;
+    this.recordConfig = null;
+    this.recordStates = null;
 
     this.init();
   }
@@ -84,8 +174,7 @@ class PolytopeRendererApp {
     await this.loadMeshFromUrl(url, initialMaterial);
 
     this.setupEventListeners();
-
-    this.renderer.setAnimationLoop(this.render.bind(this));
+    this.startRenderLoop();
   }
 
   /**
@@ -93,6 +182,7 @@ class PolytopeRendererApp {
    */
   _initializeDomElements() {
     /* eslint-disable */
+    this.canvas = document.getElementById('polytopeRenderer');
     this.faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');
     this.wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');
     this.verticesVisibleSwitcher = document.getElementById('verticesVisibleSwitcher');
@@ -107,6 +197,7 @@ class PolytopeRendererApp {
     this.infoDis = document.getElementById('info');
     this.progCon = document.getElementById('progContainer');
     this.progDis = document.getElementById('prog');
+    this.startRecordBtn = document.getElementById('startRecord');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
@@ -119,12 +210,11 @@ class PolytopeRendererApp {
    */
   _initializeRenderer() {
     const dpr = window.devicePixelRatio || 1;
-    const canvas = document.getElementById('polytopeRenderer');
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: 'high-performance',
-      canvas: canvas
+      canvas: this.canvas
     });
 
     const maxSize = Math.min(
@@ -132,8 +222,8 @@ class PolytopeRendererApp {
       720
     );
     this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
-    canvas.style.width = `${maxSize}px`;
-    canvas.style.height = `${maxSize}px`;
+    this.canvas.style.width = `${maxSize}px`;
+    this.canvas.style.height = `${maxSize}px`;
     this.progCon.style.left = `${maxSize / 2 + 8}px`;
     this.progCon.style.top = `${maxSize / 2 + 8}px`;
     if (this.nanobar) this.nanobar.style.width = `${maxSize * 0.7}px`;
@@ -144,8 +234,8 @@ class PolytopeRendererApp {
         720
       );
       this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
-      canvas.style.width = `${newMaxSize}px`;
-      canvas.style.height = `${newMaxSize}px`;
+      this.canvas.style.width = `${newMaxSize}px`;
+      this.canvas.style.height = `${newMaxSize}px`;
       this.progCon.style.left = `${newMaxSize / 2 + 8}px`;
       this.progCon.style.top = `${newMaxSize / 2 + 8}px`;
       if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
@@ -164,18 +254,8 @@ class PolytopeRendererApp {
    * 初始化透视相机和正交相机，并设置它们的初始位置。
    */
   _initializeCameras() {
-    this.cameraPersp = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
-    this.cameraOrtho = new THREE.OrthographicCamera(
-      -60,
-      60,
-      60,
-      -60,
-      0.01,
-      500
-    );
-    this.cameraPersp.position.set(0, 0, 120);
-    this.cameraOrtho.position.set(0, 0, 120);
-    this.camera = this.cameraPersp.clone();
+    this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
+    this.camera.position.set(0, 0, 120);
   }
 
   /**
@@ -207,22 +287,48 @@ class PolytopeRendererApp {
    * 初始化 TrackballControls 控制器，用于用户交互。
    */
   _initializeControls() {
-    this.controls = new TrackballControls(
-      this.camera,
-      this.renderer.domElement
-    );
-    this.controls.dynamicDampingFactor = 0.8;
-    this.controls.rotateSpeed = 4.0;
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.8;
+    this.controls.enablePan = false;
+    this.controls.minDistance = 1.0;
     this.controls.maxDistance = 150.0;
-    this.controls.minDistance = 0.1;
+    this.controls.minZoom = 0.7;
+    this.controls.maxZoom = 175.0;
   }
 
   /**
-   * THREE.js 渲染循环函数，用于更新控制器和渲染场景。
+   * THREE.js 渲染函数。
    */
   render() {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
+  }
+  
+  /**
+   * 渲染循环函数。
+   */
+  renderLoop() {
+    if (!this.isRenderingFlag) return;
+    this.render();
+    requestAnimationFrame(this.renderLoop.bind(this));
+  }
+  
+  /**
+   * 开始渲染循环。
+   */
+  startRenderLoop() {
+    if (this.isRenderingFlag) return;
+    this.isRenderingFlag = true;
+    this.renderLoop();
+  }
+  
+  /**
+   * 停止渲染循环。
+   */
+  stopRenderLoop() {
+    if (!this.isRenderingFlag) return;
+    this.isRenderingFlag = false;
   }
 
   /**
@@ -240,7 +346,7 @@ class PolytopeRendererApp {
     {
       cylinderMaterial,
       sphereMaterial,
-      cylinderColor = 0xc0c0c0,
+      cylinderColor = 0x777777,
       sphereColor = 0xffd700
     } = {}
   ) {
@@ -248,8 +354,8 @@ class PolytopeRendererApp {
       cylinderMaterial ||
       new THREE.MeshStandardMaterial({
         color: cylinderColor,
-        metalness: 1.0,
-        roughness: 0.4
+        metalness: 0.9,
+        roughness: 0.4,
       });
 
     let defaultSphereMaterial =
@@ -257,32 +363,37 @@ class PolytopeRendererApp {
       new THREE.MeshStandardMaterial({
         color: sphereColor,
         metalness: 1.0,
-        roughness: 0.5
+        roughness: 0.3
       });
 
     defaultCylinderMaterial = shaderCompCallback.cylinderMaterial3D(
       defaultCylinderMaterial,
-      this.cylinderRadiusUni
+      this.cylinderRadiusUni,
+      this.rotUni
     );
     defaultSphereMaterial = shaderCompCallback.sphereMaterial3D(
       defaultSphereMaterial,
-      this.sphereRadiusUni
+      this.sphereRadiusUni,
+      this.rotUni
     );
 
-    const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 8, 1, false);
+    const cylinderGeometry = helperFunc.toBufferGeometry(new THREE.CylinderGeometry(1, 1, 1, 16));
     const cylinderInstances = new THREE.InstancedMesh(
       cylinderGeometry,
       defaultCylinderMaterial,
       edges.length
     );
+    const v1Arr = new Float32Array(edges.length * 3);
+    const v2Arr = new Float32Array(edges.length * 3);
 
-    const sphereGeometry = new THREE.SphereGeometry(1, 16, 16);
+    const sphereGeometry = helperFunc.toBufferGeometry(new THREE.SphereGeometry(1, 16, 16));
     const sphereInstances = new THREE.InstancedMesh(
       sphereGeometry,
       defaultSphereMaterial,
       edges.length * 2
     ); // 最多可能需要边数×2的顶点
     sphereInstances.count = 0; // 初始为0，后面会递增
+    const posArr = [];
 
     const uniquePoints = new Set();
     const dummy = new THREE.Object3D();
@@ -295,39 +406,37 @@ class PolytopeRendererApp {
       const endVec = new THREE.Vector3(end.x, end.y, end.z);
       const direction = new THREE.Vector3().subVectors(endVec, startVec);
       const length = direction.length();
-
-      dummy.position.copy(
-        new THREE.Vector3().addVectors(startVec, endVec).multiplyScalar(0.5)
-      );
-      dummy.quaternion.setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        direction.clone().normalize()
-      );
-      dummy.scale.set(1, length, 1); // 通过缩放Y轴来调整长度
-      dummy.updateMatrix();
-      cylinderInstances.setMatrixAt(index, dummy.matrix);
+      v1Arr.set(startVec.toArray(), index * 3);
+      v2Arr.set(endVec.toArray(), index * 3);
 
       if (!uniquePoints.has(startKey)) {
-        dummy.position.copy(startVec);
-        dummy.scale.set(1, 1, 1);
-        dummy.quaternion.identity();
-        dummy.updateMatrix();
-        sphereInstances.setMatrixAt(sphereInstances.count++, dummy.matrix);
+        posArr.push(...startVec.toArray())
+        sphereInstances.count++;
         uniquePoints.add(startKey);
       }
 
       if (!uniquePoints.has(endKey)) {
-        dummy.position.copy(endVec);
-        dummy.scale.set(1, 1, 1);
-        dummy.quaternion.identity();
-        dummy.updateMatrix();
-        sphereInstances.setMatrixAt(sphereInstances.count++, dummy.matrix);
+        posArr.push(...endVec.toArray())
+        sphereInstances.count++;
         uniquePoints.add(endKey);
       }
     });
 
     cylinderInstances.instanceMatrix.needsUpdate = true;
     sphereInstances.instanceMatrix.needsUpdate = true;
+
+    cylinderGeometry.setAttribute(
+      'v1',
+      new THREE.InstancedBufferAttribute(v1Arr, 3)
+    );
+    cylinderGeometry.setAttribute(
+      'v2',
+      new THREE.InstancedBufferAttribute(v2Arr, 3)
+    );
+    sphereGeometry.setAttribute(
+      'pos',
+      new THREE.InstancedBufferAttribute(new Float32Array(posArr), 3)
+    );
 
     const wireframeGroup = new THREE.Group();
     const verticesGroup = new THREE.Group();
@@ -352,7 +461,7 @@ class PolytopeRendererApp {
     {
       cylinderMaterial,
       sphereMaterial,
-      cylinderColor = 0xc0c0c0,
+      cylinderColor = 0x777777,
       sphereColor = 0xffd700
     } = {}
   ) {
@@ -360,9 +469,8 @@ class PolytopeRendererApp {
       cylinderMaterial ||
       new THREE.MeshStandardMaterial({
         color: cylinderColor,
-        metalness: 1.0,
+        metalness: 0.9,
         roughness: 0.4,
-        side: THREE.DoubleSide
       });
 
     let defaultSphereMaterial =
@@ -370,7 +478,7 @@ class PolytopeRendererApp {
       new THREE.MeshStandardMaterial({
         color: sphereColor,
         metalness: 1.0,
-        roughness: 0.5
+        roughness: 0.3
       });
 
     defaultCylinderMaterial = shaderCompCallback.cylinderMaterial(
@@ -415,7 +523,7 @@ class PolytopeRendererApp {
     });
 
     const cylinderGeometry = helperFunc.toBufferGeometry(
-      new THREE.CylinderGeometry(1, 1, 1, 5)
+      new THREE.CylinderGeometry(1, 1, 1, 16)
     );
     cylinderGeometry.setAttribute(
       'v1',
@@ -433,7 +541,7 @@ class PolytopeRendererApp {
     wireframeGroup.add(instancedCylinderMesh);
 
     const sphereGeometry = helperFunc.toBufferGeometry(
-      new THREE.SphereGeometry(1, 5, 5)
+      new THREE.SphereGeometry(1, 16, 16)
     );
     sphereGeometry.setAttribute(
       'center4D',
@@ -478,6 +586,11 @@ class PolytopeRendererApp {
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
 
+    material = shaderCompCallback.faceMaterial3D(
+      material,
+      this.rotUni
+    )
+
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
     this.updateScaleFactor(
@@ -494,7 +607,6 @@ class PolytopeRendererApp {
     container.scale.setScalar(this.scaleFactor);
 
     this.scene.add(container);
-    this.render();
 
     return {
       scaleFactor: this.scaleFactor,
@@ -544,7 +656,7 @@ class PolytopeRendererApp {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
     this.projectionDistanceSlider.value =
-      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.01;
+      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05;
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
@@ -569,7 +681,6 @@ class PolytopeRendererApp {
     container.scale.setScalar(this.scaleFactor);
 
     this.scene.add(container);
-    this.render();
 
     return {
       scaleFactor: this.scaleFactor,
@@ -800,16 +911,8 @@ class PolytopeRendererApp {
    */
   updateRotation() {
     const rotations = this.rotationSliders.map(i => +i.value);
-    this.rotUni.value = rotations;
-
-    if (!this.is4D) {
-      // 只有在 3D 模式下才直接修改 solidGroup 的旋转
-      if (this.solidGroup) {
-        this.solidGroup.rotation.x = rotations[3] * (Math.PI / -180);
-        this.solidGroup.rotation.y = rotations[1] * (Math.PI / 180);
-        this.solidGroup.rotation.z = rotations[0] * (Math.PI / -180);
-      }
-    }
+    this.rotAngles = rotations;
+    this.rotUni.value = create4DRotationMat(...this.rotAngles);
   }
 
   /**
@@ -834,18 +937,14 @@ class PolytopeRendererApp {
     const oldCamera = this.camera.clone();
 
     if (isPersp) {
-      this.camera = this.cameraPersp.clone();
-      this.camera.position.copy(oldCamera.position);
-      this.camera.rotation.copy(oldCamera.rotation);
-      this.camera.quaternion.copy(oldCamera.quaternion);
+      this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
     } else {
-      this.camera = this.cameraOrtho.clone();
-      this.camera.position.copy(oldCamera.position);
-      this.camera.rotation.copy(oldCamera.rotation);
-      this.camera.quaternion.copy(oldCamera.quaternion);
+      this.camera = new THREE.OrthographicCamera(-60, 60, 60, -60, 0.01, 500);
     }
-
-    this.controls.object = this.camera;
+        
+    this.camera.position.copy(oldCamera.position);
+    this.camera.rotation.copy(oldCamera.rotation);
+    this._initializeControls();
   }
 
   /**
@@ -910,16 +1009,8 @@ class PolytopeRendererApp {
 
     this.rotationSliders.forEach((slider, i) => {
       slider.addEventListener('input', () => {
-        this.rotUni.value[i] = +slider.value;
-
-        if (!this.is4D && this.solidGroup) {
-          if (i === 3)
-            this.solidGroup.rotation.x = +slider.value * (Math.PI / -180);
-          else if (i === 1)
-            this.solidGroup.rotation.y = +slider.value * (Math.PI / 180);
-          else if (i === 0)
-            this.solidGroup.rotation.z = +slider.value * (Math.PI / -180);
-        }
+        this.rotAngles[i] = +slider.value
+        this.rotUni.value = create4DRotationMat(...this.rotAngles);
       });
     });
 
@@ -932,6 +1023,10 @@ class PolytopeRendererApp {
     this.fileInput.addEventListener(
       'change',
       this.handleFileInputChange.bind(this)
+    );
+    this.startRecordBtn.addEventListener(
+      'click',
+      this.startRecord.bind(this)
     );
   }
 
@@ -986,6 +1081,94 @@ class PolytopeRendererApp {
       }
     };
     reader.readAsText(file);
+  }
+  
+  startRecord() {
+    this.recordConfig = {
+      initalRot: [0, 0, 0, 0, 0, 0],
+      actions: [
+        {
+          type: 'rot',
+          plane: 1,
+          angle: 180,
+          start: 1,
+          end: 61
+        },
+        {
+          type: 'rot',
+          plane: 2,
+          angle: 180,
+          start: 61,
+          end: 121
+        }
+      ]
+    }
+    this.recordStates = {
+      rot: create4DRotationMat(...this.recordConfig.initalRot)
+    };
+    const totalFrames = Math.max(...this.recordConfig.actions.map(i => {
+      if (i.type === 'rot' && !this.is4D && [2, 4, 5].includes(i.plane)) {
+        alert(`旋转平面 ${i.plane} 只在四维下存在。`)
+        throw new Error(`旋转平面 ${i.plane} 只在四维下存在。`);
+      }
+      return i.end ?? -1;
+    }));
+    this.rotAngles = [0, 0, 0, 0, 0, 0];
+    this.rotUni.value = new THREE.Matrix4();
+    this.stopRenderLoop();
+    this.controls.dispose();
+    
+    this.capturer = new CCapture({
+      format: 'webm',
+      framerate: 30,
+      name: "Animation",
+      verbose: true
+    });
+    this.capturer.start();
+    
+    let frameIndex = 0;
+    function _renderLoop() {
+      if (frameIndex >= totalFrames) {
+        this.capturer.stop();
+        this.capturer.save();
+        this.capturer = null;
+        
+        this.updateProperties()
+        this.updateProjectionDistance()
+        this.updateRotation()
+        
+        this._initializeControls();
+        this.startRenderLoop();
+        
+        return;
+      }
+      this.genFrame(frameIndex);
+      this.capturer.capture(this.canvas);
+      
+      frameIndex++;
+      requestAnimationFrame(_renderLoop.bind(this));
+    }    
+    _renderLoop.bind(this)();
+  }
+  
+  genFrame(frameIndex) {
+    this.updateRecordStates(frameIndex);
+  
+    const { rot } = this.recordStates;
+    this.camera.position.set(0, 0, 120);
+    this.camera.rotation.set(0, 0, 0);
+    this.rotUni.value = rot;
+    
+    this.render();
+  }
+  
+  updateRecordStates(frameIndex) {
+    const currentRotActions = this.recordConfig.actions.filter(i => i.type === 'rot' && i.start <= frameIndex && frameIndex < i.end);
+    for (const rotAction of currentRotActions) {
+      const rotAng = [0, 0, 0, 0, 0, 0];
+      rotAng[rotAction.plane] = rotAction.angle / (rotAction.end - rotAction.start)
+      this.recordStates.rot.multiply(create4DRotationMat(...rotAng));
+    };
   }
 }
 
