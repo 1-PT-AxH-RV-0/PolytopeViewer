@@ -4,7 +4,7 @@ import Nanobar from 'nanobar';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import WebMWriter from 'webm-writer';
 
-// 导入外部辅助函数和模块
+// 导入外部辅助函数和模块。
 import createAxes from './axesCreater.js';
 import shaderCompCallback from './shaderCompCallback.js';
 import * as helperFunc from './helperFunc.js';
@@ -13,88 +13,19 @@ import { parse4OFF } from './offProcessor4D.js';
 import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
 import * as type from './type.js';
 
+// 导入样式。
+import './style.css';
+
 window.WebMWriter = WebMWriter;
-window.download = function(data, filename, mimeType) {
-  const blob = new Blob([data], {type: mimeType});
+window.download = function (data, filename, mimeType) {
+  const blob = new Blob([data], { type: mimeType });
   const url = URL.createObjectURL(blob);
-  
+
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   a.click();
 };
-
-function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
-    // 将角度转换为弧度
-    const xy = THREE.MathUtils.degToRad(xy_deg);
-    const xz = THREE.MathUtils.degToRad(xz_deg);
-    const xw = THREE.MathUtils.degToRad(xw_deg);
-    const yz = THREE.MathUtils.degToRad(yz_deg);
-    const yw = THREE.MathUtils.degToRad(yw_deg);
-    const zw = THREE.MathUtils.degToRad(zw_deg);
-    
-    // 计算各旋转角度的正弦和余弦
-    const cxy = Math.cos(xy), sxy = Math.sin(xy);
-    const cxz = Math.cos(xz), sxz = Math.sin(xz);
-    const cxw = Math.cos(xw), sxw = Math.sin(xw);
-    const cyz = Math.cos(yz), syz = Math.sin(yz);
-    const cyw = Math.cos(yw), syw = Math.sin(yw);
-    const czw = Math.cos(zw), szw = Math.sin(zw);
-    
-    // 初始化六个基本旋转矩阵
-    const Rxy = new THREE.Matrix4().set(
-        cxy, -sxy, 0.0, 0.0,
-        sxy,  cxy, 0.0, 0.0,
-        0.0,  0.0, 1.0, 0.0,
-        0.0,  0.0, 0.0, 1.0
-    );
-    
-    const Rxz = new THREE.Matrix4().set(
-        cxz, 0.0, -sxz, 0.0,
-        0.0, 1.0,  0.0, 0.0,
-        sxz, 0.0,  cxz, 0.0,
-        0.0, 0.0,  0.0, 1.0
-    );
-    
-    const Rxw = new THREE.Matrix4().set(
-        cxw, 0.0, 0.0, -sxw,
-        0.0, 1.0, 0.0,  0.0,
-        0.0, 0.0, 1.0,  0.0,
-        sxw, 0.0, 0.0,  cxw
-    );
-    
-    const Ryz = new THREE.Matrix4().set(
-        1.0,  0.0, 0.0, 0.0,
-        0.0,  cyz, -syz, 0.0,
-        0.0,  syz,  cyz, 0.0,
-        0.0,  0.0, 0.0, 1.0
-    );
-    
-    const Ryw = new THREE.Matrix4().set(
-        1.0, 0.0,  0.0, 0.0,
-        0.0, cyw,  0.0, -syw,
-        0.0, 0.0,  1.0, 0.0,
-        0.0, syw,  0.0, cyw
-    );
-    
-    const Rzw = new THREE.Matrix4().set(
-        1.0, 0.0, 0.0,  0.0,
-        0.0, 1.0, 0.0,  0.0,
-        0.0, 0.0, czw, -szw,
-        0.0, 0.0, szw,  czw
-    );
-    
-    // 组合所有旋转（顺序会影响最终结果）
-    const result = new THREE.Matrix4();
-    result.multiply(Rzw);
-    result.multiply(Ryw);
-    result.multiply(Ryz);
-    result.multiply(Rxw);
-    result.multiply(Rxz);
-    result.multiply(Rxy);
-    
-    return result;
-}
 
 /**
  * PolytopeRendererApp 类用于管理 THREE.js 场景、模型加载、用户交互和渲染循环。
@@ -110,7 +41,7 @@ class PolytopeRendererApp {
     this.perspSwitcher = null;
     this.schleSwitcher = null;
     this.scaleFactorSlider = null;
-    this.facesOpacitySlider = null;
+    this.faceOpacitySlider = null;
     this.wireframeAndVerticesDimSlider = null;
     this.projectionDistanceSlider = null;
     this.fileInput = null;
@@ -119,6 +50,7 @@ class PolytopeRendererApp {
     this.progDis = null;
     this.nanobar = null;
     this.startRecordBtn = null;
+    this.configFileInput = null;
 
     this.rotationSliders = [];
 
@@ -130,8 +62,11 @@ class PolytopeRendererApp {
     this.verticesGroup = null;
     this.is4D = false;
 
-    this.rotAngles = [0, 0, 0, 0, 0, 0]
+    this.rotAngles = [0, 0, 0, 0, 0, 0];
     this.rotUni = { value: new THREE.Matrix4() };
+    this.ofsUni = { value: new THREE.Vector4(0, 0, 0, 0) };
+    this.ofs3Uni = { value: new THREE.Vector3() };
+    this.axesOffsetScaleUni = { value: 1.0 };
     this.projDistUni = { value: 2.0 };
     this.isOrthoUni = { value: 0 };
     this.cylinderRadiusUni = { value: 0.5 };
@@ -162,7 +97,13 @@ class PolytopeRendererApp {
     this._initializeLights();
     this._initializeControls();
 
-    this.axesGroup = await createAxes(this.scene, this.rotUni);
+    this.axesGroup = await createAxes(
+      this.scene,
+      this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
+      this.axesOffsetScaleUni
+    );
 
     const initialMaterial = new THREE.MeshPhongMaterial({
       color: 0x555555,
@@ -190,7 +131,7 @@ class PolytopeRendererApp {
     this.perspSwitcher = document.getElementById('perspSwitcher');
     this.schleSwitcher = document.getElementById('schleSwitcher');
     this.scaleFactorSlider = document.getElementById('scaleFactorSlider');
-    this.facesOpacitySlider = document.getElementById('facesOpacitySlider');
+    this.faceOpacitySlider = document.getElementById('faceOpacitySlider');
     this.wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');
     this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
     this.fileInput = document.getElementById('fileInput');
@@ -198,6 +139,7 @@ class PolytopeRendererApp {
     this.progCon = document.getElementById('progContainer');
     this.progDis = document.getElementById('prog');
     this.startRecordBtn = document.getElementById('startRecord');
+    this.configFileInput = document.getElementById('configFileInput');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
@@ -304,7 +246,7 @@ class PolytopeRendererApp {
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   }
-  
+
   /**
    * 渲染循环函数。
    */
@@ -313,7 +255,7 @@ class PolytopeRendererApp {
     this.render();
     requestAnimationFrame(this.renderLoop.bind(this));
   }
-  
+
   /**
    * 开始渲染循环。
    */
@@ -322,7 +264,7 @@ class PolytopeRendererApp {
     this.isRenderingFlag = true;
     this.renderLoop();
   }
-  
+
   /**
    * 停止渲染循环。
    */
@@ -355,7 +297,7 @@ class PolytopeRendererApp {
       new THREE.MeshStandardMaterial({
         color: cylinderColor,
         metalness: 0.9,
-        roughness: 0.4,
+        roughness: 0.3
       });
 
     let defaultSphereMaterial =
@@ -369,15 +311,19 @@ class PolytopeRendererApp {
     defaultCylinderMaterial = shaderCompCallback.cylinderMaterial3D(
       defaultCylinderMaterial,
       this.cylinderRadiusUni,
-      this.rotUni
+      this.rotUni,
+      this.ofs3Uni
     );
     defaultSphereMaterial = shaderCompCallback.sphereMaterial3D(
       defaultSphereMaterial,
       this.sphereRadiusUni,
-      this.rotUni
+      this.rotUni,
+      this.ofs3Uni
     );
 
-    const cylinderGeometry = helperFunc.toBufferGeometry(new THREE.CylinderGeometry(1, 1, 1, 16));
+    const cylinderGeometry = helperFunc.toBufferGeometry(
+      new THREE.CylinderGeometry(1, 1, 1, 16)
+    );
     const cylinderInstances = new THREE.InstancedMesh(
       cylinderGeometry,
       defaultCylinderMaterial,
@@ -386,7 +332,9 @@ class PolytopeRendererApp {
     const v1Arr = new Float32Array(edges.length * 3);
     const v2Arr = new Float32Array(edges.length * 3);
 
-    const sphereGeometry = helperFunc.toBufferGeometry(new THREE.SphereGeometry(1, 16, 16));
+    const sphereGeometry = helperFunc.toBufferGeometry(
+      new THREE.SphereGeometry(1, 16, 16)
+    );
     const sphereInstances = new THREE.InstancedMesh(
       sphereGeometry,
       defaultSphereMaterial,
@@ -396,27 +344,23 @@ class PolytopeRendererApp {
     const posArr = [];
 
     const uniquePoints = new Set();
-    const dummy = new THREE.Object3D();
-
     edges.forEach(([start, end], index) => {
       const startKey = `${start.x},${start.y},${start.z}`;
       const endKey = `${end.x},${end.y},${end.z}`;
 
       const startVec = new THREE.Vector3(start.x, start.y, start.z);
       const endVec = new THREE.Vector3(end.x, end.y, end.z);
-      const direction = new THREE.Vector3().subVectors(endVec, startVec);
-      const length = direction.length();
       v1Arr.set(startVec.toArray(), index * 3);
       v2Arr.set(endVec.toArray(), index * 3);
 
       if (!uniquePoints.has(startKey)) {
-        posArr.push(...startVec.toArray())
+        posArr.push(...startVec.toArray());
         sphereInstances.count++;
         uniquePoints.add(startKey);
       }
 
       if (!uniquePoints.has(endKey)) {
-        posArr.push(...endVec.toArray())
+        posArr.push(...endVec.toArray());
         sphereInstances.count++;
         uniquePoints.add(endKey);
       }
@@ -470,7 +414,7 @@ class PolytopeRendererApp {
       new THREE.MeshStandardMaterial({
         color: cylinderColor,
         metalness: 0.9,
-        roughness: 0.4,
+        roughness: 0.3
       });
 
     let defaultSphereMaterial =
@@ -485,6 +429,8 @@ class PolytopeRendererApp {
       defaultCylinderMaterial,
       this.cylinderRadiusUni,
       this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
       this.projDistUni,
       this.isOrthoUni
     );
@@ -492,6 +438,8 @@ class PolytopeRendererApp {
       defaultSphereMaterial,
       this.sphereRadiusUni,
       this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
       this.projDistUni,
       this.isOrthoUni
     );
@@ -588,8 +536,9 @@ class PolytopeRendererApp {
 
     material = shaderCompCallback.faceMaterial3D(
       material,
-      this.rotUni
-    )
+      this.rotUni,
+      this.ofs3Uni
+    );
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
@@ -813,6 +762,8 @@ class PolytopeRendererApp {
     material = shaderCompCallback.faceMaterial(
       material,
       this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
       this.projDistUni,
       this.isOrthoUni
     );
@@ -859,7 +810,7 @@ class PolytopeRendererApp {
   }
 
   /**
-   * 根据 UI 控件的状态更新模型的可见性、不透明度以及线框和顶点的尺寸。
+   * 根据 UI 控件的状态更新模型的可见性、面不透明度、Uniform 值、摄像头模式以及线框和顶点的尺寸。
    */
   updateProperties() {
     helperFunc.changeMaterialProperty(
@@ -885,18 +836,21 @@ class PolytopeRendererApp {
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'opacity',
-      +this.facesOpacitySlider.value
+      +this.faceOpacitySlider.value
     );
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'transparent',
-      +this.facesOpacitySlider.value !== 1
+      +this.faceOpacitySlider.value !== 1
     );
+    this.toggleCamera(this.perspSwitcher.checked);
 
     this.cylinderRadiusUni.value =
       +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
     this.sphereRadiusUni.value =
       (+this.wireframeAndVerticesDimSlider.value / this.scaleFactor) * 2;
+    this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
+    this.ofs3Uni.value = new THREE.Vector3();
   }
 
   /**
@@ -912,7 +866,7 @@ class PolytopeRendererApp {
   updateRotation() {
     const rotations = this.rotationSliders.map(i => +i.value);
     this.rotAngles = rotations;
-    this.rotUni.value = create4DRotationMat(...this.rotAngles);
+    this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
   }
 
   /**
@@ -927,13 +881,14 @@ class PolytopeRendererApp {
     this.sphereRadiusUni.value =
       (+this.wireframeAndVerticesDimSlider.value / scaleFactor) * 2;
     if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
+    this.axesOffsetScaleUni.value = scaleFactor;
   }
 
   /**
    * 切换当前使用的摄像机类型（透视或正交），并保持其位置和方向。
+   * @param {boolean} isPersp - 是否使用透视相机（否则正交）。
    */
-  toggleCamera() {
-    const isPersp = this.perspSwitcher.checked;
+  toggleCamera(isPersp) {
     const oldCamera = this.camera.clone();
 
     if (isPersp) {
@@ -941,7 +896,7 @@ class PolytopeRendererApp {
     } else {
       this.camera = new THREE.OrthographicCamera(-60, 60, 60, -60, 0.01, 500);
     }
-        
+
     this.camera.position.copy(oldCamera.position);
     this.camera.rotation.copy(oldCamera.rotation);
     this._initializeControls();
@@ -983,16 +938,16 @@ class PolytopeRendererApp {
     this.scaleFactorSlider.addEventListener('input', () =>
       this.updateScaleFactor(+this.scaleFactorSlider.value)
     );
-    this.facesOpacitySlider.addEventListener('input', () => {
+    this.faceOpacitySlider.addEventListener('input', () => {
       helperFunc.changeMaterialProperty(
         this.facesGroup,
         'opacity',
-        +this.facesOpacitySlider.value
+        +this.faceOpacitySlider.value
       );
       helperFunc.changeMaterialProperty(
         this.facesGroup,
         'transparent',
-        +this.facesOpacitySlider.value !== 1
+        +this.faceOpacitySlider.value !== 1
       );
     });
     this.wireframeAndVerticesDimSlider.addEventListener('input', () => {
@@ -1009,12 +964,14 @@ class PolytopeRendererApp {
 
     this.rotationSliders.forEach((slider, i) => {
       slider.addEventListener('input', () => {
-        this.rotAngles[i] = +slider.value
-        this.rotUni.value = create4DRotationMat(...this.rotAngles);
+        this.rotAngles[i] = +slider.value;
+        this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
       });
     });
 
-    this.perspSwitcher.addEventListener('change', this.toggleCamera.bind(this));
+    this.perspSwitcher.addEventListener('change', () =>
+      this.toggleCamera(this.perspSwitcher.checked)
+    );
     this.schleSwitcher.addEventListener(
       'change',
       () => (this.isOrthoUni.value = !this.schleSwitcher.checked)
@@ -1024,10 +981,7 @@ class PolytopeRendererApp {
       'change',
       this.handleFileInputChange.bind(this)
     );
-    this.startRecordBtn.addEventListener(
-      'click',
-      this.startRecord.bind(this)
-    );
+    this.startRecordBtn.addEventListener('click', this.startRecord.bind(this));
   }
 
   /**
@@ -1082,93 +1036,515 @@ class PolytopeRendererApp {
     };
     reader.readAsText(file);
   }
-  
-  startRecord() {
-    this.recordConfig = {
-      initalRot: [0, 0, 0, 0, 0, 0],
-      actions: [
-        {
-          type: 'rot',
-          plane: 1,
-          angle: 180,
-          start: 1,
-          end: 61
-        },
-        {
-          type: 'rot',
-          plane: 2,
-          angle: 180,
-          start: 61,
-          end: 121
-        }
-      ]
-    }
-    this.recordStates = {
-      rot: create4DRotationMat(...this.recordConfig.initalRot)
-    };
-    const totalFrames = Math.max(...this.recordConfig.actions.map(i => {
-      if (i.type === 'rot' && !this.is4D && [2, 4, 5].includes(i.plane)) {
-        alert(`旋转平面 ${i.plane} 只在四维下存在。`)
-        throw new Error(`旋转平面 ${i.plane} 只在四维下存在。`);
+
+  /**
+   * 校验录制配置对象中以的有效性。
+   * @param {object} config - 要验证的配置对象。
+   * @throws {Error} 当任何字段验证失败时抛出错误，包含具体的错误信息。
+   */
+  validateRecordConfig(config) {
+    if (config.initialRot !== undefined) {
+      if (
+        !Array.isArray(config.initialRot) ||
+        config.initialRot.length !== 6 ||
+        config.initialRot.some(v => typeof v !== 'number')
+      ) {
+        throw new Error('initialRot 字段必须是包含 6 个实数的数组。');
       }
-      return i.end ?? -1;
-    }));
+    }
+
+    if (config.initialOfs !== undefined) {
+      if (
+        !Array.isArray(config.initialOfs) ||
+        config.initialOfs.length !== 4 ||
+        config.initialOfs.some(v => typeof v !== 'number')
+      ) {
+        throw new Error('initialOfs 字段必须是包含 4 个实数的数组。');
+      }
+    }
+
+    if (config.initialOfs3 !== undefined) {
+      if (
+        !Array.isArray(config.initialOfs3) ||
+        config.initialOfs3.length !== 3 ||
+        config.initialOfs3.some(v => typeof v !== 'number')
+      ) {
+        throw new Error('initialOfs3 字段必须是包含 3 个实数的数组。');
+      }
+    }
+
+    if (config.initialVerticesEdgesDim !== undefined) {
+      if (
+        typeof config.initialVerticesEdgesDim !== 'number' ||
+        config.initialVerticesEdgesDim <= 0
+      ) {
+        throw new Error('initialVerticesEdgesDim 字段必须是正实数。');
+      }
+    }
+
+    if (config.initialProjDist !== undefined) {
+      if (
+        typeof config.initialProjDist !== 'number' ||
+        config.initialProjDist <= 0
+      ) {
+        throw new Error('initialProjDist 字段必须是正实数。');
+      }
+    }
+
+    if (config.initialFaceOpacity !== undefined) {
+      if (
+        typeof config.initialFaceOpacity !== 'number' ||
+        config.initialFaceOpacity < 0 ||
+        config.initialFaceOpacity > 1
+      ) {
+        throw new Error('initialFaceOpacity 字段必须是 0~1 之间的实数。');
+      }
+    }
+
+    if (config.initialVisibilities !== undefined) {
+      const validTargets = ['faces', 'wireframe', 'vertices', 'axes'];
+      for (const [target, value] of Object.entries(
+        config.initialVisibilities
+      )) {
+        if (!validTargets.includes(target)) {
+          throw new Error(
+            `initialVisibilities 字段包含无效的目标类型: ${target}。`
+          );
+        }
+        if (typeof value !== 'boolean') {
+          throw new Error(`initialVisibilities.${target} 字段必须为布尔值。`);
+        }
+      }
+    }
+
+    if (
+      config.initialCameraProjMethod !== undefined &&
+      !['persp', 'ortho'].includes(config.initialCameraProjMethod)
+    ) {
+      throw new Error(
+        'initialCameraProjMethod 字段必须为 "persp" 或 "ortho"。'
+      );
+    }
+
+    if (
+      config.initialSchleProjEnable !== undefined &&
+      typeof config.initialSchleProjEnable !== 'boolean'
+    ) {
+      throw new Error('initialSchleProjEnable 字段必须为布尔值。');
+    }
+
+    if (
+      !Array.isArray(config.actions) ||
+      config.actions.some(i => !(i instanceof Object))
+    ) {
+      throw new Error('action 字段必须为对象列表。');
+    }
+
+    config.actions.forEach((action, index) => {
+      switch (action.type) {
+        case 'rot':
+          if (typeof action.angle !== 'number')
+            throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
+          if (
+            !(
+              Number.isInteger(action.plane) &&
+              0 <= action.plane &&
+              action.plane <= 5
+            )
+          )
+            throw new Error(
+              `actions[${index}] 操作的 plane 字段必须为大于等于零小于六的整数。`
+            );
+          if (!this.is4D && [2, 4, 5].includes(action.plane))
+            throw new Error(
+              `actions[${index}] 操作的 plane 字段值 ${action.plane} 只在四维模式可用。`
+            );
+          break;
+        case 'trans4':
+          if (!this.is4D)
+            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+          if (
+            action.ofs.length !== 4 ||
+            action.ofs.some(v => typeof v !== 'number')
+          )
+            throw new Error(
+              `actions[${index}] 操作的 ofs 字段必须为四个实数的数组。`
+            );
+          break;
+        case 'trans3':
+          if (
+            action.ofs.length !== 3 ||
+            action.ofs.some(v => typeof v !== 'number')
+          )
+            throw new Error(
+              `actions[${index}] 操作的 ofs 字段必须为三个实数的数组。`
+            );
+          break;
+        case 'setVerticesEdgesDim':
+          if (typeof action.dimOfs !== 'number')
+            throw new Error(`actions[${index}] 操作的 dimOfs 字段必须为实数。`);
+          break;
+        case 'setProjDist':
+          if (!this.is4D)
+            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+          if (typeof action.projDistOfs !== 'number')
+            throw new Error(
+              `actions[${index}] 操作的 projDistOfs 字段必须为实数。`
+            );
+          break;
+        case 'setFaceOpacity':
+          if (typeof action.faceOpacityOfs !== 'number')
+            throw new Error(
+              `actions[${index}] 操作的 faceOpacityOfs 字段必须为实数。`
+            );
+          break;
+        case 'setVisibility':
+          if (
+            !['faces', 'wireframe', 'vertices', 'axes'].includes(action.target)
+          )
+            throw new Error(
+              `actions[${index}] 操作的 target 字段值必须为 faces、wireframe、vertices 或 axes 中的一者。`
+            );
+          if (typeof action.visibility !== 'boolean')
+            throw new Error(
+              `actions[${index}] 操作的 visibility 字段值必须为 boolean 类型。`
+            );
+          break;
+        case 'setCameraProjMethod':
+          if (action.projMethod !== 'persp' && action.projMethod !== 'ortho')
+            throw new Error(
+              `actions[${index}] 操作的 projMethod 字段值必须为 persp 或 ortho 中的一者。`
+            );
+          break;
+        case 'setSchleProjEnable':
+          if (!this.is4D)
+            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+          if (typeof action.enable !== 'boolean')
+            throw new Error(
+              `actions[${index}] 操作的 enable 字段值必须为 boolean 类型。`
+            );
+          break;
+        default:
+          throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
+      }
+      
+      if (
+        Object.hasOwnProperty.call(action, 'start') &&
+        Object.hasOwnProperty.call(action, 'end') &&
+        Object.hasOwnProperty.call(action, 'at')
+      ) {
+        throw new Error(
+          `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
+        );
+      } else if (
+        Object.hasOwnProperty.call(action, 'start') &&
+        Object.hasOwnProperty.call(action, 'end')
+      ) {
+        if (['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(action.type)) {
+          throw new Error(`actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setFaceOpacity。`)
+        }
+        if (
+          !Number.isInteger(action.start) ||
+          !Number.isInteger(action.end) ||
+          action.end < action.start ||
+          action.start < 0 ||
+          action.end < 0
+        ) {
+          throw new Error(
+            `actions[${index}] 的 start 和 end 字段必须均为大于等于 0 的整数，且 end 大于等于 start。`
+          );
+        }
+      } else if (Object.hasOwnProperty.call(action, 'at')) {
+        if (!['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(action.type)) {
+          throw new Error(`actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable。`)
+        }
+        if (!Number.isInteger(action.at) || action.at < 0)
+          throw new Error(
+            `actions[${index}] 的 at 字段必须为大于等于 0 的整数。`
+          );
+      } else {
+        throw new Error(
+          `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
+        );
+      }
+    });
+  }
+  
+  /**
+   * 异步获取并解析用户选择的 JSON 文件。
+   * @param {HTMLInputElement} fileInput - 文件输入元素。
+   * @returns {Promise<object>} 返回解析后的 JSON 对象。
+   */
+  parseJsonFileFromInput(fileInput) {
+    return new Promise((resolve, reject) => {
+      // 确保输入元素是文件类型
+      if (fileInput.type !== 'file') {
+        reject(new Error('提供的元素不是文件输入类型'));
+        return;
+      }
+  
+      // 设置临时事件处理程序
+      fileInput.addEventListener('change', function handleChange() {
+        // 移除事件监听器，避免多次触发
+        fileInput.removeEventListener('change', handleChange);
+  
+        if (!fileInput.files || fileInput.files.length === 0) {
+          reject(new Error('没有选择文件'));
+          return;
+        }
+  
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+  
+        reader.onload = (event) => {
+          try {
+            const jsonData = JSON.parse(event.target.result);
+            resolve(jsonData);
+          } catch (error) {
+            reject(new Error('文件解析失败: ' + error.message));
+          }
+        };
+  
+        reader.onerror = () => {
+          reject(new Error('文件读取失败'));
+        };
+  
+        reader.readAsText(file);
+      });
+  
+      // 触发文件选择对话框
+      fileInput.click();
+    });
+  }
+
+  /**
+   * 开始录制视频。
+   */
+  async startRecord() {
+    try {
+      this.recordConfig = await this.parseJsonFileFromInput(this.configFileInput);
+      this.validateRecordConfig(this.recordConfig);
+    } catch (e) {
+      alert(e.message);
+      console.error(e);
+      return;
+    }
+    
+    this.recordStates = {
+      rots: {
+        Infinity: this.recordConfig.initialRot
+          ? helperFunc.create4DRotationMat(...this.recordConfig.initialRot)
+          : this.rotUni.value
+      },
+      ofs: this.recordConfig.initialOfs
+        ? new THREE.Vector4(...this.recordConfig.initialOfs)
+        : this.ofsUni.value,
+      ofs3: this.recordConfig.initialOfs3
+        ? new THREE.Vector3(...this.recordConfig.initialOfs3)
+        : this.ofs3Uni.value,
+      verticesEdgesDim:
+        this.recordConfig.initialVerticesEdgesDim ??
+        this.cylinderRadiusUni.value * this.scaleFactor,
+      projDist: this.recordConfig.initialProjDist ?? this.projDistUni.value,
+      faceOpacity:
+        this.recordConfig.initialFaceOpacity ?? +this.faceOpacitySlider.value,
+      visibilities: this.recordConfig.initialVisibilities ?? {
+        faces: this.faceVisibleSwitcher.checked,
+        wireframe: this.wireframeVisibleSwitcher.checked,
+        vertices: this.verticesVisibleSwitcher.checked,
+        axes: this.axisVisibleSwitcher.checked
+      },
+      cameraIsPersp: this.recordConfig.initialCameraProjMethod
+        ? this.recordConfig.initialCameraProjMethod === 'persp'
+        : this.perspSwitcher.checked,
+      schleProjEnable:
+        this.recordConfig.initialSchleProjEnable ?? !this.isOrthoUni.value
+    };
+
+    const totalFrames = Math.max(
+      ...this.recordConfig.actions.map((i, index) => {
+        i.index = index;
+        return i.end ?? i.at ?? -1;
+      })
+    );
     this.rotAngles = [0, 0, 0, 0, 0, 0];
     this.rotUni.value = new THREE.Matrix4();
     this.stopRenderLoop();
     this.controls.dispose();
-    
+
     this.capturer = new CCapture({
       format: 'webm',
       framerate: 30,
-      name: "Animation",
+      name: 'Animation',
       verbose: true
     });
     this.capturer.start();
-    
+
     let frameIndex = 0;
-    function _renderLoop() {
+    
+    /**
+     * 渲染终止后的动作。
+     * @param {boolean} byError - 是否因错误终止，为 true 时不保存视频。
+     */
+    const _onStopRender = (byError=false) => {
+      this.capturer.stop();
+      if (!byError) this.capturer.save();
+      this.capturer = null;
+
+      this.updateProperties();
+      this.updateProjectionDistance();
+      this.updateRotation();
+
+      this._initializeControls();
+      this.startRenderLoop();
+    }
+    
+    /**
+     * （视频）渲染循环。
+     */
+     const _renderLoop = () => {
       if (frameIndex >= totalFrames) {
-        this.capturer.stop();
-        this.capturer.save();
-        this.capturer = null;
-        
-        this.updateProperties()
-        this.updateProjectionDistance()
-        this.updateRotation()
-        
-        this._initializeControls();
-        this.startRenderLoop();
-        
+        _onStopRender()
         return;
       }
-      this.genFrame(frameIndex);
-      this.capturer.capture(this.canvas);
-      
+      try {
+        this.genFrame(frameIndex);
+        this.capturer.capture(this.canvas);
+      } catch (e) {
+        alert(e.message);
+        _onStopRender(true);
+        console.error(e);
+        return;
+      }
+
       frameIndex++;
-      requestAnimationFrame(_renderLoop.bind(this));
-    }    
-    _renderLoop.bind(this)();
+      requestAnimationFrame(_renderLoop);
+    }
+    _renderLoop();
   }
-  
+
+  /**
+   * 渲染一帧。
+   * @param {number} frameIndex - 帧索引。
+   */
   genFrame(frameIndex) {
     this.updateRecordStates(frameIndex);
-  
-    const { rot } = this.recordStates;
+
+    const {
+      rots,
+      ofs,
+      ofs3,
+      verticesEdgesDim,
+      projDist,
+      faceOpacity,
+      visibilities,
+      cameraIsPersp,
+      schleProjEnable
+    } = this.recordStates;
+    const rot = helperFunc
+      .getSortedValuesDesc(rots)
+      .reduce((accumulator, currentMatrix) => {
+        const product = new THREE.Matrix4();
+        product.multiplyMatrices(accumulator, currentMatrix);
+        return product;
+      }, new THREE.Matrix4().identity());
+
     this.camera.position.set(0, 0, 120);
     this.camera.rotation.set(0, 0, 0);
     this.rotUni.value = rot;
-    
+    this.ofsUni.value = ofs;
+    this.ofs3Uni.value = ofs3;
+    this.sphereRadiusUni.value = (verticesEdgesDim * 2) / this.scaleFactor;
+    this.cylinderRadiusUni.value = verticesEdgesDim / this.scaleFactor;
+    this.projDistUni.value = projDist;
+    this.isOrthoUni.value = !schleProjEnable;
+
+    helperFunc.changeMaterialProperty(this.facesGroup, 'opacity', faceOpacity);
+    helperFunc.changeMaterialProperty(
+      this.facesGroup,
+      'transparent',
+      faceOpacity !== 1
+    );
+
+    /* eslint-disable */
+    helperFunc.changeMaterialProperty(this.facesGroup, 'visible', visibilities.faces ?? true);
+    helperFunc.changeMaterialProperty(this.wireframeGroup, 'visible', visibilities.wireframe ?? true);
+    helperFunc.changeMaterialProperty(this.verticesGroup, 'visible', visibilities.vertices ?? true);
+    helperFunc.changeMaterialProperty(this.axesGroup, 'visible', visibilities.axes ?? true);
+    /* eslint-enable */
+
+    this.toggleCamera(cameraIsPersp);
+
     this.render();
   }
-  
+
+  /**
+   * 更新录制状态。
+   * @param {number} frameIndex - 帧索引。
+   * @throws {Error} 当任何动作导致错误值时抛出，包含具体的错误信息。
+   */
   updateRecordStates(frameIndex) {
-    const currentRotActions = this.recordConfig.actions.filter(i => i.type === 'rot' && i.start <= frameIndex && frameIndex < i.end);
-    for (const rotAction of currentRotActions) {
-      const rotAng = [0, 0, 0, 0, 0, 0];
-      rotAng[rotAction.plane] = rotAction.angle / (rotAction.end - rotAction.start)
-      this.recordStates.rot.multiply(create4DRotationMat(...rotAng));
-    };
+    const currrentActions = this.recordConfig.actions.filter(
+      i => (i.start <= frameIndex && frameIndex < i.end) || frameIndex === i.at
+    );
+    for (const action of currrentActions) {
+      switch (action.type) {
+        case 'rot': {
+          const rotAng = [0, 0, 0, 0, 0, 0];
+          rotAng[action.plane] = action.angle / (action.end - action.start);
+          if (this.recordStates.rots[action.index]) {
+            this.recordStates.rots[action.index].multiply(
+              helperFunc.create4DRotationMat(...rotAng)
+            );
+          } else {
+            this.recordStates.rots[action.index] =
+              helperFunc.create4DRotationMat(...rotAng);
+          }
+          break;
+        }
+        case 'trans4':
+          this.recordStates.ofs.add(
+            new THREE.Vector4(...action.ofs).divideScalar(
+              action.end - action.start
+            )
+          );
+          break;
+        case 'trans3':
+          this.recordStates.ofs3.add(
+            new THREE.Vector3(...action.ofs).divideScalar(
+              action.end - action.start
+            )
+          );
+          break;
+        case 'setVerticesEdgesDim':
+          this.recordStates.verticesEdgesDim +=
+            action.dimOfs / (action.end - action.start);
+          if (this.recordStates.verticesEdgesDim <= 0) 
+            throw new Error(`actions[${action.index}] 错误地导致边和顶点的尺寸为负数。`);
+          break;
+        case 'setProjDist':
+          this.recordStates.projDist +=
+            action.projDistOfs / (action.end - action.start);
+          if (this.recordStates.projDist <= 0) 
+            throw new Error(`actions[${action.index}] 错误地导致投影距离为负数。`);
+          break;
+        case 'setFaceOpacity':
+          this.recordStates.faceOpacity +=
+            action.faceOpacityOfs / (action.end - action.start);
+          if (this.recordStates.faceOpacity < 0 || this.recordStates.faceOpacity > 1)
+            throw new Error(`actions[${action.index}] 错误地导致面透明度超出 0~1 的范围。`);
+          break;
+        case 'setVisibility':
+          this.recordStates.visibilities[action.target] = action.visibility;
+          break;
+        case 'setCameraProjMethod':
+          this.recordStates.cameraIsPersp = action.projMethod === 'persp';
+          break;
+        case 'setSchleProjEnable':
+          this.recordStates.schleProjEnable = action.enable;
+          break;
+      }
+    }
   }
 }
 

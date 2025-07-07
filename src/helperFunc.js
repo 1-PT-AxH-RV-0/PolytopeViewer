@@ -403,6 +403,176 @@ function toBufferGeometry(source) {
   return geo;
 }
 
+/**
+ *
+ * @param xy_deg
+ * @param xz_deg
+ * @param xw_deg
+ * @param yz_deg
+ * @param yw_deg
+ * @param zw_deg
+ */
+function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
+  // 将角度转换为弧度
+  const xy = THREE.MathUtils.degToRad(xy_deg);
+  const xz = THREE.MathUtils.degToRad(xz_deg);
+  const xw = THREE.MathUtils.degToRad(xw_deg);
+  const yz = THREE.MathUtils.degToRad(yz_deg);
+  const yw = THREE.MathUtils.degToRad(yw_deg);
+  const zw = THREE.MathUtils.degToRad(zw_deg);
+
+  // 计算各旋转角度的正弦和余弦
+  const cxy = Math.cos(xy),
+    sxy = Math.sin(xy);
+  const cxz = Math.cos(xz),
+    sxz = Math.sin(xz);
+  const cxw = Math.cos(xw),
+    sxw = Math.sin(xw);
+  const cyz = Math.cos(yz),
+    syz = Math.sin(yz);
+  const cyw = Math.cos(yw),
+    syw = Math.sin(yw);
+  const czw = Math.cos(zw),
+    szw = Math.sin(zw);
+
+  // 初始化六个基本旋转矩阵
+  const Rxy = new THREE.Matrix4().set(
+    cxy,
+    -sxy,
+    0.0,
+    0.0,
+    sxy,
+    cxy,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  );
+
+  const Rxz = new THREE.Matrix4().set(
+    cxz,
+    0.0,
+    -sxz,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    sxz,
+    0.0,
+    cxz,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  );
+
+  const Rxw = new THREE.Matrix4().set(
+    cxw,
+    0.0,
+    0.0,
+    -sxw,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    sxw,
+    0.0,
+    0.0,
+    cxw
+  );
+
+  const Ryz = new THREE.Matrix4().set(
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    cyz,
+    -syz,
+    0.0,
+    0.0,
+    syz,
+    cyz,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  );
+
+  const Ryw = new THREE.Matrix4().set(
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    cyw,
+    0.0,
+    -syw,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    syw,
+    0.0,
+    cyw
+  );
+
+  const Rzw = new THREE.Matrix4().set(
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    czw,
+    -szw,
+    0.0,
+    0.0,
+    szw,
+    czw
+  );
+
+  // 组合所有旋转（顺序会影响最终结果）
+  const result = new THREE.Matrix4();
+  result.multiply(Rzw);
+  result.multiply(Ryw);
+  result.multiply(Ryz);
+  result.multiply(Rxw);
+  result.multiply(Rxz);
+  result.multiply(Rxy);
+
+  return result;
+}
+
+/**
+ * 按键的数值大小对对象进行排序，并返回排序后的值数组。
+ * @param {object} obj - 要排序的对象。
+ * @returns {Array} 排序后的值数组（按 key 从大到小）。
+ */
+function getSortedValuesDesc(obj) {
+  return Object.entries(obj)
+    .sort(([keyA], [keyB]) => +keyB - +keyA)
+    .map(([, value]) => value);
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -417,5 +587,7 @@ export {
   getFarthest4DPointDist,
   changeMaterialProperty,
   disposeGroup,
-  toBufferGeometry
+  toBufferGeometry,
+  create4DRotationMat,
+  getSortedValuesDesc
 };
