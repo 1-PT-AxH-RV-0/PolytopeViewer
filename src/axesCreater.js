@@ -48,10 +48,20 @@ function loadFontAsync(url) {
  * 创建坐标轴圆柱体网格。
  * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)。
  * @param {number} color - 圆柱体颜色。
- * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵的 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Mesh} 圆柱体网格对象
  */
-function createAxisCylinderMesh(axis, color, rotUni) {
+function createAxisCylinderMesh(
+  axis,
+  color,
+  rotUni,
+  ofsUni,
+  ofs3Uni,
+  offsetScaleUni
+) {
   const geometry = toBufferGeometry(
     new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 10)
   );
@@ -66,7 +76,13 @@ function createAxisCylinderMesh(axis, color, rotUni) {
   geometry.setAttribute('len', new THREE.Float32BufferAttribute(lenArr, 1));
 
   let material = createMaterial(color);
-  material = shaderCompCallback.axisMaterial(material, rotUni);
+  material = shaderCompCallback.axisMaterial(
+    material,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
   const cylinder = new THREE.Mesh(geometry, material);
 
@@ -77,10 +93,20 @@ function createAxisCylinderMesh(axis, color, rotUni) {
  * 创建坐标轴圆锥体网格
  * @param {number} axis - 坐标轴索引 (0:X, 1:Y, 2:Z, 3:W)。
  * @param {number} color - 圆锥体颜色。
- * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵的 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Mesh} 圆锥体网格对象。
  */
-function createAxisConeMesh(axis, color, rotUni) {
+function createAxisConeMesh(
+  axis,
+  color,
+  rotUni,
+  ofsUni,
+  ofs3Uni,
+  offsetScaleUni
+) {
   const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 10));
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
@@ -99,7 +125,13 @@ function createAxisConeMesh(axis, color, rotUni) {
   );
 
   let material = createMaterial(color);
-  material = shaderCompCallback.axisConeMaterial(material, rotUni);
+  material = shaderCompCallback.axisConeMaterial(
+    material,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
   const cone = new THREE.Mesh(geometry, material);
 
@@ -112,10 +144,22 @@ function createAxisConeMesh(axis, color, rotUni) {
  * @param {number} color - 标签颜色。
  * @param {string} text - 标签文本。
  * @param {THREE.Font} font - 字体对象。
- * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵的 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Mesh} 标签网格对象。
  */
-function createAxisLabelMesh(axis, color, text, font, rotUni) {
+function createAxisLabelMesh(
+  axis,
+  color,
+  text,
+  font,
+  rotUni,
+  ofsUni,
+  ofs3Uni,
+  offsetScaleUni
+) {
   const geometry = toBufferGeometry(
     new TextGeometry(text, {
       font: font,
@@ -145,7 +189,13 @@ function createAxisLabelMesh(axis, color, text, font, rotUni) {
   );
 
   let material = createMaterial(color);
-  material = shaderCompCallback.axisLabelMaterial(material, rotUni);
+  material = shaderCompCallback.axisLabelMaterial(
+    material,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
   const label = new THREE.Mesh(geometry, material);
 
@@ -155,28 +205,123 @@ function createAxisLabelMesh(axis, color, text, font, rotUni) {
 /**
  * 创建坐标轴系统。
  * @param {THREE.Scene} scene - 场景对象。
- * @param {THREE.IUniform<[number, number, number, number, number, number]>} rotUni - 4D 旋转欧拉角的 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵的 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {Promise<THREE.Group>} 包含所有坐标轴元素的组对象。
  */
-async function createAxes(scene, rotUni) {
+async function createAxes(scene, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
   const font = await loadFontAsync(fontUrl);
   const container = new THREE.Group();
 
-  const cylinderX = createAxisCylinderMesh(0, 0xff0000, rotUni);
-  const coneX = createAxisConeMesh(0, 0xff0000, rotUni);
-  const labelX = createAxisLabelMesh(0, 0xff0000, 'X', font, rotUni);
+  const cylinderX = createAxisCylinderMesh(
+    0,
+    0xff0000,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const coneX = createAxisConeMesh(
+    0,
+    0xff0000,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const labelX = createAxisLabelMesh(
+    0,
+    0xff0000,
+    'X',
+    font,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
-  const cylinderY = createAxisCylinderMesh(1, 0x00ff00, rotUni);
-  const coneY = createAxisConeMesh(1, 0x00ff00, rotUni);
-  const labelY = createAxisLabelMesh(1, 0x00ff00, 'Y', font, rotUni);
+  const cylinderY = createAxisCylinderMesh(
+    1,
+    0x00ff00,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const coneY = createAxisConeMesh(
+    1,
+    0x00ff00,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const labelY = createAxisLabelMesh(
+    1,
+    0x00ff00,
+    'Y',
+    font,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
-  const cylinderZ = createAxisCylinderMesh(2, 0x0000ff, rotUni);
-  const coneZ = createAxisConeMesh(2, 0x0000ff, rotUni);
-  const labelZ = createAxisLabelMesh(2, 0x0000ff, 'Z', font, rotUni);
+  const cylinderZ = createAxisCylinderMesh(
+    2,
+    0x0000ff,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const coneZ = createAxisConeMesh(
+    2,
+    0x0000ff,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const labelZ = createAxisLabelMesh(
+    2,
+    0x0000ff,
+    'Z',
+    font,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
-  const cylinderW = createAxisCylinderMesh(3, 0xf07026, rotUni);
-  const coneW = createAxisConeMesh(3, 0xf07026, rotUni);
-  const labelW = createAxisLabelMesh(3, 0xf07026, 'W', font, rotUni);
+  const cylinderW = createAxisCylinderMesh(
+    3,
+    0xf07026,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const coneW = createAxisConeMesh(
+    3,
+    0xf07026,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
+  const labelW = createAxisLabelMesh(
+    3,
+    0xf07026,
+    'W',
+    font,
+    rotUni,
+    ofsUni,
+    ofs3Uni,
+    offsetScaleUni
+  );
 
   container.add(cylinderX, coneX, labelX);
   container.add(cylinderY, coneY, labelY);

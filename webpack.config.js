@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
-  entry: {index: './src/index.js'},
+  entry: {index: './src/viewer.js'},
   output: {
     filename: 'js/[name].js',
     chunkFilename: 'js/[name].chunk.js',

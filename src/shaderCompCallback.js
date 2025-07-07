@@ -5,19 +5,22 @@ import shaderFuncs from './GLSLs.js';
  * 3D 空间球体材质：在顶点阶段简单地按 radius 缩放顶点。
  * @param {THREE.Material} material - 原始材质。
  * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function sphereMaterial3D(material, sphereRadiusUni, rotUni) {
+function sphereMaterial3D(material, sphereRadiusUni, rotUni, ofs3Uni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.radius = sphereRadiusUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset3D = ofs3Uni;
     shader.vertexShader = `
       attribute vec3 pos;
       uniform float radius;
       uniform mat4 rotation4D;
+      uniform vec3 offset3D;
       ${shader.vertexShader}
     `;
 
@@ -28,6 +31,7 @@ function sphereMaterial3D(material, sphereRadiusUni, rotUni) {
       // 顶点按 radius 统一缩放
       transformed *= radius;
       transformed += (rotation4D * vec4(pos, 0)).xyz;
+      transformed += offset3D;
       `
     );
   };
@@ -39,28 +43,32 @@ function sphereMaterial3D(material, sphereRadiusUni, rotUni) {
  * 3D 空间圆柱材质：在顶点阶段按 x, z 方向缩放至所需半径。
  * @param {THREE.Material} material - 原始材质。
  * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function cylinderMaterial3D(material, cylinderRadiusUni, rotUni) {
+function cylinderMaterial3D(material, cylinderRadiusUni, rotUni, ofs3Uni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.radius = cylinderRadiusUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset3D = ofs3Uni;
 
     shader.vertexShader = `
       attribute vec3 v1;
       attribute vec3 v2;
       uniform float radius;
       uniform mat4 rotation4D;
+      uniform vec3 offset3D;
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <defaultnormal_vertex>',
-      `
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <defaultnormal_vertex>',
+        `
       #include <defaultnormal_vertex>
       // 计算法向量。
       vec3 transformedV1 = (rotation4D * vec4(v1, 0)).xyz;
@@ -69,17 +77,19 @@ function cylinderMaterial3D(material, cylinderRadiusUni, rotUni) {
       objectNormal = transformCylinderPoint(objectNormal, transformedV1, transformedV2);
       transformedNormal = normalMatrix * objectNormal;
       `
-    ).replace(
-      '#include <begin_vertex>',
-      `
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `
       #include <begin_vertex>
       // 让圆柱变粗/细。
       transformed.x *= radius;
       transformed.z *= radius;
       transformed.y += 0.5;
       transformed = transformCylinderPoint(transformed, transformedV1, transformedV2);
+      transformed += offset3D;
       `
-    );
+      );
   };
 
   return material;
@@ -88,17 +98,20 @@ function cylinderMaterial3D(material, cylinderRadiusUni, rotUni) {
 /**
  * 面片材质，在 Shader 中旋转顶点。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function faceMaterial3D(material, rotUni) {
+function faceMaterial3D(material, rotUni, ofs3Uni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset3D = ofs3Uni;
 
     shader.vertexShader = `
       uniform mat4 rotation4D;
+      uniform vec3 offset3D;
       ${shader.vertexShader}
     `;
 
@@ -108,6 +121,7 @@ function faceMaterial3D(material, rotUni) {
       #include <begin_vertex>
       // 将位置旋转。
       transformed = (rotation4D * vec4(transformed, 0)).xyz;
+      transformed += offset3D;
       `
     );
   };
@@ -120,7 +134,9 @@ function faceMaterial3D(material, rotUni) {
  * 过程：克隆材质，注入 Schlegel 投影、4D 旋转矩阵等 GLSL 片段，并在顶点阶段根据旋转和投影计算出 3D 坐标。
  * @param {THREE.Material} material - 原始 Three.js 材质。
  * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
  * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
  * @returns {THREE.Material} 新的材质实例。
@@ -129,6 +145,8 @@ function sphereMaterial(
   material,
   sphereRadiusUni,
   rotUni,
+  ofsUni,
+  ofs3Uni,
   projDistUni,
   isOrthoUni
 ) {
@@ -137,6 +155,8 @@ function sphereMaterial(
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
     shader.uniforms.radius = sphereRadiusUni;
     shader.uniforms.isOrtho = isOrthoUni;
 
@@ -146,6 +166,8 @@ function sphereMaterial(
       uniform float projectionDistance;
       uniform bool isOrtho;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
 
       ${shaderFuncs.schlegelProjection}
       ${shader.vertexShader}
@@ -157,8 +179,8 @@ function sphereMaterial(
       `
       #include <begin_vertex>
       // 将顶点按球体半径缩放，再加上中心点的 3D 投影
-      vec3 center3D = schlegelProjection(rotation4D * center4D);
-      transformed = transformed * radius + center3D;
+      vec3 center3D = schlegelProjection(rotation4D * center4D + offset4D);
+      transformed = transformed * radius + center3D + offset3D;
       `
     );
   };
@@ -171,7 +193,9 @@ function sphereMaterial(
  * 过程：克隆材质，注入 Schlegel 投影 & 4D 旋转等工具函数，并在顶点阶段通过 transformCylinderPoint 计算圆柱表面点。
  * @param {THREE.Material} material - 原始材质。
  * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
  * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
  * @returns {THREE.Material} 新材质实例。
@@ -180,6 +204,8 @@ function cylinderMaterial(
   material,
   cylinderRadiusUni,
   rotUni,
+  ofsUni,
+  ofs3Uni,
   projDistUni,
   isOrthoUni
 ) {
@@ -188,6 +214,8 @@ function cylinderMaterial(
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
     shader.uniforms.radius = cylinderRadiusUni;
     shader.uniforms.isOrtho = isOrthoUni;
 
@@ -198,35 +226,39 @@ function cylinderMaterial(
       uniform float projectionDistance;
       uniform bool isOrtho;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
       
       ${shaderFuncs.schlegelProjection}
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
     `;
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <defaultnormal_vertex>',
-      `
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <defaultnormal_vertex>',
+        `
       #include <defaultnormal_vertex>
       // 计算 4D 空间中圆柱两端点的投影
-      vec3 pv1 = schlegelProjection(rotation4D * v1);
-      vec3 pv2 = schlegelProjection(rotation4D * v2);
+      vec3 pv1 = schlegelProjection(rotation4D * v1 + offset4D);
+      vec3 pv2 = schlegelProjection(rotation4D * v2 + offset4D);
       // 计算法向量
       objectNormal = transformCylinderPoint(objectNormal, pv1, pv2);
       transformedNormal = normalMatrix * objectNormal;
       `
-    ).replace(
-      '#include <begin_vertex>',
-      `
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `
       #include <begin_vertex>
       // 将模型顶点在 x, z 方向缩放至所需半径（让圆柱变粗/细）
       transformed.x *= radius;
       transformed.z *= radius;
       transformed.y += 0.5;
       // 将顶点旋转平移到合适位置
-      transformed = transformCylinderPoint(transformed, pv1, pv2);
+      transformed = transformCylinderPoint(transformed, pv1, pv2) + offset3D;
       `
-    );
+      );
   };
 
   return material;
@@ -235,17 +267,28 @@ function cylinderMaterial(
 /**
  * 面片材质：将面的位置从 4D 空间经旋转后投影到 3D。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
  * @param {THREE.IUniform<number>} projDistUni - 投影距离 uniform.
  * @param {THREE.IUniform<boolean>} isOrthoUni - 是否正交投影 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
+function faceMaterial(
+  material,
+  rotUni,
+  ofsUni,
+  ofs3Uni,
+  projDistUni,
+  isOrthoUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.projectionDistance = projDistUni;
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
     shader.uniforms.isOrtho = isOrthoUni;
 
     shader.vertexShader = `
@@ -253,6 +296,8 @@ function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
       uniform float projectionDistance;
       uniform bool isOrtho;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
       
       ${shaderFuncs.schlegelProjection}
       ${shader.vertexShader}
@@ -263,8 +308,8 @@ function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
       `
       #include <begin_vertex>
       // 将四维位置旋转后投影到三维空间
-      vec4 rotatedPosition4D = rotation4D * position4D;
-      transformed = schlegelProjection(rotatedPosition4D);
+      vec4 rotatedPosition4D = rotation4D * position4D + offset4D;
+      transformed = schlegelProjection(rotatedPosition4D) + offset3D;
       `
     );
   };
@@ -275,19 +320,28 @@ function faceMaterial(material, rotUni, projDistUni, isOrthoUni) {
 /**
  * 轴线材质：在四维空间中选择某一坐标轴，映射为三维的一根圆柱。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function axisMaterial(material, rotUni) {
+function axisMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
+    shader.uniforms.offsetScale = offsetScaleUni;
 
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
+      uniform float offsetScale;
       
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
@@ -309,7 +363,7 @@ function axisMaterial(material, rotUni) {
       float scale = len / length(vProj) * s;
       vProj *= scale;
       // 旋转与平移
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), -vProj, vProj);
+      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), -vProj + offset4D.xyz * offsetScale, vProj + offset4D.xyz * offsetScale) + offset3D * offsetScale;
       `
     );
   };
@@ -320,20 +374,29 @@ function axisMaterial(material, rotUni) {
 /**
  * 轴锥材质：在四维空间中选择轴线，并生成一个锥体。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function axisConeMaterial(material, rotUni) {
+function axisConeMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
+    shader.uniforms.offsetScale = offsetScaleUni;
 
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
       attribute float height;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
+      uniform float offsetScale;
 
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
@@ -355,7 +418,7 @@ function axisConeMaterial(material, rotUni) {
       float scale2 = (len * s + height) / length(vProj);
       vec3 vProj1 = vProj * scale1;
       vec3 vProj2 = vProj * scale2;
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1, vProj2);
+      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale) + offset3D * offsetScale;
       `
     );
   };
@@ -366,20 +429,29 @@ function axisConeMaterial(material, rotUni) {
 /**
  * 轴标签材质：在轴线上添加文本标签。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.Matrix4} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
+ * @param {THREE.IUniform<THREE.Vector4>} ofsUni - 4D 位置偏移 uniform.
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param {THREE.IUniform<number>} offsetScaleUni - 位置偏移缩放 uniform.
  * @returns {THREE.Material} - 新材质实例。
  */
-function axisLabelMaterial(material, rotUni) {
+function axisLabelMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
     shader.uniforms.rotation4D = rotUni;
+    shader.uniforms.offset4D = ofsUni;
+    shader.uniforms.offset3D = ofs3Uni;
+    shader.uniforms.offsetScale = offsetScaleUni;
 
     shader.vertexShader = `
       attribute uint axis;
       attribute float len;
       attribute float offset;
       uniform mat4 rotation4D;
+      uniform vec4 offset4D;
+      uniform vec3 offset3D;
+      uniform float offsetScale;
 
       ${shaderFuncs.transformCylinderPoint}
       ${shader.vertexShader}
@@ -401,7 +473,7 @@ function axisLabelMaterial(material, rotUni) {
       float scale2 = (len * s + offset + 1.0) / length(vProj);
       vec3 vProj1 = vProj * scale1;
       vec3 vProj2 = vProj * scale2;
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1, vProj2);
+      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale) + offset3D * offsetScale;
       `
     );
   };
