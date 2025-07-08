@@ -37,6 +37,13 @@ body {
   display: block;
 }
 
+.tabs {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
+}
+
 .controls {
   overflow: auto;
   padding: 8px;
@@ -44,6 +51,32 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.sele-off {
+  display: none;
+  padding: 8px;
+  overflow: auto;
+  flex-grow: 1;
+}
+
+.nav {
+  display: flex;
+  background-color: black;
+  gap: 1px;
+  height: 1.5rem;
+  width: 100%;
+}
+
+.nav > div {
+  flex: 1 0 0;
+  height: 100%;
+  background-color: white;
+  text-align: center;
+}
+
+.nav > div.active {
+  background-color: #bbb;
 }
 
 .file-input {
