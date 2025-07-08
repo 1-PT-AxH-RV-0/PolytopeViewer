@@ -130,7 +130,6 @@ class PolytopeRendererApp {
    */
   async init() {
     this._initializeDomElements();
-    this._initializeNav();
     this._initializeRenderer();
     this._initializeScene();
     this._initializeCameras();
@@ -193,25 +192,6 @@ class PolytopeRendererApp {
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
       document.getElementById(`rot${i}Slider`)
     );
-  }
-
-  /**
-   * 初始化导航栏。
-   */
-  _initializeNav() {
-    this.ctrlsNav.addEventListener('click', () => {
-      this.controlsPage.style.display = 'block';
-      this.seleOffPage.style.display = 'none';
-      this.ctrlsNav.classList.add('active');
-      this.offsNav.classList.remove('active');
-    });
-
-    this.offsNav.addEventListener('click', () => {
-      this.controlsPage.style.display = 'none';
-      this.seleOffPage.style.display = 'block';
-      this.ctrlsNav.classList.remove('active');
-      this.offsNav.classList.add('active');
-    });
   }
 
   /**
@@ -865,7 +845,7 @@ class PolytopeRendererApp {
       fetch(url)
         .then(response => {
           if (!response.ok) {
-            throw new Error('网络响应不正常');
+            throw new Error('网络响应不正常。');
           }
           return response.text();
         })
@@ -1106,6 +1086,39 @@ class PolytopeRendererApp {
         this.updateEnable();
       });
     });
+    
+    this.setupNavEventListeners();
+    this.setupCollapseEventListeners();
+  }
+  
+  /**
+   * 设置导航栏的事件监听器。
+   */
+  setupNavEventListeners() {
+    this.ctrlsNav.addEventListener('click', () => {
+      this.controlsPage.style.display = 'flex';
+      this.seleOffPage.style.display = 'none';
+      this.ctrlsNav.classList.add('active');
+      this.offsNav.classList.remove('active');
+    });
+
+    this.offsNav.addEventListener('click', () => {
+      this.controlsPage.style.display = 'none';
+      this.seleOffPage.style.display = 'block';
+      this.ctrlsNav.classList.remove('active');
+      this.offsNav.classList.add('active');
+    });
+  }
+  /**
+   * 设置 OFF 文件分类的展开 / 收起的事件监听器。
+   */
+  setupCollapseEventListeners() {
+    this.polyhedraSeleEle.querySelectorAll('li:has(span)').forEach(li => {
+      li.querySelector('span').addEventListener('click', () => {
+        const ul = li.querySelector('ul');
+        ul.style.display = ul.style.display === 'none' ? null : 'none';
+      })
+    })
   }
 
   /**
