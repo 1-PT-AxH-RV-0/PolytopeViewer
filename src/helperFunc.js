@@ -404,13 +404,14 @@ function toBufferGeometry(source) {
 }
 
 /**
- *
- * @param xy_deg
- * @param xz_deg
- * @param xw_deg
- * @param yz_deg
- * @param yw_deg
- * @param zw_deg
+ * 从旋转欧拉角创建 4D 旋转矩阵。（角度制）
+ * @param {number} xy_deg - xy 旋转角度。
+ * @param {number} xz_deg - xz 旋转角度。
+ * @param {number} xw_deg - xw 旋转角度。
+ * @param {number} yz_deg - yz 旋转角度。
+ * @param {number} yw_deg - yw 旋转角度。
+ * @param {number} zw_deg - zw 旋转角度。
+ * @returns {THREE.Matrix4} - 4D 旋转矩阵。
  */
 function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
   // 将角度转换为弧度
@@ -421,134 +422,58 @@ function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
   const yw = THREE.MathUtils.degToRad(yw_deg);
   const zw = THREE.MathUtils.degToRad(zw_deg);
 
+  /* eslint-disable */
   // 计算各旋转角度的正弦和余弦
-  const cxy = Math.cos(xy),
-    sxy = Math.sin(xy);
-  const cxz = Math.cos(xz),
-    sxz = Math.sin(xz);
-  const cxw = Math.cos(xw),
-    sxw = Math.sin(xw);
-  const cyz = Math.cos(yz),
-    syz = Math.sin(yz);
-  const cyw = Math.cos(yw),
-    syw = Math.sin(yw);
-  const czw = Math.cos(zw),
-    szw = Math.sin(zw);
+  const cxy = Math.cos(xy), sxy = Math.sin(xy);
+  const cxz = Math.cos(xz), sxz = Math.sin(xz);
+  const cxw = Math.cos(xw), sxw = Math.sin(xw);
+  const cyz = Math.cos(yz), syz = Math.sin(yz);
+  const cyw = Math.cos(yw), syw = Math.sin(yw);
+  const czw = Math.cos(zw), szw = Math.sin(zw);
 
   // 初始化六个基本旋转矩阵
   const Rxy = new THREE.Matrix4().set(
-    cxy,
-    -sxy,
-    0.0,
-    0.0,
-    sxy,
-    cxy,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0
+    cxy,-sxy, 0.0, 0.0,
+    sxy, cxy, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1.0
   );
 
   const Rxz = new THREE.Matrix4().set(
-    cxz,
-    0.0,
-    -sxz,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    sxz,
-    0.0,
-    cxz,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0
+    cxz, 0.0,-sxz, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    sxz, 0.0, cxz, 0.0,
+    0.0, 0.0, 0.0, 1.0
   );
 
   const Rxw = new THREE.Matrix4().set(
-    cxw,
-    0.0,
-    0.0,
-    -sxw,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    sxw,
-    0.0,
-    0.0,
-    cxw
+    cxw, 0.0, 0.0,-sxw,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    sxw, 0.0, 0.0, cxw
   );
 
-  const Ryz = new THREE.Matrix4().set(
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    cyz,
-    -syz,
-    0.0,
-    0.0,
-    syz,
-    cyz,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0
+    const Ryz = new THREE.Matrix4().set(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, cyz,-syz, 0.0,
+    0.0, syz, cyz, 0.0,
+    0.0, 0.0, 0.0, 1.0
   );
 
   const Ryw = new THREE.Matrix4().set(
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    cyw,
-    0.0,
-    -syw,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    syw,
-    0.0,
-    cyw
+    1.0, 0.0, 0.0, 0.0,
+    0.0, cyw, 0.0,-syw,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, syw, 0.0, cyw
   );
 
   const Rzw = new THREE.Matrix4().set(
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    czw,
-    -szw,
-    0.0,
-    0.0,
-    szw,
-    czw
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, czw,-szw,
+    0.0, 0.0, szw, czw
   );
+  /* eslint-enable */
 
   // 组合所有旋转（顺序会影响最终结果）
   const result = new THREE.Matrix4();
@@ -573,6 +498,292 @@ function getSortedValuesDesc(obj) {
     .map(([, value]) => value);
 }
 
+/**
+ * 校验录制配置对象中以的有效性。
+ * @param {object} config - 要验证的配置对象。
+ * @param {boolean} is4D - 是否为 4D 模式。
+ * @throws {Error} 当任何字段验证失败时抛出错误，包含具体的错误信息。
+ */
+function validateRecordConfig(config, is4D) {
+  if (config.initialRot !== undefined) {
+    if (
+      !Array.isArray(config.initialRot) ||
+      config.initialRot.length !== 6 ||
+      config.initialRot.some(v => typeof v !== 'number')
+    ) {
+      throw new Error('initialRot 字段必须是包含 6 个实数的数组。');
+    }
+  }
+
+  if (config.initialOfs !== undefined) {
+    if (
+      !Array.isArray(config.initialOfs) ||
+      config.initialOfs.length !== 4 ||
+      config.initialOfs.some(v => typeof v !== 'number')
+    ) {
+      throw new Error('initialOfs 字段必须是包含 4 个实数的数组。');
+    }
+  }
+
+  if (config.initialOfs3 !== undefined) {
+    if (
+      !Array.isArray(config.initialOfs3) ||
+      config.initialOfs3.length !== 3 ||
+      config.initialOfs3.some(v => typeof v !== 'number')
+    ) {
+      throw new Error('initialOfs3 字段必须是包含 3 个实数的数组。');
+    }
+  }
+
+  if (config.initialVerticesEdgesDim !== undefined) {
+    if (
+      typeof config.initialVerticesEdgesDim !== 'number' ||
+      config.initialVerticesEdgesDim <= 0
+    ) {
+      throw new Error('initialVerticesEdgesDim 字段必须是正实数。');
+    }
+  }
+
+  if (config.initialProjDist !== undefined) {
+    if (
+      typeof config.initialProjDist !== 'number' ||
+      config.initialProjDist <= 0
+    ) {
+      throw new Error('initialProjDist 字段必须是正实数。');
+    }
+  }
+
+  if (config.initialFaceOpacity !== undefined) {
+    if (
+      typeof config.initialFaceOpacity !== 'number' ||
+      config.initialFaceOpacity < 0 ||
+      config.initialFaceOpacity > 1
+    ) {
+      throw new Error('initialFaceOpacity 字段必须是 0~1 之间的实数。');
+    }
+  }
+
+  if (config.initialVisibilities !== undefined) {
+    const validTargets = ['faces', 'wireframe', 'vertices', 'axes'];
+    for (const [target, value] of Object.entries(config.initialVisibilities)) {
+      if (!validTargets.includes(target)) {
+        throw new Error(
+          `initialVisibilities 字段包含无效的目标类型: ${target}。`
+        );
+      }
+      if (typeof value !== 'boolean') {
+        throw new Error(`initialVisibilities.${target} 字段必须为布尔值。`);
+      }
+    }
+  }
+
+  if (
+    config.initialCameraProjMethod !== undefined &&
+    !['persp', 'ortho'].includes(config.initialCameraProjMethod)
+  ) {
+    throw new Error('initialCameraProjMethod 字段必须为 "persp" 或 "ortho"。');
+  }
+
+  if (
+    config.initialSchleProjEnable !== undefined &&
+    typeof config.initialSchleProjEnable !== 'boolean'
+  ) {
+    throw new Error('initialSchleProjEnable 字段必须为布尔值。');
+  }
+
+  if (
+    !Array.isArray(config.actions) ||
+    config.actions.some(i => !(i instanceof Object))
+  ) {
+    throw new Error('action 字段必须为对象列表。');
+  }
+
+  config.actions.forEach((action, index) => {
+    switch (action.type) {
+      case 'rot':
+        if (typeof action.angle !== 'number')
+          throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
+        if (
+          !(
+            Number.isInteger(action.plane) &&
+            0 <= action.plane &&
+            action.plane <= 5
+          )
+        )
+          throw new Error(
+            `actions[${index}] 操作的 plane 字段必须为大于等于零小于六的整数。`
+          );
+        if (!is4D && [2, 4, 5].includes(action.plane))
+          throw new Error(
+            `actions[${index}] 操作的 plane 字段值 ${action.plane} 只在四维模式可用。`
+          );
+        break;
+      case 'trans4':
+        if (!is4D) throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+        if (
+          action.ofs.length !== 4 ||
+          action.ofs.some(v => typeof v !== 'number')
+        )
+          throw new Error(
+            `actions[${index}] 操作的 ofs 字段必须为四个实数的数组。`
+          );
+        break;
+      case 'trans3':
+        if (
+          action.ofs.length !== 3 ||
+          action.ofs.some(v => typeof v !== 'number')
+        )
+          throw new Error(
+            `actions[${index}] 操作的 ofs 字段必须为三个实数的数组。`
+          );
+        break;
+      case 'setVerticesEdgesDim':
+        if (typeof action.dimOfs !== 'number')
+          throw new Error(`actions[${index}] 操作的 dimOfs 字段必须为实数。`);
+        break;
+      case 'setProjDist':
+        if (!is4D) throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+        if (typeof action.projDistOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 projDistOfs 字段必须为实数。`
+          );
+        break;
+      case 'setFaceOpacity':
+        if (typeof action.faceOpacityOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 faceOpacityOfs 字段必须为实数。`
+          );
+        break;
+      case 'setVisibility':
+        if (!['faces', 'wireframe', 'vertices', 'axes'].includes(action.target))
+          throw new Error(
+            `actions[${index}] 操作的 target 字段值必须为 faces、wireframe、vertices 或 axes 中的一者。`
+          );
+        if (typeof action.visibility !== 'boolean')
+          throw new Error(
+            `actions[${index}] 操作的 visibility 字段值必须为 boolean 类型。`
+          );
+        break;
+      case 'setCameraProjMethod':
+        if (action.projMethod !== 'persp' && action.projMethod !== 'ortho')
+          throw new Error(
+            `actions[${index}] 操作的 projMethod 字段值必须为 persp 或 ortho 中的一者。`
+          );
+        break;
+      case 'setSchleProjEnable':
+        if (!is4D) throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+        if (typeof action.enable !== 'boolean')
+          throw new Error(
+            `actions[${index}] 操作的 enable 字段值必须为 boolean 类型。`
+          );
+        break;
+      default:
+        throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
+    }
+
+    if (
+      Object.hasOwnProperty.call(action, 'start') &&
+      Object.hasOwnProperty.call(action, 'end') &&
+      Object.hasOwnProperty.call(action, 'at')
+    ) {
+      throw new Error(
+        `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
+      );
+    } else if (
+      Object.hasOwnProperty.call(action, 'start') &&
+      Object.hasOwnProperty.call(action, 'end')
+    ) {
+      if (
+        ['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(
+          action.type
+        )
+      ) {
+        throw new Error(
+          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setFaceOpacity。`
+        );
+      }
+      if (
+        !Number.isInteger(action.start) ||
+        !Number.isInteger(action.end) ||
+        action.end < action.start ||
+        action.start < 0 ||
+        action.end < 0
+      ) {
+        throw new Error(
+          `actions[${index}] 的 start 和 end 字段必须均为大于等于 0 的整数，且 end 大于等于 start。`
+        );
+      }
+    } else if (Object.hasOwnProperty.call(action, 'at')) {
+      if (
+        ![
+          'setVisibility',
+          'setCameraProjMethod',
+          'setSchleProjEnable'
+        ].includes(action.type)
+      ) {
+        throw new Error(
+          `actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable。`
+        );
+      }
+      if (!Number.isInteger(action.at) || action.at < 0)
+        throw new Error(
+          `actions[${index}] 的 at 字段必须为大于等于 0 的整数。`
+        );
+    } else {
+      throw new Error(
+        `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
+      );
+    }
+  });
+}
+
+/**
+ * 异步获取并解析用户选择的 JSON 文件。
+ * @param {HTMLInputElement} fileInput - 文件输入元素。
+ * @returns {Promise<object>} 返回解析后的 JSON 对象。
+ */
+function parseJsonFileFromInput(fileInput) {
+  return new Promise((resolve, reject) => {
+    // 确保输入元素是文件类型
+    if (fileInput.type !== 'file') {
+      reject(new Error('提供的元素不是文件输入类型。'));
+      return;
+    }
+
+    // 设置临时事件处理程序
+    fileInput.addEventListener('change', function handleChange() {
+      // 移除事件监听器，避免多次触发
+      fileInput.removeEventListener('change', handleChange);
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        reject(new Error('没有选择文件。'));
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = event => {
+        try {
+          const jsonData = JSON.parse(event.target.result);
+          resolve(jsonData);
+        } catch (error) {
+          reject(new Error('文件解析失败: ' + error.message));
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error('文件读取失败。'));
+      };
+
+      reader.readAsText(file);
+    });
+
+    // 触发文件选择对话框
+    fileInput.click();
+  });
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -589,5 +800,7 @@ export {
   disposeGroup,
   toBufferGeometry,
   create4DRotationMat,
-  getSortedValuesDesc
+  getSortedValuesDesc,
+  validateRecordConfig,
+  parseJsonFileFromInput
 };

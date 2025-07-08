@@ -890,24 +890,24 @@ class PolytopeRendererApp {
     if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
     this.axesOffsetScaleUni.value = scaleFactor;
   }
-  
+
   /**
    * 更新 UI 控件可用状态。
    * @param {boolean} enable - true 表示启用，false 表示禁用。
    */
-  updateEnable(enable=true) {
+  updateEnable(enable = true) {
     /**
      * 禁用或启用页面上所有的 input 和 button 元素。
      * @param {boolean} enable - true 表示启用，false 表示禁用。
      */
-    const _toggleInputsAndButtons = (enable) => {
+    const _toggleInputsAndButtons = enable => {
       const elements = document.querySelectorAll('input, button');
-      
+
       elements.forEach(element => {
-          element.disabled = !enable;
+        element.disabled = !enable;
       });
-    }
-    
+    };
+
     _toggleInputsAndButtons(enable);
     this.stopRecordBtn.disabled = !this.isRecordingFlag;
     if (!enable) return;
@@ -923,7 +923,7 @@ class PolytopeRendererApp {
     this.rotationSliders[2].disabled = !this.is4D;
     this.rotationSliders[4].disabled = !this.is4D;
     this.rotationSliders[5].disabled = !this.is4D;
-    
+
     this.startRecordBtn.disabled = this.isRecordingFlag;
   }
 
@@ -1020,13 +1020,16 @@ class PolytopeRendererApp {
       () => (this.isOrthoUni.value = !this.schleSwitcher.checked)
     );
 
-    this.uploadOffBtn.addEventListener('click', () => this.fileInput.click())
+    this.uploadOffBtn.addEventListener('click', () => this.fileInput.click());
     this.fileInput.addEventListener(
       'change',
       this.handleFileInputChange.bind(this)
     );
     this.startRecordBtn.addEventListener('click', this.startRecord.bind(this));
-    this.stopRecordBtn.addEventListener('click', () => this.stopRecordFlag = true);
+    this.stopRecordBtn.addEventListener(
+      'click',
+      () => (this.stopRecordFlag = true)
+    );
   }
 
   /**
@@ -1070,298 +1073,20 @@ class PolytopeRendererApp {
   }
 
   /**
-   * 校验录制配置对象中以的有效性。
-   * @param {object} config - 要验证的配置对象。
-   * @throws {Error} 当任何字段验证失败时抛出错误，包含具体的错误信息。
-   */
-  validateRecordConfig(config) {
-    if (config.initialRot !== undefined) {
-      if (
-        !Array.isArray(config.initialRot) ||
-        config.initialRot.length !== 6 ||
-        config.initialRot.some(v => typeof v !== 'number')
-      ) {
-        throw new Error('initialRot 字段必须是包含 6 个实数的数组。');
-      }
-    }
-
-    if (config.initialOfs !== undefined) {
-      if (
-        !Array.isArray(config.initialOfs) ||
-        config.initialOfs.length !== 4 ||
-        config.initialOfs.some(v => typeof v !== 'number')
-      ) {
-        throw new Error('initialOfs 字段必须是包含 4 个实数的数组。');
-      }
-    }
-
-    if (config.initialOfs3 !== undefined) {
-      if (
-        !Array.isArray(config.initialOfs3) ||
-        config.initialOfs3.length !== 3 ||
-        config.initialOfs3.some(v => typeof v !== 'number')
-      ) {
-        throw new Error('initialOfs3 字段必须是包含 3 个实数的数组。');
-      }
-    }
-
-    if (config.initialVerticesEdgesDim !== undefined) {
-      if (
-        typeof config.initialVerticesEdgesDim !== 'number' ||
-        config.initialVerticesEdgesDim <= 0
-      ) {
-        throw new Error('initialVerticesEdgesDim 字段必须是正实数。');
-      }
-    }
-
-    if (config.initialProjDist !== undefined) {
-      if (
-        typeof config.initialProjDist !== 'number' ||
-        config.initialProjDist <= 0
-      ) {
-        throw new Error('initialProjDist 字段必须是正实数。');
-      }
-    }
-
-    if (config.initialFaceOpacity !== undefined) {
-      if (
-        typeof config.initialFaceOpacity !== 'number' ||
-        config.initialFaceOpacity < 0 ||
-        config.initialFaceOpacity > 1
-      ) {
-        throw new Error('initialFaceOpacity 字段必须是 0~1 之间的实数。');
-      }
-    }
-
-    if (config.initialVisibilities !== undefined) {
-      const validTargets = ['faces', 'wireframe', 'vertices', 'axes'];
-      for (const [target, value] of Object.entries(
-        config.initialVisibilities
-      )) {
-        if (!validTargets.includes(target)) {
-          throw new Error(
-            `initialVisibilities 字段包含无效的目标类型: ${target}。`
-          );
-        }
-        if (typeof value !== 'boolean') {
-          throw new Error(`initialVisibilities.${target} 字段必须为布尔值。`);
-        }
-      }
-    }
-
-    if (
-      config.initialCameraProjMethod !== undefined &&
-      !['persp', 'ortho'].includes(config.initialCameraProjMethod)
-    ) {
-      throw new Error(
-        'initialCameraProjMethod 字段必须为 "persp" 或 "ortho"。'
-      );
-    }
-
-    if (
-      config.initialSchleProjEnable !== undefined &&
-      typeof config.initialSchleProjEnable !== 'boolean'
-    ) {
-      throw new Error('initialSchleProjEnable 字段必须为布尔值。');
-    }
-
-    if (
-      !Array.isArray(config.actions) ||
-      config.actions.some(i => !(i instanceof Object))
-    ) {
-      throw new Error('action 字段必须为对象列表。');
-    }
-
-    config.actions.forEach((action, index) => {
-      switch (action.type) {
-        case 'rot':
-          if (typeof action.angle !== 'number')
-            throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
-          if (
-            !(
-              Number.isInteger(action.plane) &&
-              0 <= action.plane &&
-              action.plane <= 5
-            )
-          )
-            throw new Error(
-              `actions[${index}] 操作的 plane 字段必须为大于等于零小于六的整数。`
-            );
-          if (!this.is4D && [2, 4, 5].includes(action.plane))
-            throw new Error(
-              `actions[${index}] 操作的 plane 字段值 ${action.plane} 只在四维模式可用。`
-            );
-          break;
-        case 'trans4':
-          if (!this.is4D)
-            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
-          if (
-            action.ofs.length !== 4 ||
-            action.ofs.some(v => typeof v !== 'number')
-          )
-            throw new Error(
-              `actions[${index}] 操作的 ofs 字段必须为四个实数的数组。`
-            );
-          break;
-        case 'trans3':
-          if (
-            action.ofs.length !== 3 ||
-            action.ofs.some(v => typeof v !== 'number')
-          )
-            throw new Error(
-              `actions[${index}] 操作的 ofs 字段必须为三个实数的数组。`
-            );
-          break;
-        case 'setVerticesEdgesDim':
-          if (typeof action.dimOfs !== 'number')
-            throw new Error(`actions[${index}] 操作的 dimOfs 字段必须为实数。`);
-          break;
-        case 'setProjDist':
-          if (!this.is4D)
-            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
-          if (typeof action.projDistOfs !== 'number')
-            throw new Error(
-              `actions[${index}] 操作的 projDistOfs 字段必须为实数。`
-            );
-          break;
-        case 'setFaceOpacity':
-          if (typeof action.faceOpacityOfs !== 'number')
-            throw new Error(
-              `actions[${index}] 操作的 faceOpacityOfs 字段必须为实数。`
-            );
-          break;
-        case 'setVisibility':
-          if (
-            !['faces', 'wireframe', 'vertices', 'axes'].includes(action.target)
-          )
-            throw new Error(
-              `actions[${index}] 操作的 target 字段值必须为 faces、wireframe、vertices 或 axes 中的一者。`
-            );
-          if (typeof action.visibility !== 'boolean')
-            throw new Error(
-              `actions[${index}] 操作的 visibility 字段值必须为 boolean 类型。`
-            );
-          break;
-        case 'setCameraProjMethod':
-          if (action.projMethod !== 'persp' && action.projMethod !== 'ortho')
-            throw new Error(
-              `actions[${index}] 操作的 projMethod 字段值必须为 persp 或 ortho 中的一者。`
-            );
-          break;
-        case 'setSchleProjEnable':
-          if (!this.is4D)
-            throw new Error(`actions[${index}] 操作只在四维模式可用。`);
-          if (typeof action.enable !== 'boolean')
-            throw new Error(
-              `actions[${index}] 操作的 enable 字段值必须为 boolean 类型。`
-            );
-          break;
-        default:
-          throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
-      }
-      
-      if (
-        Object.hasOwnProperty.call(action, 'start') &&
-        Object.hasOwnProperty.call(action, 'end') &&
-        Object.hasOwnProperty.call(action, 'at')
-      ) {
-        throw new Error(
-          `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
-        );
-      } else if (
-        Object.hasOwnProperty.call(action, 'start') &&
-        Object.hasOwnProperty.call(action, 'end')
-      ) {
-        if (['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(action.type)) {
-          throw new Error(`actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setFaceOpacity。`)
-        }
-        if (
-          !Number.isInteger(action.start) ||
-          !Number.isInteger(action.end) ||
-          action.end < action.start ||
-          action.start < 0 ||
-          action.end < 0
-        ) {
-          throw new Error(
-            `actions[${index}] 的 start 和 end 字段必须均为大于等于 0 的整数，且 end 大于等于 start。`
-          );
-        }
-      } else if (Object.hasOwnProperty.call(action, 'at')) {
-        if (!['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(action.type)) {
-          throw new Error(`actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable。`)
-        }
-        if (!Number.isInteger(action.at) || action.at < 0)
-          throw new Error(
-            `actions[${index}] 的 at 字段必须为大于等于 0 的整数。`
-          );
-      } else {
-        throw new Error(
-          `actions[${index}] 要么同时拥有 start 和 end 字段，要么只拥有 at 字段。`
-        );
-      }
-    });
-  }
-  
-  /**
-   * 异步获取并解析用户选择的 JSON 文件。
-   * @param {HTMLInputElement} fileInput - 文件输入元素。
-   * @returns {Promise<object>} 返回解析后的 JSON 对象。
-   */
-  parseJsonFileFromInput(fileInput) {
-    return new Promise((resolve, reject) => {
-      // 确保输入元素是文件类型
-      if (fileInput.type !== 'file') {
-        reject(new Error('提供的元素不是文件输入类型'));
-        return;
-      }
-  
-      // 设置临时事件处理程序
-      fileInput.addEventListener('change', function handleChange() {
-        // 移除事件监听器，避免多次触发
-        fileInput.removeEventListener('change', handleChange);
-  
-        if (!fileInput.files || fileInput.files.length === 0) {
-          reject(new Error('没有选择文件'));
-          return;
-        }
-  
-        const file = fileInput.files[0];
-        const reader = new FileReader();
-  
-        reader.onload = (event) => {
-          try {
-            const jsonData = JSON.parse(event.target.result);
-            resolve(jsonData);
-          } catch (error) {
-            reject(new Error('文件解析失败: ' + error.message));
-          }
-        };
-  
-        reader.onerror = () => {
-          reject(new Error('文件读取失败'));
-        };
-  
-        reader.readAsText(file);
-      });
-  
-      // 触发文件选择对话框
-      fileInput.click();
-    });
-  }
-  
-  /**
    * 开始录制视频。
    */
   async startRecord() {
     try {
-      this.recordConfig = await this.parseJsonFileFromInput(this.configFileInput);
-      this.validateRecordConfig(this.recordConfig);
+      this.recordConfig = await helperFunc.parseJsonFileFromInput(
+        this.configFileInput
+      );
+      helperFunc.validateRecordConfig(this.recordConfig, this.is4D);
     } catch (e) {
       alert(e.message);
       console.error(e);
       return;
     }
-    
+
     this.isRecordingFlag = true;
     this.updateEnable(false);
     this.recordStates = {
@@ -1415,12 +1140,12 @@ class PolytopeRendererApp {
     this.capturer.start();
 
     let frameIndex = 0;
-    
+
     /**
      * 渲染终止后的动作。
      * @param {boolean} byError - 是否因错误终止，为 true 时不保存视频。
      */
-    const _onStopRender = (byError=false) => {
+    const _onStopRender = (byError = false) => {
       this.capturer.stop();
       if (!byError) this.capturer.save();
       this.capturer = null;
@@ -1432,14 +1157,14 @@ class PolytopeRendererApp {
 
       this._initializeControls();
       this.startRenderLoop();
-      
+
       this.updateEnable();
-    }
-    
+    };
+
     /**
      * （视频）渲染循环。
      */
-     const _renderLoop = () => {
+    const _renderLoop = () => {
       if (frameIndex >= totalFrames || this.stopRecordFlag) {
         _onStopRender();
         this.stopRecordFlag = false;
@@ -1457,7 +1182,7 @@ class PolytopeRendererApp {
 
       frameIndex++;
       requestAnimationFrame(_renderLoop);
-    }
+    };
     _renderLoop();
   }
 
@@ -1557,20 +1282,29 @@ class PolytopeRendererApp {
         case 'setVerticesEdgesDim':
           this.recordStates.verticesEdgesDim +=
             action.dimOfs / (action.end - action.start);
-          if (this.recordStates.verticesEdgesDim <= 0) 
-            throw new Error(`actions[${action.index}] 错误地导致边和顶点的尺寸为负数。`);
+          if (this.recordStates.verticesEdgesDim <= 0)
+            throw new Error(
+              `actions[${action.index}] 错误地导致边和顶点的尺寸为负数。`
+            );
           break;
         case 'setProjDist':
           this.recordStates.projDist +=
             action.projDistOfs / (action.end - action.start);
-          if (this.recordStates.projDist <= 0) 
-            throw new Error(`actions[${action.index}] 错误地导致投影距离为负数。`);
+          if (this.recordStates.projDist <= 0)
+            throw new Error(
+              `actions[${action.index}] 错误地导致投影距离为负数。`
+            );
           break;
         case 'setFaceOpacity':
           this.recordStates.faceOpacity +=
             action.faceOpacityOfs / (action.end - action.start);
-          if (this.recordStates.faceOpacity < 0 || this.recordStates.faceOpacity > 1)
-            throw new Error(`actions[${action.index}] 错误地导致面透明度超出 0~1 的范围。`);
+          if (
+            this.recordStates.faceOpacity < 0 ||
+            this.recordStates.faceOpacity > 1
+          )
+            throw new Error(
+              `actions[${action.index}] 错误地导致面透明度超出 0~1 的范围。`
+            );
           break;
         case 'setVisibility':
           this.recordStates.visibilities[action.target] = action.visibility;
