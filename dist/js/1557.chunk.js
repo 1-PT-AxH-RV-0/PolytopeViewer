@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1557],{1557:(e,s,a)=>{e.exports=a.p+"assets/Parabiaugmented_hexagonal_prism.off"}}]);

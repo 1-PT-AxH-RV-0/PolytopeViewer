@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1546],{1546:(e,s,i)=>{e.exports=i.p+"assets/Bigyrate_diminished_rhombicosidodecahedron.off"}}]);

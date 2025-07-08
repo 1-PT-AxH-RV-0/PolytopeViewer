@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3778],{3778:(s,e,p)=>{s.exports=p.p+"assets/Square_pyramid.off"}}]);

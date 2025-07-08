@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7822],{7822:(e,s,a)=>{e.exports=a.p+"assets/Gyroelongated_pentagonal_bicupola.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9242],{9242:(e,s,t)=>{e.exports=t.p+"assets/Biaugmented_truncated_cube.off"}}]);

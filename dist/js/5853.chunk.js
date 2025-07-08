@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5853],{5853:(e,s,p)=>{e.exports=p.p+"assets/Snub_dodecahedron.off"}}]);

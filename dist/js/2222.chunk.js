@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2222],{2222:(e,s,u)=>{e.exports=u.p+"assets/Truncated_cube.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2969],{2969:(e,s,t)=>{e.exports=t.p+"assets/Deltoidal_icositetrahedron.off"}}]);

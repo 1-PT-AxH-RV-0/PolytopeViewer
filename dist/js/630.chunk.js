@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[630],{630:(s,e,p)=>{s.exports=p.p+"assets/Snub_square_antiprism.off"}}]);

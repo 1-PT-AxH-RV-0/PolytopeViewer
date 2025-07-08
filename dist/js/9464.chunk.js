@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9464],{9464:(e,s,a)=>{e.exports=a.p+"assets/Great_dodecahedron.off"}}]);

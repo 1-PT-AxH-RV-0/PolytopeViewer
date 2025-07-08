@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2115],{2115:(s,e,a)=>{s.exports=a.p+"assets/Pentagonal_rotunda.off"}}]);

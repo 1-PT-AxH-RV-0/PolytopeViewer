@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1139],{1139:(s,e,a)=>{s.exports=a.p+"assets/Pentagonal_orthobicupola.off"}}]);

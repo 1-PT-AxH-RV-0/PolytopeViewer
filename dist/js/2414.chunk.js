@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2414],{2414:(e,s,p)=>{e.exports=p.p+"assets/Augmented_hexagonal_prism.off"}}]);

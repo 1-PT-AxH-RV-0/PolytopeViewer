@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5047],{5047:(s,e,p)=>{s.exports=p.p+"assets/Sphenocorona.off"}}]);

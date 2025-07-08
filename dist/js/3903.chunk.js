@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3903],{3903:(e,s,a)=>{e.exports=a.p+"assets/Paragyrate_diminished_rhombicosidodecahedron.off"}}]);
