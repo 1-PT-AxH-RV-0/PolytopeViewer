@@ -45,11 +45,13 @@ class PolytopeRendererApp {
     this.wireframeAndVerticesDimSlider = null;
     this.projectionDistanceSlider = null;
     this.fileInput = null;
+    this.uploadOffBtn = null;
     this.infoDis = null;
     this.progCon = null;
     this.progDis = null;
     this.nanobar = null;
     this.startRecordBtn = null;
+    this.stopRecordBtn = null;
     this.configFileInput = null;
 
     this.rotationSliders = [];
@@ -82,6 +84,8 @@ class PolytopeRendererApp {
     this.capturer = null;
     this.recordConfig = null;
     this.recordStates = null;
+    this.isRecordingFlag = false;
+    this.stopRecordFlag = false;
 
     this.init();
   }
@@ -113,6 +117,7 @@ class PolytopeRendererApp {
     });
 
     await this.loadMeshFromUrl(url, initialMaterial);
+    this.updateEnable();
 
     this.setupEventListeners();
     this.startRenderLoop();
@@ -135,10 +140,12 @@ class PolytopeRendererApp {
     this.wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');
     this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
     this.fileInput = document.getElementById('fileInput');
+    this.uploadOffBtn = document.getElementById('uploadOff');
     this.infoDis = document.getElementById('info');
     this.progCon = document.getElementById('progContainer');
     this.progDis = document.getElementById('prog');
     this.startRecordBtn = document.getElementById('startRecord');
+    this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
     /* eslint-enable */
 
@@ -883,6 +890,42 @@ class PolytopeRendererApp {
     if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
     this.axesOffsetScaleUni.value = scaleFactor;
   }
+  
+  /**
+   * 更新 UI 控件可用状态。
+   * @param {boolean} enable - true 表示启用，false 表示禁用。
+   */
+  updateEnable(enable=true) {
+    /**
+     * 禁用或启用页面上所有的 input 和 button 元素。
+     * @param {boolean} enable - true 表示启用，false 表示禁用。
+     */
+    const _toggleInputsAndButtons = (enable) => {
+      const elements = document.querySelectorAll('input, button');
+      
+      elements.forEach(element => {
+          element.disabled = !enable;
+      });
+    }
+    
+    _toggleInputsAndButtons(enable);
+    this.stopRecordBtn.disabled = !this.isRecordingFlag;
+    if (!enable) return;
+    this.projectionDistanceSlider.disabled = true;
+    if (!this.schleSwitcher.disabled && !this.is4D) {
+      this.rotationSliders[2].value = 0;
+      this.rotationSliders[4].value = 0;
+      this.rotationSliders[5].value = 0;
+      this.updateRotation();
+    }
+    this.projectionDistanceSlider.disabled = !this.is4D;
+    this.schleSwitcher.disabled = !this.is4D;
+    this.rotationSliders[2].disabled = !this.is4D;
+    this.rotationSliders[4].disabled = !this.is4D;
+    this.rotationSliders[5].disabled = !this.is4D;
+    
+    this.startRecordBtn.disabled = this.isRecordingFlag;
+  }
 
   /**
    * 切换当前使用的摄像机类型（透视或正交），并保持其位置和方向。
@@ -977,11 +1020,13 @@ class PolytopeRendererApp {
       () => (this.isOrthoUni.value = !this.schleSwitcher.checked)
     );
 
+    this.uploadOffBtn.addEventListener('click', () => this.fileInput.click())
     this.fileInput.addEventListener(
       'change',
       this.handleFileInputChange.bind(this)
     );
     this.startRecordBtn.addEventListener('click', this.startRecord.bind(this));
+    this.stopRecordBtn.addEventListener('click', () => this.stopRecordFlag = true);
   }
 
   /**
@@ -1015,24 +1060,11 @@ class PolytopeRendererApp {
       });
 
       if (this.is4D) {
-        this.loadMeshFrom4OffData(data, material);
-        this.projectionDistanceSlider.disabled = false;
-        this.schleSwitcher.disabled = false;
-        this.rotationSliders[2].disabled = false;
-        this.rotationSliders[4].disabled = false;
-        this.rotationSliders[5].disabled = false;
+        await this.loadMeshFrom4OffData(data, material);
       } else {
         await this.loadMeshFromOffData(data, material);
-        this.projectionDistanceSlider.disabled = true;
-        this.schleSwitcher.disabled = true;
-        this.rotationSliders[2].disabled = true;
-        this.rotationSliders[4].disabled = true;
-        this.rotationSliders[5].disabled = true;
-        this.rotationSliders[2].value = 0;
-        this.rotationSliders[4].value = 0;
-        this.rotationSliders[5].value = 0;
-        this.updateRotation();
       }
+      this.updateEnable();
     };
     reader.readAsText(file);
   }
@@ -1316,7 +1348,7 @@ class PolytopeRendererApp {
       fileInput.click();
     });
   }
-
+  
   /**
    * 开始录制视频。
    */
@@ -1330,6 +1362,8 @@ class PolytopeRendererApp {
       return;
     }
     
+    this.isRecordingFlag = true;
+    this.updateEnable(false);
     this.recordStates = {
       rots: {
         Infinity: this.recordConfig.initialRot
@@ -1390,6 +1424,7 @@ class PolytopeRendererApp {
       this.capturer.stop();
       if (!byError) this.capturer.save();
       this.capturer = null;
+      this.isRecordingFlag = false;
 
       this.updateProperties();
       this.updateProjectionDistance();
@@ -1397,14 +1432,17 @@ class PolytopeRendererApp {
 
       this._initializeControls();
       this.startRenderLoop();
+      
+      this.updateEnable();
     }
     
     /**
      * （视频）渲染循环。
      */
      const _renderLoop = () => {
-      if (frameIndex >= totalFrames) {
-        _onStopRender()
+      if (frameIndex >= totalFrames || this.stopRecordFlag) {
+        _onStopRender();
+        this.stopRecordFlag = false;
         return;
       }
       try {
