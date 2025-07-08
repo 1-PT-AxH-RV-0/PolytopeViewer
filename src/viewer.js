@@ -10,7 +10,6 @@ import shaderCompCallback from './shaderCompCallback.js';
 import * as helperFunc from './helperFunc.js';
 import { parseOFF } from './offProcessor.js';
 import { parse4OFF } from './offProcessor4D.js';
-import url from '../assets/models/Small_stellated_dodecahedron.off'; // 默认加载的模型 URL
 import * as type from './type.js';
 
 // 导入样式。
@@ -33,6 +32,13 @@ window.download = function (data, filename, mimeType) {
  */
 class PolytopeRendererApp {
   constructor() {
+    // 导航栏元素。
+    this.ctrlsNav = null;
+    this.offsNav = null;
+    this.controlsPage = null;
+    this.seleOffPage = null;
+
+    // 控制页元素。
     this.canvas = null;
     this.faceVisibleSwitcher = null;
     this.wireframeVisibleSwitcher = null;
@@ -53,17 +59,19 @@ class PolytopeRendererApp {
     this.startRecordBtn = null;
     this.stopRecordBtn = null;
     this.configFileInput = null;
-
     this.rotationSliders = [];
 
-    this.scaleFactor = 1;
+    // OFF 选择页元素。
+    this.polyhedraSeleEle = null;
+
+    // 物体组变量
     this.axesGroup = null;
     this.solidGroup = null;
     this.facesGroup = null;
     this.wireframeGroup = null;
     this.verticesGroup = null;
-    this.is4D = false;
 
+    // Uniform 对象。
     this.rotAngles = [0, 0, 0, 0, 0, 0];
     this.rotUni = { value: new THREE.Matrix4() };
     this.ofsUni = { value: new THREE.Vector4(0, 0, 0, 0) };
@@ -74,20 +82,47 @@ class PolytopeRendererApp {
     this.cylinderRadiusUni = { value: 0.5 };
     this.sphereRadiusUni = { value: 1.0 };
 
+    // 渲染用变量。
     this.renderer = null;
     this.isRenderingFlag = false;
     this.scene = null;
     this.camera = null;
     this.controls = null;
 
-    this.loadMeshPromise = null;
+    // 录制变量。
     this.capturer = null;
     this.recordConfig = null;
     this.recordStates = null;
     this.isRecordingFlag = false;
     this.stopRecordFlag = false;
 
+    // 其他变量。
+    this.loadMeshPromise = null;
+    this.is4D = false;
+    this.scaleFactor = 1;
+    this.initialMaterial = new THREE.MeshPhongMaterial({
+      color: 0x555555,
+      specular: 0x222222,
+      shininess: 50,
+      flatShading: true
+    });
+
     this.init();
+  }
+
+  /**
+   * 动态导入 OFF。
+   * @param {string} path - OFF 文件路径。
+   * @returns {string} - 导入的 OFF 字符串。
+   */
+  async importOff(path) {
+    try {
+      const data = await import(`../assets/models/${path}`);
+      return data.default;
+    } catch (error) {
+      console.error('OFF 加载失败：', error);
+      return {};
+    }
   }
 
   /**
@@ -95,6 +130,7 @@ class PolytopeRendererApp {
    */
   async init() {
     this._initializeDomElements();
+    this._initializeNav();
     this._initializeRenderer();
     this._initializeScene();
     this._initializeCameras();
@@ -109,14 +145,12 @@ class PolytopeRendererApp {
       this.axesOffsetScaleUni
     );
 
-    const initialMaterial = new THREE.MeshPhongMaterial({
-      color: 0x555555,
-      specular: 0x222222,
-      shininess: 50,
-      flatShading: true
-    });
-
-    await this.loadMeshFromUrl(url, initialMaterial);
+    await this.loadMeshFromUrl(
+      await this.importOff(
+        'polyhedra/KeplerPoinsot/Small_stellated_dodecahedron.off'
+      ),
+      this.initialMaterial
+    );
     this.updateEnable();
 
     this.setupEventListeners();
@@ -128,6 +162,11 @@ class PolytopeRendererApp {
    */
   _initializeDomElements() {
     /* eslint-disable */
+    this.ctrlsNav = document.getElementById('ctrlsNav');
+    this.offsNav = document.getElementById('offsNav');
+    this.controlsPage = document.getElementById('controls');
+    this.seleOffPage = document.getElementById('seleOff');
+    
     this.canvas = document.getElementById('polytopeRenderer');
     this.faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');
     this.wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');
@@ -147,11 +186,32 @@ class PolytopeRendererApp {
     this.startRecordBtn = document.getElementById('startRecord');
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
+    
+    this.polyhedraSeleEle = document.getElementById('polyhedra');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
       document.getElementById(`rot${i}Slider`)
     );
+  }
+
+  /**
+   * 初始化导航栏。
+   */
+  _initializeNav() {
+    this.ctrlsNav.addEventListener('click', () => {
+      this.controlsPage.style.display = 'block';
+      this.seleOffPage.style.display = 'none';
+      this.ctrlsNav.classList.add('active');
+      this.offsNav.classList.remove('active');
+    });
+
+    this.offsNav.addEventListener('click', () => {
+      this.controlsPage.style.display = 'none';
+      this.seleOffPage.style.display = 'block';
+      this.ctrlsNav.classList.remove('active');
+      this.offsNav.classList.add('active');
+    });
   }
 
   /**
@@ -1030,6 +1090,22 @@ class PolytopeRendererApp {
       'click',
       () => (this.stopRecordFlag = true)
     );
+
+    this.polyhedraSeleEle.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', async () => {
+        if (this.solidGroup) {
+          helperFunc.disposeGroup(this.solidGroup);
+          this.scene.remove(this.solidGroup);
+        }
+
+        await this.loadMeshFromUrl(
+          await this.importOff(`polyhedra/${a.dataset.path}`),
+          this.initialMaterial
+        );
+
+        this.updateEnable();
+      });
+    });
   }
 
   /**
@@ -1055,17 +1131,10 @@ class PolytopeRendererApp {
           .filter(line => line.trim() !== '' && !line.startsWith('#'))[0]
           .trim() === '4OFF';
 
-      const material = new THREE.MeshPhongMaterial({
-        color: 0x555555,
-        specular: 0x222222,
-        shininess: 50,
-        flatShading: true
-      });
-
       if (this.is4D) {
-        await this.loadMeshFrom4OffData(data, material);
+        await this.loadMeshFrom4OffData(data, this.initialMaterial);
       } else {
-        await this.loadMeshFromOffData(data, material);
+        await this.loadMeshFromOffData(data, this.initialMaterial);
       }
       this.updateEnable();
     };
