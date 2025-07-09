@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5474],{5474:(e,s,t)=>{e.exports=t.p+"assets/Cantellated_tesseract.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8631],{8631:(s,e,p)=>{s.exports=p.p+"assets/Taghi.off"}}]);

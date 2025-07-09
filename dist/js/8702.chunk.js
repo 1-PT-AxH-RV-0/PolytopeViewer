@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8702],{8702:(s,e,p)=>{s.exports=p.p+"assets/Gaghi.off"}}]);

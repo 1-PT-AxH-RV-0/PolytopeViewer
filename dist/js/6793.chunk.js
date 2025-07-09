@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6793],{6793:(e,s,t)=>{e.exports=t.p+"assets/Cantellated_pentachoron.off"}}]);

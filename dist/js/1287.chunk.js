@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1287],{1287:(s,e,f)=>{s.exports=f.p+"assets/Gofix.off"}}]);

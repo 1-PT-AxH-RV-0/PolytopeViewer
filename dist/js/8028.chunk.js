@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8028],{8028:(s,e,f)=>{s.exports=f.p+"assets/Rigfix.off"}}]);

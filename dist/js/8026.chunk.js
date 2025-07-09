@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8026],{8026:(s,e,p)=>{s.exports=p.p+"assets/Rigogishi.off"}}]);

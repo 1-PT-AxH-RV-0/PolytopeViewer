@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1738],{1738:(s,e,c)=>{s.exports=c.p+"assets/Runcitruncated_hecatonicosachoron.off"}}]);

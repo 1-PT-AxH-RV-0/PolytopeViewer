@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6975],{6975:(s,e,p)=>{s.exports=p.p+"assets/Tighi.off"}}]);

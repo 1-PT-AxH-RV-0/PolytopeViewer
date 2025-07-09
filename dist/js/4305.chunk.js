@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4305],{4305:(s,e,p)=>{s.exports=p.p+"assets/Tesseract.off"}}]);

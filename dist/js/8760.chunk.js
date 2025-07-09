@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8760],{8760:(s,e,f)=>{s.exports=f.p+"assets/Sirfix.off"}}]);

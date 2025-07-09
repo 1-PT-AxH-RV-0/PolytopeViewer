@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5794],{5794:(s,e,t)=>{s.exports=t.p+"assets/Bitruncated_tesseract.off"}}]);
