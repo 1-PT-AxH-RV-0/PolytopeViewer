@@ -62,7 +62,9 @@ class PolytopeRendererApp {
     this.rotationSliders = [];
 
     // OFF 选择页元素。
+    this.offSeleEle = null;
     this.polyhedraSeleEle = null;
+    this.polychoraSeleEle = null;
 
     // 物体组变量
     this.axesGroup = null;
@@ -186,7 +188,9 @@ class PolytopeRendererApp {
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
     
+    this.offSeleEle = document.getElementById('offSele');
     this.polyhedraSeleEle = document.getElementById('polyhedra');
+    this.polychoraSeleEle = document.getElementById('polychora');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
@@ -838,9 +842,10 @@ class PolytopeRendererApp {
    * 从指定的 URL 异步加载模型数据。
    * @param {string} url - 模型的 URL。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
+   * @param {boolean} is4Off - 是否是 4OFF 文件。
    * @returns {Promise<void>} 一个 Promise，在模型加载完成后解析。
    */
-  async loadMeshFromUrl(url, material) {
+  async loadMeshFromUrl(url, material, is4Off=false) {
     return new Promise(resolve => {
       fetch(url)
         .then(response => {
@@ -850,12 +855,12 @@ class PolytopeRendererApp {
           return response.text();
         })
         .then(async data => {
-          await this.loadMeshFromOffData(data, material);
+          await (is4Off ? this.loadMeshFrom4OffData.bind(this) : this.loadMeshFromOffData.bind(this))(data, material);
           resolve();
         });
     });
   }
-
+  
   /**
    * 根据 UI 控件的状态更新模型的可见性、面不透明度、Uniform 值、摄像头模式以及线框和顶点的尺寸。
    */
@@ -1082,7 +1087,24 @@ class PolytopeRendererApp {
           await this.importOff(`polyhedra/${a.dataset.path}`),
           this.initialMaterial
         );
+        this.is4D = false;
+        this.updateEnable();
+      });
+    });
+    
+    this.polychoraSeleEle.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', async () => {
+        if (this.solidGroup) {
+          helperFunc.disposeGroup(this.solidGroup);
+          this.scene.remove(this.solidGroup);
+        }
 
+        await this.loadMeshFromUrl(
+          await this.importOff(`polychora/${a.dataset.path}`),
+          this.initialMaterial,
+          true
+        );
+        this.is4D = true;
         this.updateEnable();
       });
     });
@@ -1113,7 +1135,7 @@ class PolytopeRendererApp {
    * 设置 OFF 文件分类的展开 / 收起的事件监听器。
    */
   setupCollapseEventListeners() {
-    this.polyhedraSeleEle.querySelectorAll('li:has(span)').forEach(li => {
+    this.offSeleEle.querySelectorAll('li:has(span)').forEach(li => {
       li.querySelector('span').addEventListener('click', () => {
         const ul = li.querySelector('ul');
         ul.style.display = ul.style.display === 'none' ? null : 'none';
