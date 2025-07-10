@@ -60,6 +60,19 @@ body {
   flex-grow: 1;
 }
 
+.inf-families-container {
+  display: flex;
+  align-items: center;
+}
+
+.gen-inf-families {
+  margin-right: 4px;
+}
+
+.inf-family-params {
+  width: 2em;
+}
+
 .nav {
   display: flex;
   background-color: black;

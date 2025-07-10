@@ -49,7 +49,6 @@ function parse4OFF(data) {
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])
   );
-  console.log(vertices, faces, edges, cells)
   return { vertices, faces, edges, cells };
 }
 

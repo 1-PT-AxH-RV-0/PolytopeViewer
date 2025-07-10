@@ -7,9 +7,10 @@ import WebMWriter from 'webm-writer';
 // 导入外部辅助函数和模块。
 import createAxes from './axesCreater.js';
 import shaderCompCallback from './shaderCompCallback.js';
+import infFamilies from './infFamilies.js';
 import * as helperFunc from './helperFunc.js';
 import { parseOFF } from './offProcessor.js';
-import { parse4OFF } from './offProcessor4D.js';
+import { process4DMeshData, parse4OFF } from './offProcessor4D.js';
 import * as type from './type.js';
 
 // 导入样式。
@@ -65,6 +66,16 @@ class PolytopeRendererApp {
     this.offSeleEle = null;
     this.polyhedraSeleEle = null;
     this.polychoraSeleEle = null;
+    
+    this.genPrismBtn = null;
+    this.prismNInput = null;
+    
+    this.genAntiprismBtn = null;
+    this.antiprismNInput = null;
+    
+    this.genDuoprismBtn = null;
+    this.duoprismMInput = null;
+    this.duoprismNInput = null;
 
     // 物体组变量
     this.axesGroup = null;
@@ -152,7 +163,8 @@ class PolytopeRendererApp {
       ),
       this.initialMaterial
     );
-    this.updateEnable();
+    
+    // await this.loadMeshFromData(infFamilies.antiprism(5), this.initialMaterial);
 
     this.setupEventListeners();
     this.startRenderLoop();
@@ -191,6 +203,16 @@ class PolytopeRendererApp {
     this.offSeleEle = document.getElementById('offSele');
     this.polyhedraSeleEle = document.getElementById('polyhedra');
     this.polychoraSeleEle = document.getElementById('polychora');
+    
+    this.genPrismBtn = document.getElementById('genPrism');
+    this.prismNInput = document.getElementById('prismN');
+    
+    this.genAntiprismBtn = document.getElementById('genAntiprism');
+    this.antiprismNInput = document.getElementById('antiprismN');
+    
+    this.genDuoprismBtn = document.getElementById('genDuoprism');
+    this.duoprismMInput = document.getElementById('duoprismM');
+    this.duoprismNInput = document.getElementById('duoprismN');
     /* eslint-enable */
 
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
@@ -569,6 +591,8 @@ class PolytopeRendererApp {
    * @returns {{scaleFactor: number, solidGroup: THREE.Object3D, facesGroup: THREE.Mesh, wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含模型相关 THREE.js 对象的引用和计算出的缩放因子。
    */
   loadMesh(meshData, material) {
+    this.is4D = false;
+    this.updateEnable();
     const container = new THREE.Object3D();
     const geometry = new THREE.BufferGeometry();
 
@@ -624,6 +648,8 @@ class PolytopeRendererApp {
    * @returns {{scaleFactor: number, solidGroup: THREE.Object3D, facesGroup: THREE.Mesh, wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 包含模型相关 THREE.js 对象的引用和计算出的缩放因子。
    */
   load4DMesh(meshData, material) {
+    this.is4D = true;
+    this.updateEnable();
     const container = new THREE.Object3D();
     const geometry = new THREE.BufferGeometry();
 
@@ -652,6 +678,15 @@ class PolytopeRendererApp {
     meshData.faces.forEach(face => indices.push(...face));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
+    
+    material = shaderCompCallback.faceMaterial(
+      material,
+      this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
+      this.projDistUni,
+      this.isOrthoUni
+    );
 
     const mesh = new THREE.Mesh(geometry, material);
     mesh.material.side = THREE.DoubleSide;
@@ -753,13 +788,18 @@ class PolytopeRendererApp {
   }
 
   /**
-   * 从 OFF 格式的字符串数据加载 3D 网格模型。
-   * @param {string} data - OFF 格式的字符串数据。
+   * 从 OFF 格式的字符串数据或网格数据加载 3D 网格模型。
+   * @param {string|type.NonTriMesh4D} data - OFF 格式的字符串数据或网格数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
-  async loadMeshFromOffData(data, material) {
+  async loadMeshFromData(data, material) {
+    if (this.solidGroup) {
+      helperFunc.disposeGroup(this.solidGroup);
+      this.scene.remove(this.solidGroup);
+    }
+  
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
-    const mesh = parseOFF(data);
+    const mesh = data instanceof Object ? data : parseOFF(data);
     this.loadMeshPromise = this.processMeshData(mesh);
     const processedMesh = await this.loadMeshPromise.promise;
 
@@ -790,13 +830,18 @@ class PolytopeRendererApp {
   }
 
   /**
-   * 从 4OFF 格式的字符串数据加载 4D 网格模型。
-   * @param {string} data - 4OFF 格式的字符串数据。
+   * 从 4OFF 格式的字符串或 4D 网格数据数据加载 4D 网格模型。
+   * @param {string|type.NonTriMesh4D} data - 4OFF 格式的字符串数据或 4D 网格数据。
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
-  async loadMeshFrom4OffData(data, material) {
+  async loadMeshFrom4Data(data, material) {
+    if (this.solidGroup) {
+      helperFunc.disposeGroup(this.solidGroup);
+      this.scene.remove(this.solidGroup);
+    }
+  
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
-    const mesh = parse4OFF(data);
+    const mesh = data instanceof Object ? data : parse4OFF(data);
     this.loadMeshPromise = this.processMeshData(mesh, true);
     const processedMesh = await this.loadMeshPromise.promise;
 
@@ -809,15 +854,6 @@ class PolytopeRendererApp {
       .trim()
       .replace(' ', '');
     this.infoDis.innerText = info;
-
-    material = shaderCompCallback.faceMaterial(
-      material,
-      this.rotUni,
-      this.ofsUni,
-      this.ofs3Uni,
-      this.projDistUni,
-      this.isOrthoUni
-    );
 
     const {
       scaleFactor,
@@ -855,7 +891,7 @@ class PolytopeRendererApp {
           return response.text();
         })
         .then(async data => {
-          await (is4Off ? this.loadMeshFrom4OffData.bind(this) : this.loadMeshFromOffData.bind(this))(data, material);
+          await (is4Off ? this.loadMeshFrom4Data.bind(this) : this.loadMeshFromData.bind(this))(data, material);
           resolve();
         });
     });
@@ -1078,39 +1114,26 @@ class PolytopeRendererApp {
 
     this.polyhedraSeleEle.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', async () => {
-        if (this.solidGroup) {
-          helperFunc.disposeGroup(this.solidGroup);
-          this.scene.remove(this.solidGroup);
-        }
-
         await this.loadMeshFromUrl(
           await this.importOff(`polyhedra/${a.dataset.path}`),
           this.initialMaterial
         );
-        this.is4D = false;
-        this.updateEnable();
       });
     });
     
     this.polychoraSeleEle.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', async () => {
-        if (this.solidGroup) {
-          helperFunc.disposeGroup(this.solidGroup);
-          this.scene.remove(this.solidGroup);
-        }
-
         await this.loadMeshFromUrl(
           await this.importOff(`polychora/${a.dataset.path}`),
           this.initialMaterial,
           true
         );
-        this.is4D = true;
-        this.updateEnable();
       });
     });
     
     this.setupNavEventListeners();
     this.setupCollapseEventListeners();
+    this.setupSolidInfFamiliesEventListeners();
   }
   
   /**
@@ -1131,6 +1154,7 @@ class PolytopeRendererApp {
       this.offsNav.classList.add('active');
     });
   }
+  
   /**
    * 设置 OFF 文件分类的展开 / 收起的事件监听器。
    */
@@ -1141,6 +1165,27 @@ class PolytopeRendererApp {
         ul.style.display = ul.style.display === 'none' ? null : 'none';
       })
     })
+  }
+  
+  /**
+   * 设置立体无限家族的事件监听器。
+   */
+  setupSolidInfFamiliesEventListeners() {
+    this.genPrismBtn.addEventListener('click', async () => {
+      const [n, s] = this.prismNInput.value.split('/').map(i => +i);
+      await this.loadMeshFromData(infFamilies.prism(n, s), this.initialMaterial);
+    });
+    
+    this.genAntiprismBtn.addEventListener('click', async () => {
+      const [n, s] = this.antiprismNInput.value.split('/').map(i => +i);
+      await this.loadMeshFromData(infFamilies.antiprism(n, s), this.initialMaterial);
+    });
+    
+    this.genDuoprismBtn.addEventListener('click', async () => {
+      const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
+      const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);
+      await this.loadMeshFrom4Data(infFamilies.duoprism(m, n, s1, s2), this.initialMaterial);
+    });
   }
 
   /**
@@ -1155,11 +1200,6 @@ class PolytopeRendererApp {
     reader.onload = async e => {
       const data = e.target.result;
 
-      if (this.solidGroup) {
-        helperFunc.disposeGroup(this.solidGroup);
-        this.scene.remove(this.solidGroup);
-      }
-
       this.is4D =
         data
           .split('\n')
@@ -1167,11 +1207,10 @@ class PolytopeRendererApp {
           .trim() === '4OFF';
 
       if (this.is4D) {
-        await this.loadMeshFrom4OffData(data, this.initialMaterial);
+        await this.loadMeshFrom4Data(data, this.initialMaterial);
       } else {
-        await this.loadMeshFromOffData(data, this.initialMaterial);
+        await this.loadMeshFromData(data, this.initialMaterial);
       }
-      this.updateEnable();
     };
     reader.readAsText(file);
   }
