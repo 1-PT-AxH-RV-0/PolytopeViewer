@@ -20,6 +20,7 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
   - `offProcessor4D.js`：解析 4OFF 的工具。
   - `processMeshData.worker.js`：用 WebWorker 处理网格数据。
   - `axesCreater.js`：创建坐标轴。
+  - `infFamilies.js`：无限家族的网格数据生成函数。
   - `helperFunc.js`：一些辅助函数。
   - `GLSLs.js`：在 GLSL 中的辅助函数。
   - `shaderCompCallback.js`：为 Three.js 的内置材质注入四维或其他功能。
@@ -52,6 +53,9 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
   - 阿基米德多面体
   - 卡塔兰多面体
   - 约翰逊多面体
+  - 无限家族
+    - 正角柱
+    - 正反角柱
 - 多胞体
   - 凸正多胞体
   - 施莱夫利–赫斯多胞体
@@ -64,6 +68,8 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
     - 扩充
     - 扩充截角
     - 全截
+  - 无限家族
+    - 正双角柱
 
 之后会添加更多。
 

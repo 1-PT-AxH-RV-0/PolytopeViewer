@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const WebpackBar = require('webpackbar');
 
 module.exports = {
   entry: {index: './src/viewer.js'},
@@ -61,6 +62,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new WebpackBar(),
     new HtmlWebpackPlugin({
       title: '多胞形预览器',
       template: './src/index.html',
