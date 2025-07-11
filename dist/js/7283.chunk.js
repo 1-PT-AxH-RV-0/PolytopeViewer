@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7283],{7283:(e,s,a)=>{e.exports=a.p+"assets/Gyroelongated_pentagonal_pyramid.off"}}]);

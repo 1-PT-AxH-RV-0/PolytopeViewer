@@ -1,0 +1,22 @@
+"use strict";
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+(self["webpackChunk"] = self["webpackChunk"] || []).push([["assets_models_polychora_RuncinatedSchl_fliHess_Runcinated_facted_hexacosichoron_off"],{
+
+/***/ "./assets/models/polychora/RuncinatedSchläfliHess/Runcinated_facted_hexacosichoron.off":
+/*!*********************************************************************************************!*\
+  !*** ./assets/models/polychora/RuncinatedSchläfliHess/Runcinated_facted_hexacosichoron.off ***!
+  \*********************************************************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("module.exports = __webpack_require__.p + \"assets/Runcinated_facted_hexacosichoron.off\";\n\n//# sourceURL=webpack:///./assets/models/polychora/RuncinatedSchl%C3%A4fliHess/Runcinated_facted_hexacosichoron.off?");
+
+/***/ })
+
+}]);

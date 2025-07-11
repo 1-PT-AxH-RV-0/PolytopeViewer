@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8347],{8347:(s,e,a)=>{s.exports=a.p+"assets/Elongated_triangular_bipyramid.off"}}]);

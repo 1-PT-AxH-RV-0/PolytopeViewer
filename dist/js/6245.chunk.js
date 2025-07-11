@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6245],{6245:(e,s,t)=>{e.exports=t.p+"assets/Omnitruncated_pentachoron.off"}}]);

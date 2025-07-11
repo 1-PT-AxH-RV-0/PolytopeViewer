@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2361],{2361:(e,s,t)=>{e.exports=t.p+"assets/Great_stellated_dodecahedron.off"}}]);

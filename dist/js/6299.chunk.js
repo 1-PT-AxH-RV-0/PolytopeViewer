@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6299],{6299:(s,e,f)=>{s.exports=f.p+"assets/Gyrobifastigium.off"}}]);

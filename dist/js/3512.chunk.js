@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3512],{3512:(e,s,a)=>{e.exports=a.p+"assets/Parabiaugmented_dodecahedron.off"}}]);

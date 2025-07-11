@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1662],{1662:(e,s,a)=>{e.exports=a.p+"assets/Gyroelongated_pentagonal_cupolarotunda.off"}}]);

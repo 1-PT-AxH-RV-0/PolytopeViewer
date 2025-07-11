@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2949],{2949:(s,e,t)=>{s.exports=t.p+"assets/Triakis_tetrahedron.off"}}]);

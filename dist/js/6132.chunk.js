@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6132],{6132:(s,e,p)=>{s.exports=p.p+"assets/Icosahedron.off"}}]);

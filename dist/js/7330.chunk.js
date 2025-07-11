@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7330],{7330:(e,s,t)=>{e.exports=t.p+"assets/Truncated_octahedron.off"}}]);

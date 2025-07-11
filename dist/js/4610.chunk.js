@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4610],{4610:(s,e,p)=>{s.exports=p.p+"assets/Tico.off"}}]);

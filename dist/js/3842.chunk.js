@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3842],{3842:(e,s,t)=>{e.exports=t.p+"assets/Cantellated_icositetrachoron.off"}}]);

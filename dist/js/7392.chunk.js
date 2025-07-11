@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7392],{7392:(e,s,i)=>{e.exports=i.p+"assets/Metabidiminished_rhombicosidodecahedron.off"}}]);

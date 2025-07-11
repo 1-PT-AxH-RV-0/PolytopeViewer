@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4796],{4796:(e,s,o)=>{e.exports=o.p+"assets/Gyrate_rhombicosidodecahedron.off"}}]);

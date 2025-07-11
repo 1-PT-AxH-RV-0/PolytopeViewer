@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3228],{847:(s,e,a)=>{s.exports=a.p+"assets/Triangular_cupola.off"}}]);

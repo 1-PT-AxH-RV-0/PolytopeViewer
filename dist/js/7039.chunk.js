@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7039],{7039:(e,s,t)=>{e.exports=t.p+"assets/Deltoidal_hexecontahedron.off"}}]);

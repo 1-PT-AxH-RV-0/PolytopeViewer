@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[576],{576:(e,s,t)=>{e.exports=t.p+"assets/Metabiaugmented_truncated_dodecahedron.off"}}]);

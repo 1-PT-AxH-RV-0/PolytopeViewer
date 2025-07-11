@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5287],{5287:(s,e,i)=>{s.exports=i.p+"assets/Tridiminished_rhombicosidodecahedron.off"}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7176],{7176:(s,e,a)=>{s.exports=a.p+"assets/Elongated_triangular_gyrobicupola.off"}}]);

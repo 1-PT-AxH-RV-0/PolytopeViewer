@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5088],{5088:(s,e,u)=>{s.exports=u.p+"assets/Snub_cube.off"}}]);

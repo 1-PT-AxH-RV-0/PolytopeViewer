@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1241],{1241:(s,e,a)=>{s.exports=a.p+"assets/Pentagonal_bipyramid.off"}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3328],{3328:(s,e,p)=>{s.exports=p.p+"assets/Square_gyrobicupola.off"}}]);

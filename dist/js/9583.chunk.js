@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9583],{9583:(e,s,a)=>{e.exports=a.p+"assets/Elongated_pentagonal_orthocupolarotunda.off"}}]);

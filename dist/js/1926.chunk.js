@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1926],{1926:(e,s,a)=>{e.exports=a.p+"assets/Triangular_hebesphenorotunda.off"}}]);
