@@ -10,7 +10,7 @@ import shaderCompCallback from './shaderCompCallback.js';
 import infFamilies from './infFamilies.js';
 import * as helperFunc from './helperFunc.js';
 import { parseOFF } from './offProcessor.js';
-import { process4DMeshData, parse4OFF } from './offProcessor4D.js';
+import { parse4OFF } from './offProcessor4D.js';
 import * as type from './type.js';
 
 // 导入样式。
@@ -66,13 +66,13 @@ class PolytopeRendererApp {
     this.offSeleEle = null;
     this.polyhedraSeleEle = null;
     this.polychoraSeleEle = null;
-    
+
     this.genPrismBtn = null;
     this.prismNInput = null;
-    
+
     this.genAntiprismBtn = null;
     this.antiprismNInput = null;
-    
+
     this.genDuoprismBtn = null;
     this.duoprismMInput = null;
     this.duoprismNInput = null;
@@ -163,7 +163,7 @@ class PolytopeRendererApp {
       ),
       this.initialMaterial
     );
-    
+
     // await this.loadMeshFromData(infFamilies.antiprism(5), this.initialMaterial);
 
     this.setupEventListeners();
@@ -678,7 +678,7 @@ class PolytopeRendererApp {
     meshData.faces.forEach(face => indices.push(...face));
     geometry.setIndex(indices);
     geometry.computeVertexNormals();
-    
+
     material = shaderCompCallback.faceMaterial(
       material,
       this.rotUni,
@@ -797,7 +797,7 @@ class PolytopeRendererApp {
       helperFunc.disposeGroup(this.solidGroup);
       this.scene.remove(this.solidGroup);
     }
-  
+
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = data instanceof Object ? data : parseOFF(data);
     this.loadMeshPromise = this.processMeshData(mesh);
@@ -839,7 +839,7 @@ class PolytopeRendererApp {
       helperFunc.disposeGroup(this.solidGroup);
       this.scene.remove(this.solidGroup);
     }
-  
+
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = data instanceof Object ? data : parse4OFF(data);
     this.loadMeshPromise = this.processMeshData(mesh, true);
@@ -881,7 +881,7 @@ class PolytopeRendererApp {
    * @param {boolean} is4Off - 是否是 4OFF 文件。
    * @returns {Promise<void>} 一个 Promise，在模型加载完成后解析。
    */
-  async loadMeshFromUrl(url, material, is4Off=false) {
+  async loadMeshFromUrl(url, material, is4Off = false) {
     return new Promise(resolve => {
       fetch(url)
         .then(response => {
@@ -891,12 +891,16 @@ class PolytopeRendererApp {
           return response.text();
         })
         .then(async data => {
-          await (is4Off ? this.loadMeshFrom4Data.bind(this) : this.loadMeshFromData.bind(this))(data, material);
+          await (
+            is4Off
+              ? this.loadMeshFrom4Data.bind(this)
+              : this.loadMeshFromData.bind(this)
+          )(data, material);
           resolve();
         });
     });
   }
-  
+
   /**
    * 根据 UI 控件的状态更新模型的可见性、面不透明度、Uniform 值、摄像头模式以及线框和顶点的尺寸。
    */
@@ -1120,7 +1124,7 @@ class PolytopeRendererApp {
         );
       });
     });
-    
+
     this.polychoraSeleEle.querySelectorAll('a').forEach(a => {
       a.addEventListener('click', async () => {
         await this.loadMeshFromUrl(
@@ -1130,12 +1134,12 @@ class PolytopeRendererApp {
         );
       });
     });
-    
+
     this.setupNavEventListeners();
     this.setupCollapseEventListeners();
     this.setupSolidInfFamiliesEventListeners();
   }
-  
+
   /**
    * 设置导航栏的事件监听器。
    */
@@ -1154,7 +1158,7 @@ class PolytopeRendererApp {
       this.offsNav.classList.add('active');
     });
   }
-  
+
   /**
    * 设置 OFF 文件分类的展开 / 收起的事件监听器。
    */
@@ -1163,28 +1167,37 @@ class PolytopeRendererApp {
       li.querySelector('span').addEventListener('click', () => {
         const ul = li.querySelector('ul');
         ul.style.display = ul.style.display === 'none' ? null : 'none';
-      })
-    })
+      });
+    });
   }
-  
+
   /**
    * 设置立体无限家族的事件监听器。
    */
   setupSolidInfFamiliesEventListeners() {
     this.genPrismBtn.addEventListener('click', async () => {
       const [n, s] = this.prismNInput.value.split('/').map(i => +i);
-      await this.loadMeshFromData(infFamilies.prism(n, s), this.initialMaterial);
+      await this.loadMeshFromData(
+        infFamilies.prism(n, s),
+        this.initialMaterial
+      );
     });
-    
+
     this.genAntiprismBtn.addEventListener('click', async () => {
       const [n, s] = this.antiprismNInput.value.split('/').map(i => +i);
-      await this.loadMeshFromData(infFamilies.antiprism(n, s), this.initialMaterial);
+      await this.loadMeshFromData(
+        infFamilies.antiprism(n, s),
+        this.initialMaterial
+      );
     });
-    
+
     this.genDuoprismBtn.addEventListener('click', async () => {
       const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
       const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);
-      await this.loadMeshFrom4Data(infFamilies.duoprism(m, n, s1, s2), this.initialMaterial);
+      await this.loadMeshFrom4Data(
+        infFamilies.duoprism(m, n, s1, s2),
+        this.initialMaterial
+      );
     });
   }
 

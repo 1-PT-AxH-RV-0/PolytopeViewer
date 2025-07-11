@@ -792,6 +792,7 @@ export {
   getUniqueSortedPairs,
   rotate4DPointsToXY,
   apply4DInverseRotation,
+  apply4DMatrix,
   are4DPointsClose,
   range,
   getFarthestPointDist,
