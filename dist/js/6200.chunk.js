@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6200],{6200:(s,e,a)=>{s.exports=a.p+"assets/Elongated_square_cupola.off"}}]);

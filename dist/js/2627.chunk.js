@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2627],{2627:(s,e,t)=>{s.exports=t.p+"assets/Icositetrachoron.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6098],{6098:(s,e,p)=>{s.exports=p.p+"assets/Augmented_triangular_prism.off"}}]);

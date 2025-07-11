@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6690],{6690:(s,e,k)=>{s.exports=k.p+"assets/Tetrakis_cube.off"}}]);

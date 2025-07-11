@@ -784,6 +784,136 @@ function parseJsonFileFromInput(fileInput) {
   });
 }
 
+/**
+ * 计算三维点集的质心。
+ * @param {type.Point3D[]} points - 三维点集数组。
+ * @returns {type.Point3D} - 质心坐标。
+ */
+function calculateCentroid(points) {
+  let sumX = 0,
+    sumY = 0,
+    sumZ = 0;
+  const count = points.length;
+
+  for (const point of points) {
+    sumX += point.x;
+    sumY += point.y;
+    sumZ += point.z;
+  }
+
+  return {
+    x: sumX / count,
+    y: sumY / count,
+    z: sumZ / count
+  };
+}
+
+/**
+ * 计算三个平面的交点坐标。
+ * @param {type.Point3D[][]} pointSets 点集数组。
+ * @returns {type.Point3D} 交点坐标，如果无解或有无穷多解则返回 null。
+ */
+function findPlanesIntersection(pointSets) {
+  const planes = [];
+  for (const pointSet of pointSets) {
+    const plane = getPlaneEquation(pointSet);
+    if (!plane) return null;
+    planes.push(plane);
+  }
+
+  return solveThreePlanes(planes[0], planes[1], planes[2]);
+}
+
+/**
+ * 根据三个点计算平面方程。
+ * @param {[type.Point3D, type.Point3D, type.Point3D]} points 三个三维点的数组。
+ * @returns {object} 平面方程 {A, B, C, D}，如果点共线则返回 null。
+ */
+function getPlaneEquation(points) {
+  const [p1, p2, p3] = points;
+
+  // 计算两个向量
+  const v1 = {
+    x: p2.x - p1.x,
+    y: p2.y - p1.y,
+    z: p2.z - p1.z
+  };
+  const v2 = {
+    x: p3.x - p1.x,
+    y: p3.y - p1.y,
+    z: p3.z - p1.z
+  };
+
+  // 计算法向量（叉积）
+  const A = v1.y * v2.z - v1.z * v2.y;
+  const B = v1.z * v2.x - v1.x * v2.z;
+  const C = v1.x * v2.y - v1.y * v2.x;
+
+  // 检查法向量是否为零向量（点共线）
+  if (A === 0 && B === 0 && C === 0) {
+    return null;
+  }
+
+  // 计算D
+  const D = A * p1.x + B * p1.y + C * p1.z;
+
+  return { A, B, C, D };
+}
+
+/**
+ * 解三个平面方程的方程组
+ * @param {object} plane1 第一个平面方程 {A, B, C, D}
+ * @param {object} plane2 第二个平面方程 {A, B, C, D}
+ * @param {object} plane3 第三个平面方程 {A, B, C, D}
+ * @returns {object} 交点坐标 {x, y, z}，如果无解或有无穷多解则返回null
+ */
+function solveThreePlanes(plane1, plane2, plane3) {
+  const { A: A1, B: B1, C: C1, D: D1 } = plane1;
+  const { A: A2, B: B2, C: C2, D: D2 } = plane2;
+  const { A: A3, B: B3, C: C3, D: D3 } = plane3;
+
+  // 构建系数矩阵和常数项
+  // A1x + B1y + C1z = D1
+  // A2x + B2y + C2z = D2
+  // A3x + B3y + C3z = D3
+
+  // 计算行列式
+  const det =
+    A1 * (B2 * C3 - B3 * C2) -
+    B1 * (A2 * C3 - A3 * C2) +
+    C1 * (A2 * B3 - A3 * B2);
+
+  // 如果行列式为0，则无解或有无穷多解
+  if (Math.abs(det) < 1e-10) {
+    return null;
+  }
+
+  // 计算x的分子行列式
+  const detX =
+    D1 * (B2 * C3 - B3 * C2) -
+    B1 * (D2 * C3 - D3 * C2) +
+    C1 * (D2 * B3 - D3 * B2);
+
+  // 计算y的分子行列式
+  const detY =
+    A1 * (D2 * C3 - D3 * C2) -
+    D1 * (A2 * C3 - A3 * C2) +
+    C1 * (A2 * D3 - A3 * D2);
+
+  // 计算z的分子行列式
+  const detZ =
+    A1 * (B2 * D3 - B3 * D2) -
+    B1 * (A2 * D3 - A3 * D2) +
+    D1 * (A2 * B3 - A3 * B2);
+
+  // 计算解
+  const x = detX / det;
+  const y = detY / det;
+  const z = detZ / det;
+
+  return { x, y, z };
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -803,5 +933,7 @@ export {
   create4DRotationMat,
   getSortedValuesDesc,
   validateRecordConfig,
-  parseJsonFileFromInput
+  parseJsonFileFromInput,
+  calculateCentroid,
+  findPlanesIntersection
 };

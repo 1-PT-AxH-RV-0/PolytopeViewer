@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3906],{3906:(s,e,a)=>{s.exports=a.p+"assets/Elongated_triangular_cupola.off"}}]);

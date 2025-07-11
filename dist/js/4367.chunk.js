@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4367],{4367:(s,e,t)=>{s.exports=t.p+"assets/Cantitruncated_hexacosichoron.off"}}]);

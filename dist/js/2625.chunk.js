@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2625],{5006:(s,e,f)=>{s.exports=f.p+"assets/Tiffix.off"}}]);

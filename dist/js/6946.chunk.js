@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6946],{6946:(e,s,t)=>{e.exports=t.p+"assets/Rectified_tesseract.off"}}]);

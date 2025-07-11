@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9431],{9431:(s,e,a)=>{s.exports=a.p+"assets/Great_icosahedron.off"}}]);

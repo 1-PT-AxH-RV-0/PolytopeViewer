@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9535],{9535:(e,s,a)=>{e.exports=a.p+"assets/Gyroelongated_square_cupola.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3552],{3552:(s,e,f)=>{s.exports=f.p+"assets/Girfix.off"}}]);

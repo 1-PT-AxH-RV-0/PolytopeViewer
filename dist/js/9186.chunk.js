@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9186],{9186:(s,e,p)=>{s.exports=p.p+"assets/Pentachoron.off"}}]);

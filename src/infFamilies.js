@@ -1,6 +1,10 @@
 import { chunk } from 'lodash';
 import { getUniqueSortedPairs } from './helperFunc.js';
-import { range, create4DRotationMat, apply4DMatrix } from './helperFunc.js';
+import {
+  range,
+  calculateCentroid,
+  findPlanesIntersection
+} from './helperFunc.js';
 import * as type from './type.js';
 
 /**
@@ -102,6 +106,7 @@ function antiprism(n, s = 1) {
     }
   }
   const faces = [];
+  faces.push(...chunk(range(0, 2 * n - 1), n / gcd));
   for (let componentIndex = 0; componentIndex < gcd; componentIndex++) {
     for (
       let i = (n / gcd) * componentIndex;
@@ -117,7 +122,59 @@ function antiprism(n, s = 1) {
       faces.push([i3, i2 + n, i2]);
     }
   }
-  faces.push(...chunk(range(0, 2 * n - 1), n / gcd));
+
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
+  );
+
+  return { vertices, faces, edges };
+}
+
+/**
+ * 生成 n 方偏方面体的网格数据。
+ * @param {number} n - 多边形的边数。
+ * @param {number} s - 多边形的步长。
+ * @returns {type.NonTriMesh3D} 网格数据对象。
+ */
+function trapezohedron(n, s = 1) {
+  const gcd = getGCD(n, s);
+  const { vertices: antiprismVertices, faces: antiprismFaces } = antiprism(
+    n,
+    s
+  );
+  let vertices = antiprismFaces.map(f =>
+    calculateCentroid(f.map(vi => antiprismVertices[vi]))
+  );
+
+  if (n / gcd > 3) {
+    vertices = vertices.slice(gcd * 2);
+    const planes1 = [
+      [vertices[0], vertices[1], vertices[2]],
+      [vertices[2], vertices[3], vertices[4]],
+      [vertices[4], vertices[5], vertices[6]]
+    ];
+    const planes2 = [
+      [vertices[1], vertices[2], vertices[3]],
+      [vertices[3], vertices[4], vertices[5]],
+      [vertices[5], vertices[6], vertices[7]]
+    ];
+    vertices.unshift(
+      findPlanesIntersection(planes1),
+      findPlanesIntersection(planes2)
+    );
+  }
+  const faces = [];
+  const n_ = n / gcd;
+  for (let componentIndex = 0; componentIndex < gcd; componentIndex++) {
+    for (let i = n_ * componentIndex; i < n_ * (componentIndex + 1); i++) {
+      const i1 = i * 2;
+      const i2 = i1 + 1;
+      const i3 = (i1 + 2) % (2 * n_ * (componentIndex + 1));
+      const i4 = (i1 + 3) % (2 * n_ * (componentIndex + 1));
+      faces.push([0, i1 + 2, i2 + 2, i3 + 2]);
+      faces.push([1, i2 + 2, i3 + 2, i4 + 2]);
+    }
+  }
 
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])
@@ -137,7 +194,7 @@ function antiprism(n, s = 1) {
 function duoprism(m, n, s1 = 1, s2 = 1) {
   const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
-  
+
   const gcd1 = getGCD(m, s1);
   const gcd2 = getGCD(n, s2);
 
@@ -156,7 +213,7 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
         vertices.push({ x, y: z, z: -y, w });
       }
     }
-  
+
     const rectangularFaces = [];
     for (let i = 0; i < m; i++) {
       for (let j = 0; j < n; j++) {
@@ -169,7 +226,7 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
         rectangularFaces.push([v0, v1, v2, v3]);
       }
     }
-  
+
     const mGonFaces = [];
     for (let j = 0; j < n; j++) {
       const face = [];
@@ -178,7 +235,7 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
       }
       mGonFaces.push(face);
     }
-  
+
     const nGonFaces = [];
     for (let i = 0; i < m; i++) {
       const face = [];
@@ -187,11 +244,11 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
       }
       nGonFaces.push(face);
     }
-  
+
     faces.push(...rectangularFaces);
     faces.push(...mGonFaces);
     faces.push(...nGonFaces);
-  
+
     for (let i = 0; i < m; i++) {
       const cellFaces = [];
       for (let j = 0; j < n; j++) {
@@ -202,7 +259,7 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
       cellFaces.push(rectangularFaces.length + ((i + 1) % m));
       cells.push(cellFaces);
     }
-  
+
     for (let j = 0; j < n; j++) {
       const cellFaces = [];
       for (let i = 0; i < m; i++) {
@@ -221,25 +278,25 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
     // const nVerticesInOneComponent = m_ * n_
     // const nFacesInOneComponent = m_ * n_ + m_ + n_
     // for (let i = 0; i < gcd1; i++) {
-      // const { vertices: componentVertices, faces: componentFaces, cells: componentCells} = duoprism(m_, n_, s1_, s2_);
-      // const deg = (2 * Math.PI * s1) / m / gcd1 * i
-      
-      // faces.push(...componentFaces.map(face => face.map(vertexI => vertexI + nVerticesInOneComponent * i)))
-      // cells.push(...componentCells.map(cell => cell.map(faceI => faceI + nFacesInOneComponent * i)))
-      // vertices.push(...componentVertices.map(v =>
-        // ({
-          // x: Math.cos(deg) * v.x - Math.sin(deg) * v.z,
-          // y: v.y,
-          // z: Math.sin(deg) * v.x + Math.cos(deg) * v.z,
-          // w: v.w
-        // })
-      // ))
+    // const { vertices: componentVertices, faces: componentFaces, cells: componentCells} = duoprism(m_, n_, s1_, s2_);
+    // const deg = (2 * Math.PI * s1) / m / gcd1 * i
+
+    // faces.push(...componentFaces.map(face => face.map(vertexI => vertexI + nVerticesInOneComponent * i)))
+    // cells.push(...componentCells.map(cell => cell.map(faceI => faceI + nFacesInOneComponent * i)))
+    // vertices.push(...componentVertices.map(v =>
+    // ({
+    // x: Math.cos(deg) * v.x - Math.sin(deg) * v.z,
+    // y: v.y,
+    // z: Math.sin(deg) * v.x + Math.cos(deg) * v.z,
+    // w: v.w
+    // })
+    // ))
     // }
     // console.log(cells.map(a => a.join(' ')).join('\n'))
     alert('不支持复合双角柱。');
     throw new Error('不支持复合双角柱。');
   }
-  
+
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])
   );
@@ -250,5 +307,6 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
 export default {
   prism,
   antiprism,
+  trapezohedron,
   duoprism
 };

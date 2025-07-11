@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2950],{2950:(s,e,a)=>{s.exports=a.p+"assets/Disdyakis_triacontahedron.off"}}]);

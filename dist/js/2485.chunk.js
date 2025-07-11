@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2485],{2485:(s,e,a)=>{s.exports=a.p+"assets/Disdyakis_dodecahedron.off"}}]);

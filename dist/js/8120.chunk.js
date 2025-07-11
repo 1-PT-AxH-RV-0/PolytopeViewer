@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8120],{8120:(s,e,c)=>{s.exports=c.p+"assets/Omnitruncated_hecatonicosachoron.off"}}]);

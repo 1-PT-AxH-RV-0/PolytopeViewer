@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8906],{8906:(e,s,p)=>{e.exports=p.p+"assets/Augmented_sphenocorona.off"}}]);

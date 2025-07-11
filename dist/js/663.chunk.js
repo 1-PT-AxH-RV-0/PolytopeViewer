@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[663],{663:(s,e,t)=>{s.exports=t.p+"assets/Rhombic_triacontahedron.off"}}]);

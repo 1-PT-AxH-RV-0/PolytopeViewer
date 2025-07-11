@@ -73,6 +73,9 @@ class PolytopeRendererApp {
     this.genAntiprismBtn = null;
     this.antiprismNInput = null;
 
+    this.genTrapezohedronBtn = null;
+    this.trapezohedronNInput = null;
+
     this.genDuoprismBtn = null;
     this.duoprismMInput = null;
     this.duoprismNInput = null;
@@ -164,7 +167,12 @@ class PolytopeRendererApp {
       this.initialMaterial
     );
 
-    // await this.loadMeshFromData(infFamilies.antiprism(5), this.initialMaterial);
+    /*
+    await this.loadMeshFromData(
+      infFamilies.trapezohedron(4),
+      this.initialMaterial
+    );
+    */
 
     this.setupEventListeners();
     this.startRenderLoop();
@@ -199,17 +207,20 @@ class PolytopeRendererApp {
     this.startRecordBtn = document.getElementById('startRecord');
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
-    
+
     this.offSeleEle = document.getElementById('offSele');
     this.polyhedraSeleEle = document.getElementById('polyhedra');
     this.polychoraSeleEle = document.getElementById('polychora');
-    
+
     this.genPrismBtn = document.getElementById('genPrism');
     this.prismNInput = document.getElementById('prismN');
-    
+
     this.genAntiprismBtn = document.getElementById('genAntiprism');
     this.antiprismNInput = document.getElementById('antiprismN');
-    
+
+    this.genTrapezohedronBtn = document.getElementById('genTrapezohedron');
+    this.trapezohedronNInput = document.getElementById('trapezohedronN');
+
     this.genDuoprismBtn = document.getElementById('genDuoprism');
     this.duoprismMInput = document.getElementById('duoprismM');
     this.duoprismNInput = document.getElementById('duoprismN');
@@ -1187,6 +1198,14 @@ class PolytopeRendererApp {
       const [n, s] = this.antiprismNInput.value.split('/').map(i => +i);
       await this.loadMeshFromData(
         infFamilies.antiprism(n, s),
+        this.initialMaterial
+      );
+    });
+
+    this.genTrapezohedronBtn.addEventListener('click', async () => {
+      const [n, s] = this.trapezohedronNInput.value.split('/').map(i => +i);
+      await this.loadMeshFromData(
+        infFamilies.trapezohedron(n, s),
         this.initialMaterial
       );
     });

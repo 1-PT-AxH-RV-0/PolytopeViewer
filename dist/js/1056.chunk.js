@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1056],{1056:(s,e,t)=>{s.exports=t.p+"assets/Runcitruncated_tesseract.off"}}]);

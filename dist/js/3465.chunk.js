@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3465],{3465:(s,e,f)=>{s.exports=f.p+"assets/Tigfix.off"}}]);

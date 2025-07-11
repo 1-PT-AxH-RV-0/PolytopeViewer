@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7411],{7411:(s,e,p)=>{s.exports=p.p+"assets/Sirsashi.off"}}]);

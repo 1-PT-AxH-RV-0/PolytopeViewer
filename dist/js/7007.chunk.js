@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7007],{7007:(s,e,i)=>{s.exports=i.p+"assets/Parabidiminished_rhombicosidodecahedron.off"}}]);
