@@ -133,7 +133,10 @@ function process4DMeshData(
     for (const face of cell) {
       processedCell.push(...range(...facesMap[face]));
     }
-    processedCells.push(processedCell);
+    processedCells.push({
+      facesCount: cell.length,
+      faceIndices: processedCell
+    });
   }
 
   return {

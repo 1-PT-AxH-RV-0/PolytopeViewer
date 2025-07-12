@@ -192,6 +192,10 @@ function trapezohedron(n, s = 1) {
  * @returns {type.NonTriMesh4D} 4D 网格数据对象。
  */
 function duoprism(m, n, s1 = 1, s2 = 1) {
+  const polygon_edge_length1 = 2 * Math.sin((Math.PI * s1) / m);
+  const polygon_edge_length2 = 2 * Math.sin((Math.PI * s2) / n);
+  const polygon2ScaleFactor = polygon_edge_length1 / polygon_edge_length2;
+
   const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
 
@@ -208,8 +212,8 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
       const y = Math.sin(theta1);
       for (const j of polygonIndexIterator(n, s2)) {
         const theta2 = (2 * Math.PI * j) / n + offset2;
-        const z = Math.cos(theta2);
-        const w = Math.sin(theta2);
+        const z = Math.cos(theta2) * polygon2ScaleFactor;
+        const w = Math.sin(theta2) * polygon2ScaleFactor;
         vertices.push({ x, y: z, z: -y, w });
       }
     }
@@ -249,25 +253,27 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
     faces.push(...mGonFaces);
     faces.push(...nGonFaces);
 
+    // n 个 m 角柱。
+    for (let i = 0; i < n; i++) {
+      const cellFaces = [];
+      for (let j = 0; j < m; j++) {
+        const faceIdx = j * n + i;
+        cellFaces.push(faceIdx);
+      }
+      cellFaces.push(rectangularFaces.length + i);
+      cellFaces.push(rectangularFaces.length + ((i + 1) % n));
+      cells.push(cellFaces);
+    }
+
+    // m 个 n 角柱。
     for (let i = 0; i < m; i++) {
       const cellFaces = [];
       for (let j = 0; j < n; j++) {
         const faceIdx = i * n + j;
         cellFaces.push(faceIdx);
       }
-      cellFaces.push(rectangularFaces.length + i);
-      cellFaces.push(rectangularFaces.length + ((i + 1) % m));
-      cells.push(cellFaces);
-    }
-
-    for (let j = 0; j < n; j++) {
-      const cellFaces = [];
-      for (let i = 0; i < m; i++) {
-        const faceIdx = i * n + j;
-        cellFaces.push(faceIdx);
-      }
-      cellFaces.push(rectangularFaces.length + m + j);
-      cellFaces.push(rectangularFaces.length + m + ((j + 1) % n));
+      cellFaces.push(rectangularFaces.length + n + i);
+      cellFaces.push(rectangularFaces.length + n + ((i + 1) % m));
       cells.push(cellFaces);
     }
   } else {

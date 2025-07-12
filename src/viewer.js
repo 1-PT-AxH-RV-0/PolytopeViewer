@@ -3,6 +3,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Nanobar from 'nanobar';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import WebMWriter from 'webm-writer';
+import { EditorView, basicSetup } from 'codemirror';
+import { json } from '@codemirror/lang-json';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { linter } from '@codemirror/lint';
+import { jsonParseLinter } from '@codemirror/lang-json';
 
 // 导入外部辅助函数和模块。
 import createAxes from './axesCreater.js';
@@ -60,6 +65,7 @@ class PolytopeRendererApp {
     this.startRecordBtn = null;
     this.stopRecordBtn = null;
     this.configFileInput = null;
+    this.highlightCellsBtn = null;
     this.rotationSliders = [];
 
     // OFF 选择页元素。
@@ -122,6 +128,10 @@ class PolytopeRendererApp {
       shininess: 50,
       flatShading: true
     });
+    this.editor = null;
+    this.cells = [];
+    this.faces = [];
+    this.nHedraInCells = {};
 
     this.init();
   }
@@ -151,6 +161,7 @@ class PolytopeRendererApp {
     this._initializeCameras();
     this._initializeLights();
     this._initializeControls();
+    this._initializeJsonEditor();
 
     this.axesGroup = await createAxes(
       this.scene,
@@ -177,7 +188,7 @@ class PolytopeRendererApp {
     this.setupEventListeners();
     this.startRenderLoop();
   }
-
+  
   /**
    * 获取所有必要的 DOM 元素并将其赋值给类属性。
    */
@@ -207,6 +218,7 @@ class PolytopeRendererApp {
     this.startRecordBtn = document.getElementById('startRecord');
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
+    this.highlightCellsBtn = document.getElementById('highlightCells');
 
     this.offSeleEle = document.getElementById('offSele');
     this.polyhedraSeleEle = document.getElementById('polyhedra');
@@ -321,6 +333,26 @@ class PolytopeRendererApp {
     this.controls.maxDistance = 150.0;
     this.controls.minZoom = 0.7;
     this.controls.maxZoom = 175.0;
+  }
+
+  /**
+    初始化 JSON 代码编辑器。
+   */
+  _initializeJsonEditor () {
+    this.editor = new EditorView({
+      doc: `{
+        "ranges": [[0, 1], [3, 4]],
+        "nHedra": [4, 6],
+        "indices": [2, 5]
+      }`.replace(/(?!= ) {6}/g, ''),
+      extensions: [
+        basicSetup,
+        json(),
+        oneDark,
+        linter(jsonParseLinter())
+      ],
+      parent: document.querySelector('#jsonEditor')
+    });
   }
 
   /**
@@ -603,6 +635,9 @@ class PolytopeRendererApp {
    */
   loadMesh(meshData, material) {
     this.is4D = false;
+    this.cells = [];
+    this.faces = [];
+    this.nHedraInCells = {};
     this.updateEnable();
     const container = new THREE.Object3D();
     const geometry = new THREE.BufferGeometry();
@@ -660,8 +695,18 @@ class PolytopeRendererApp {
    */
   load4DMesh(meshData, material) {
     this.is4D = true;
+    this.cells = meshData.cells;
+    this.faces = meshData.faces;
+    this.nHedraInCells = {};
+    meshData.cells.forEach((cell, cellIdx) => {
+      if (Object.hasOwnProperty.call(this.nHedraInCells, cell.facesCount)) {
+        this.nHedraInCells[cell.facesCount].push(cellIdx);
+      } else {
+        this.nHedraInCells[cell.facesCount] = [cellIdx];
+      }
+    });
     this.updateEnable();
-    const container = new THREE.Object3D();
+    const container = new THREE.Group();
     const geometry = new THREE.BufferGeometry();
 
     // position 属性在这里没有实际作用，但必须设置以防止着色器报错。
@@ -911,6 +956,135 @@ class PolytopeRendererApp {
         });
     });
   }
+  
+  /**
+   * 高亮胞。
+   * @param {Object} highlightConfig - 要高亮的胞的配置对象。
+   * @throws {Error} - 当配置对象中描述的胞不存在时抛出，包含具体的位置。
+   */
+  highlightCells(highlightConfig) {
+    helperFunc.validateHighlightConfig(highlightConfig);
+    const highlightCellsIdx = [];
+    
+    // 验证 indices。
+    if (Object.hasOwnProperty.call(highlightConfig, 'indices')) {
+      for (const index of highlightConfig.indices) {
+        if (!this.cells[index]) {
+          throw new Error(`索引为 ${index} 的胞不存在。`);
+        }
+      }
+      highlightCellsIdx.push(...highlightConfig.indices);
+    }
+    
+    // 验证 ranges。
+    if (Object.hasOwnProperty.call(highlightConfig, 'ranges')) {
+      for (const [i, range] of highlightConfig.ranges.entries()) {
+        const [start, end] = range;
+        if (!this.cells[start]) {
+          throw new Error(`ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`);
+        }
+        if (!this.cells[end - 1]) {
+          throw new Error(`ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
+        }
+        highlightCellsIdx.push(...helperFunc.range(start, end - 1));
+      }
+    }
+    
+    // 验证 nHedra。
+    if (Object.hasOwnProperty.call(highlightConfig, 'nHedra')) {
+      for (const [i, item] of highlightConfig.nHedra.entries()) {
+        if (typeof item === "number") {
+          const nFaces = item;
+          if (!this.nHedraInCells[nFaces]) {
+            throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
+          }
+          highlightCellsIdx.push(...this.nHedraInCells[nFaces]);
+        } else if (item instanceof Object) {
+          const {nFaces, ranges} = item;
+          if (!this.nHedraInCells[nFaces]) {
+            throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
+          }
+          const cells = [];
+          for (const [j, range] of ranges.entries()) {
+            const [start, end] = range;
+            if (start >= this.nHedraInCells[nFaces].length) {
+              throw new Error(`nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`);
+            }
+            if (end > this.nHedraInCells[nFaces].length) {
+              throw new Error(`nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`);
+            }
+            cells.push(...this.nHedraInCells[nFaces].slice(...range));
+          }
+          highlightCellsIdx.push(...cells);
+        }
+      }
+    }
+    
+    // 验证 exclude。
+    if (Object.hasOwnProperty.call(highlightConfig, 'exclude')) {
+      const exclude = highlightConfig.exclude;
+      
+      if (Object.hasOwnProperty.call(exclude, 'indices')) {
+        for (const index of exclude.indices) {
+          if (!this.cells[index]) {
+            throw new Error(`exclude.indices 中的索引 ${index} 对应的胞不存在。`);
+          }
+        }
+        helperFunc.filterArray(highlightCellsIdx, exclude.indices);
+      }
+      
+      if (Object.hasOwnProperty.call(exclude, 'ranges')) {
+        for (const [i, range] of exclude.ranges.entries()) {
+          const [start, end] = range;
+          if (!this.cells[start]) {
+            throw new Error(`exclude.ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`);
+          }
+          if (!this.cells[end - 1]) {
+            throw new Error(`exclude.ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
+          }
+          helperFunc.filterArray(highlightCellsIdx, helperFunc.range(start, end - 1));
+        }
+      }
+      
+      if (Object.hasOwnProperty.call(exclude, 'nHedra')) {
+        for (const [i, item] of exclude.nHedra.entries()) {
+          if (typeof item === "number") {
+            const nFaces = item;
+            if (!this.nHedraInCells[nFaces]) {
+              throw new Error(`exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
+            }
+            helperFunc.filterArray(highlightCellsIdx, this.nHedraInCells[nFaces]);
+          } else if (item instanceof Object) {
+            const {nFaces, ranges} = item;
+            if (!this.nHedraInCells[nFaces]) {
+              throw new Error(`exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
+            }
+            const cells = [];
+            for (const [j, range] of ranges.entries()) {
+              const [start, end] = range;
+              if (start >= this.nHedraInCells[nFaces].length) {
+                throw new Error(`exclude.nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`);
+              }
+              if (end > this.nHedraInCells[nFaces].length) {
+                throw new Error(`exclude.nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`);
+              }
+              cells.push(...this.nHedraInCells[nFaces].slice(...range));
+            }
+            helperFunc.filterArray(highlightCellsIdx, cells);
+          }
+        }
+      }
+    }
+    
+    const indices = [];
+    for (const cellIdx of highlightCellsIdx) {
+      for (const faceIndex of this.cells[cellIdx].faceIndices) {
+        indices.push(...this.faces[faceIndex]);
+      }
+    }
+    
+    this.facesGroup.geometry.setIndex(indices);
+  }
 
   /**
    * 根据 UI 控件的状态更新模型的可见性、面不透明度、Uniform 值、摄像头模式以及线框和顶点的尺寸。
@@ -1016,6 +1190,7 @@ class PolytopeRendererApp {
     }
     this.projectionDistanceSlider.disabled = !this.is4D;
     this.schleSwitcher.disabled = !this.is4D;
+    this.highlightCellsBtn.disabled = !this.is4D;
     this.rotationSliders[2].disabled = !this.is4D;
     this.rotationSliders[4].disabled = !this.is4D;
     this.rotationSliders[5].disabled = !this.is4D;
@@ -1121,6 +1296,17 @@ class PolytopeRendererApp {
       'change',
       this.handleFileInputChange.bind(this)
     );
+    
+    this.highlightCellsBtn.addEventListener('click', () => {
+      const highlightConfig = JSON.parse(this.editor.state.doc.toString());
+      try {
+        this.highlightCells(highlightConfig);
+      } catch (e) {
+        alert(e.message);
+        console.error(e)
+      }
+    })
+    
     this.startRecordBtn.addEventListener('click', this.startRecord.bind(this));
     this.stopRecordBtn.addEventListener(
       'click',
