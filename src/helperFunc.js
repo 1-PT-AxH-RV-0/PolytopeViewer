@@ -738,6 +738,102 @@ function validateRecordConfig(config, is4D) {
 }
 
 /**
+ * 验证 highlightConfig 配置对象。
+ * @param {object} config - 要验证的 highlightConfig 对象。
+ * @throws {Error} - 当配置无效时抛出错误。
+ */
+function validateHighlightConfig(config) {
+  // 基础类型检查
+  if (!config || typeof config !== 'object' || Array.isArray(config)) {
+    throw new Error('highlightConfig 必须是非数组的对象类型。');
+  }
+
+  // 检查是否包含有效配置项（排除 exclude 字段）
+  const validKeys = ['indices', 'ranges', 'nHedra'];
+  const hasValidConfig = validKeys.some(key => 
+    config[key] !== undefined && 
+    (Array.isArray(config[key]) || 
+     (typeof config[key] === 'object' && !Array.isArray(config[key])))
+  );
+
+  if (!hasValidConfig && !config.exclude) {
+    throw new Error('highlightConfig 必须包含至少一个有效配置项（indices/ranges/nHedra）或 exclude 配置。');
+  }
+
+  // 验证包含配置
+  const validateInclusion = (conf, prefix = '') => {
+    if (conf.indices !== undefined) {
+      if (!Array.isArray(conf.indices)) {
+        throw new Error(`${prefix}indices 必须是数组类型。`);
+      }
+      conf.indices.forEach((num, i) => {
+        if (!Number.isInteger(num) || num < 0) {
+          throw new Error(`${prefix}indices[${i}] 必须是非负整数，当前值为 ${num}。`);
+        }
+      });
+    }
+
+    if (conf.ranges !== undefined) {
+      if (!Array.isArray(conf.ranges)) {
+        throw new Error(`${prefix}ranges 必须是二维数组类型。`);
+      }
+      conf.ranges.forEach((range, i) => {
+        if (!Array.isArray(range) || range.length !== 2) {
+          throw new Error(`${prefix}ranges[${i}] 必须是 [start, end] 格式的数组。`);
+        }
+        const [start, end] = range;
+        if (!Number.isInteger(start) || start < 0) {
+          throw new Error(`${prefix}ranges[${i}][0]（start）必须是非负整数，当前值为 ${start}。`);
+        }
+        if (!Number.isInteger(end) || end < 0) {
+          throw new Error(`${prefix}ranges[${i}][1]（end）必须是非负整数，当前值为 ${end}。`);
+        }
+        if (start > end) {
+          throw new Error(`${prefix}ranges[${i}] 的 start 值 ${start} 不能大于 end 值 ${end}。`);
+        }
+      });
+    }
+
+    if (conf.nHedra !== undefined) {
+      if (!Array.isArray(conf.nHedra)) {
+        throw new Error(`${prefix}nHedra 必须是数组类型。`);
+      }
+      conf.nHedra.forEach((item, i) => {
+        if (typeof item === 'number') {
+          if (!Number.isInteger(item) || item <= 0) {
+            throw new Error(`${prefix}nHedra[${i}] 作为数字时必须为正整数，当前值为 ${item}。`);
+          }
+        } else if (typeof item === 'object' && item !== null) {
+          if (!Number.isInteger(item.nFaces) || item.nFaces <= 0) {
+            throw new Error(`${prefix}nHedra[${i}].nFaces 必须为正整数，当前值为 ${item.nFaces}。`);
+          }
+          if (!item.ranges) {
+            throw new Error(`${prefix}nHedra[${i}].ranges 是必填项。`);
+          }
+          if (!Array.isArray(item.ranges)) {
+            throw new Error(`${prefix}nHedra[${i}].ranges 必须是二维数组类型。`);
+          }
+          validateInclusion({ ranges: item.ranges }, `${prefix}nHedra[${i}].`);
+        } else {
+          throw new Error(`${prefix}nHedra[${i}] 必须是数字或配置对象。`);
+        }
+      });
+    }
+  };
+
+  // 验证主配置
+  validateInclusion(config);
+
+  // 验证 exclude 配置
+  if (config.exclude) {
+    if (typeof config.exclude !== 'object' || Array.isArray(config.exclude)) {
+      throw new Error('exclude 配置必须是对象类型。');
+    }
+    validateInclusion(config.exclude, 'exclude.');
+  }
+}
+
+/**
  * 异步获取并解析用户选择的 JSON 文件。
  * @param {HTMLInputElement} fileInput - 文件输入元素。
  * @returns {Promise<object>} 返回解析后的 JSON 对象。
@@ -914,6 +1010,22 @@ function solveThreePlanes(plane1, plane2, plane3) {
   return { x, y, z };
 }
 
+/**
+ * 从源数组中原地移除排除数组中包含的元素。
+ * @param {Array} sourceArray - 将被修改的源数组。
+ * @param {Array} excludeArray - 包含需要移除元素的数组。
+ * @returns {Array} 返回修改后的源数组（移除了排除元素的数组）。
+ */
+function filterArray(sourceArray, excludeArray) {
+    const excludeSet = new Set(excludeArray);
+    for (let i = sourceArray.length - 1; i >= 0; i--) {
+        if (excludeSet.has(sourceArray[i])) {
+            sourceArray.splice(i, 1);
+        }
+    }
+    return sourceArray;
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -933,7 +1045,9 @@ export {
   create4DRotationMat,
   getSortedValuesDesc,
   validateRecordConfig,
+  validateHighlightConfig,
   parseJsonFileFromInput,
   calculateCentroid,
-  findPlanesIntersection
+  findPlanesIntersection,
+  filterArray
 };

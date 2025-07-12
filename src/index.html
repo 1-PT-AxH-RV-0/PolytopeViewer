@@ -34,10 +34,12 @@
         <div>YW 旋转：<input disabled type="range" min="-360" max="360" value="0" step="0.01" id="rotYWSlider" /></div>
         <div>ZW 旋转：<input disabled type="range" min="-360" max="360" value="0" step="0.01" id="rotZWSlider" /></div>
         <div><input type="file" id="fileInput" class="file-input" /></div>
+        <div><input type="file" id="configFileInput" class="config-file-input" /></div>
         <div><button id="uploadOff" />上传 OFF</div>
         <div><button id="startRecord" />开始录制</div>
         <div><button disiabled id="stopRecord" />结束录制</div>
-        <div><input type="file" id="configFileInput" class="config-file-input" /></div>
+        <div><button disiabled id="highlightCells" />高亮胞</div>
+        <div id="jsonEditor"></div>
       </div>
       
       <div id="seleOff" class="sele-off">
