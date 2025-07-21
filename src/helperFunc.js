@@ -513,9 +513,19 @@ function validateRecordConfig(config, is4D) {
     ) {
       throw new Error('initialRot 字段必须是包含 6 个实数的数组。');
     }
+    if (
+      (config.initialRot[2] !== 0 ||
+        config.initialRot[4] !== 0 ||
+        config.initialRot[5] !== 0) &&
+      !is4D
+    )
+      throw new Error(
+        'initialRot 字段的索引 2、4、5 上的值在非 4D 模式下必须为 0。'
+      );
   }
 
   if (config.initialOfs !== undefined) {
+    if (!is4D) throw new Error('initialOfs 字段的只在 4D 模式下可用。');
     if (
       !Array.isArray(config.initialOfs) ||
       config.initialOfs.length !== 4 ||
@@ -545,6 +555,7 @@ function validateRecordConfig(config, is4D) {
   }
 
   if (config.initialProjDist !== undefined) {
+    if (!is4D) throw new Error('initialProjDist 字段的只在 4D 模式下可用。');
     if (
       typeof config.initialProjDist !== 'number' ||
       config.initialProjDist <= 0
@@ -584,12 +595,15 @@ function validateRecordConfig(config, is4D) {
     throw new Error('initialCameraProjMethod 字段必须为 "persp" 或 "ortho"。');
   }
 
-  if (
-    config.initialSchleProjEnable !== undefined &&
-    typeof config.initialSchleProjEnable !== 'boolean'
-  ) {
-    throw new Error('initialSchleProjEnable 字段必须为布尔值。');
+  if (config.initialSchleProjEnable !== undefined) {
+    if (!is4D)
+      throw new Error('initialSchleProjEnable 字段的只在 4D 模式下可用。');
+    if (typeof config.initialSchleProjEnable !== 'boolean')
+      throw new Error('initialSchleProjEnable 字段必须为布尔值。');
   }
+
+  config.initialHighlightConfig !== undefined &&
+    validateHighlightConfig(config.initialHighlightConfig);
 
   if (
     !Array.isArray(config.actions) ||
@@ -677,6 +691,14 @@ function validateRecordConfig(config, is4D) {
             `actions[${index}] 操作的 enable 字段值必须为 boolean 类型。`
           );
         break;
+      case 'highlightCells':
+        if (!is4D) throw new Error(`actions[${index}] 操作只在四维模式可用。`);
+        console.log(action.highlightConfig);
+        validateHighlightConfig(
+          action.highlightConfig,
+          `actions[${index}].highlightConfig.`
+        );
+        break;
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
     }
@@ -694,9 +716,12 @@ function validateRecordConfig(config, is4D) {
       Object.hasOwnProperty.call(action, 'end')
     ) {
       if (
-        ['setVisibility', 'setCameraProjMethod', 'setSchleProjEnable'].includes(
-          action.type
-        )
+        [
+          'setVisibility',
+          'setCameraProjMethod',
+          'setSchleProjEnable',
+          'highlightCells'
+        ].includes(action.type)
       ) {
         throw new Error(
           `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setFaceOpacity。`
@@ -718,11 +743,12 @@ function validateRecordConfig(config, is4D) {
         ![
           'setVisibility',
           'setCameraProjMethod',
-          'setSchleProjEnable'
+          'setSchleProjEnable',
+          'highlightCells'
         ].includes(action.type)
       ) {
         throw new Error(
-          `actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable。`
+          `actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable、highlightCells。`
         );
       }
       if (!Number.isInteger(action.at) || action.at < 0)
@@ -740,24 +766,29 @@ function validateRecordConfig(config, is4D) {
 /**
  * 验证 highlightConfig 配置对象。
  * @param {object} config - 要验证的 highlightConfig 对象。
+ * @param {string} prefix - 错误提示的前缀。
  * @throws {Error} - 当配置无效时抛出错误。
  */
-function validateHighlightConfig(config) {
+function validateHighlightConfig(config, prefix = '') {
   // 基础类型检查
+  if (config === 'all') return;
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
-    throw new Error('highlightConfig 必须是非数组的对象类型。');
+    throw new Error('highlightConfig 必须是非数组的对象类型或为字符串 "all"。');
   }
 
   // 检查是否包含有效配置项（排除 exclude 字段）
   const validKeys = ['indices', 'ranges', 'nHedra'];
-  const hasValidConfig = validKeys.some(key => 
-    config[key] !== undefined && 
-    (Array.isArray(config[key]) || 
-     (typeof config[key] === 'object' && !Array.isArray(config[key])))
+  const hasValidConfig = validKeys.some(
+    key =>
+      config[key] !== undefined &&
+      (Array.isArray(config[key]) ||
+        (typeof config[key] === 'object' && !Array.isArray(config[key])))
   );
 
   if (!hasValidConfig && !config.exclude) {
-    throw new Error('highlightConfig 必须包含至少一个有效配置项（indices/ranges/nHedra）或 exclude 配置。');
+    throw new Error(
+      'highlightConfig 必须包含至少一个有效配置项（indices/ranges/nHedra）或 exclude 配置。'
+    );
   }
 
   // 验证包含配置
@@ -768,7 +799,9 @@ function validateHighlightConfig(config) {
       }
       conf.indices.forEach((num, i) => {
         if (!Number.isInteger(num) || num < 0) {
-          throw new Error(`${prefix}indices[${i}] 必须是非负整数，当前值为 ${num}。`);
+          throw new Error(
+            `${prefix}indices[${i}] 必须是非负整数，当前值为 ${num}。`
+          );
         }
       });
     }
@@ -779,17 +812,25 @@ function validateHighlightConfig(config) {
       }
       conf.ranges.forEach((range, i) => {
         if (!Array.isArray(range) || range.length !== 2) {
-          throw new Error(`${prefix}ranges[${i}] 必须是 [start, end] 格式的数组。`);
+          throw new Error(
+            `${prefix}ranges[${i}] 必须是 [start, end] 格式的数组。`
+          );
         }
         const [start, end] = range;
         if (!Number.isInteger(start) || start < 0) {
-          throw new Error(`${prefix}ranges[${i}][0]（start）必须是非负整数，当前值为 ${start}。`);
+          throw new Error(
+            `${prefix}ranges[${i}][0]（start）必须是非负整数，当前值为 ${start}。`
+          );
         }
         if (!Number.isInteger(end) || end < 0) {
-          throw new Error(`${prefix}ranges[${i}][1]（end）必须是非负整数，当前值为 ${end}。`);
+          throw new Error(
+            `${prefix}ranges[${i}][1]（end）必须是非负整数，当前值为 ${end}。`
+          );
         }
         if (start > end) {
-          throw new Error(`${prefix}ranges[${i}] 的 start 值 ${start} 不能大于 end 值 ${end}。`);
+          throw new Error(
+            `${prefix}ranges[${i}] 的 start 值 ${start} 不能大于 end 值 ${end}。`
+          );
         }
       });
     }
@@ -801,17 +842,23 @@ function validateHighlightConfig(config) {
       conf.nHedra.forEach((item, i) => {
         if (typeof item === 'number') {
           if (!Number.isInteger(item) || item <= 0) {
-            throw new Error(`${prefix}nHedra[${i}] 作为数字时必须为正整数，当前值为 ${item}。`);
+            throw new Error(
+              `${prefix}nHedra[${i}] 作为数字时必须为正整数，当前值为 ${item}。`
+            );
           }
         } else if (typeof item === 'object' && item !== null) {
           if (!Number.isInteger(item.nFaces) || item.nFaces <= 0) {
-            throw new Error(`${prefix}nHedra[${i}].nFaces 必须为正整数，当前值为 ${item.nFaces}。`);
+            throw new Error(
+              `${prefix}nHedra[${i}].nFaces 必须为正整数，当前值为 ${item.nFaces}。`
+            );
           }
           if (!item.ranges) {
             throw new Error(`${prefix}nHedra[${i}].ranges 是必填项。`);
           }
           if (!Array.isArray(item.ranges)) {
-            throw new Error(`${prefix}nHedra[${i}].ranges 必须是二维数组类型。`);
+            throw new Error(
+              `${prefix}nHedra[${i}].ranges 必须是二维数组类型。`
+            );
           }
           validateInclusion({ ranges: item.ranges }, `${prefix}nHedra[${i}].`);
         } else {
@@ -822,14 +869,14 @@ function validateHighlightConfig(config) {
   };
 
   // 验证主配置
-  validateInclusion(config);
+  validateInclusion(config, prefix);
 
   // 验证 exclude 配置
   if (config.exclude) {
     if (typeof config.exclude !== 'object' || Array.isArray(config.exclude)) {
       throw new Error('exclude 配置必须是对象类型。');
     }
-    validateInclusion(config.exclude, 'exclude.');
+    validateInclusion(config.exclude, prefix + 'exclude.');
   }
 }
 
@@ -1017,13 +1064,13 @@ function solveThreePlanes(plane1, plane2, plane3) {
  * @returns {Array} 返回修改后的源数组（移除了排除元素的数组）。
  */
 function filterArray(sourceArray, excludeArray) {
-    const excludeSet = new Set(excludeArray);
-    for (let i = sourceArray.length - 1; i >= 0; i--) {
-        if (excludeSet.has(sourceArray[i])) {
-            sourceArray.splice(i, 1);
-        }
+  const excludeSet = new Set(excludeArray);
+  for (let i = sourceArray.length - 1; i >= 0; i--) {
+    if (excludeSet.has(sourceArray[i])) {
+      sourceArray.splice(i, 1);
     }
-    return sourceArray;
+  }
+  return sourceArray;
 }
 
 export {
