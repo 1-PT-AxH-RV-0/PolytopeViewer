@@ -23,6 +23,7 @@
     "@codemirror/theme-one-dark": "^6.1.3",
     "ccapture.js": "^1.1.0",
     "codemirror": "^6.0.2",
+    "is-odd": "^3.0.1",
     "lodash": "^4.17.21",
     "martinez-polygon-clipping": "^0.7.4",
     "nanobar": "^0.4.2",

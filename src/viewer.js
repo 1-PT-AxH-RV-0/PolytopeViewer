@@ -82,6 +82,11 @@ class PolytopeRendererApp {
     this.genTrapezohedronBtn = null;
     this.trapezohedronNInput = null;
 
+    this.genStephanoidBtn = null;
+    this.stephanoidNInput = null;
+    this.stephanoidAInput = null;
+    this.stephanoidBInput = null;
+
     this.genDuoprismBtn = null;
     this.duoprismMInput = null;
     this.duoprismNInput = null;
@@ -178,12 +183,10 @@ class PolytopeRendererApp {
       this.initialMaterial
     );
 
-    /*
-    await this.loadMeshFromData(
-      infFamilies.trapezohedron(4),
+    /* await this.loadMeshFromData(
+      infFamilies.stephanoid(5, 1, 3),
       this.initialMaterial
-    );
-    */
+    ); */
 
     this.setupEventListeners();
     this.startRenderLoop();
@@ -232,6 +235,11 @@ class PolytopeRendererApp {
 
     this.genTrapezohedronBtn = document.getElementById('genTrapezohedron');
     this.trapezohedronNInput = document.getElementById('trapezohedronN');
+    
+    this.genStephanoidBtn = document.getElementById('genStephanoid');
+    this.stephanoidNInput = document.getElementById('stephanoidN');
+    this.stephanoidAInput = document.getElementById('stephanoidA');
+    this.stephanoidBInput = document.getElementById('stephanoidB');
 
     this.genDuoprismBtn = document.getElementById('genDuoprism');
     this.duoprismMInput = document.getElementById('duoprismM');
@@ -1416,6 +1424,16 @@ class PolytopeRendererApp {
       const [n, s] = this.trapezohedronNInput.value.split('/').map(i => +i);
       await this.loadMeshFromData(
         infFamilies.trapezohedron(n, s),
+        this.initialMaterial
+      );
+    });
+
+    this.genStephanoidBtn.addEventListener('click', async () => {
+      const n = +this.stephanoidNInput.value;
+      const a = +this.stephanoidAInput.value;
+      const b = +this.stephanoidBInput.value;
+      await this.loadMeshFromData(
+        infFamilies.stephanoid(n, a, b),
         this.initialMaterial
       );
     });
