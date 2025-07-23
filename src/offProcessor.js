@@ -5,7 +5,8 @@ import {
   inverseRotatePoint,
   rotateToXY,
   arePointsClose,
-  getUniqueSortedPairs
+  getUniqueSortedPairs,
+  range
 } from './helperFunc.js';
 import * as type from './type.js';
 
@@ -57,7 +58,8 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
   let processedItems = 0;
   let prevPostTime = performance.now();
 
-  faces.forEach(face => {
+  const facesMap = {};
+  faces.forEach((face, faceIndex) => {
     /**
      * 三角剖分单个面。
      * @param {Array<type.Point3D>} vertices3D - 顶点数组。
@@ -95,9 +97,15 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
       return triangles;
     }
 
+    const trianglesForFaceStartIndex = processedFaces.length;
     const faceVertices = face.map(idx => vertices[idx]);
     const triangles = triangulateFace(faceVertices);
     triangles.forEach(t => processedFaces.push(t));
+    const trianglesForFaceEndIndex = processedFaces.length - 1;
+    facesMap[faceIndex] = range(
+      trianglesForFaceStartIndex,
+      trianglesForFaceEndIndex
+    );
 
     processedItems++;
     // 每隔 200ms 发送一次进度。
@@ -107,7 +115,12 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
     }
   });
 
-  return { vertices: processedVertices, faces: processedFaces, edges };
+  return {
+    vertices: processedVertices,
+    faces: processedFaces,
+    edges,
+    facesMap
+  };
 }
 
 export { processMeshData, parseOFF };

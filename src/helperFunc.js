@@ -602,8 +602,22 @@ function validateRecordConfig(config, is4D) {
       throw new Error('initialSchleProjEnable 字段必须为布尔值。');
   }
 
-  config.initialHighlightConfig !== undefined &&
-    validateHighlightConfig(config.initialHighlightConfig);
+  if (config.initialHighlightConfig !== undefined) {
+    if (!is4D)
+      throw new Error('initialHighlightConfig 字段的只在 4D 模式下可用。');
+    for (const [color, cellsSelectorConfig] of Object.entries(
+      config.initialHighlightConfig
+    )) {
+      if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+        throw new Error(
+          `initialHighlightConfig 的十六进制 RGBA 色码 ${color} 无效。`
+        );
+      validateCellsSelectorConfig(
+        cellsSelectorConfig,
+        `initialHighlightConfig.${color}.`
+      );
+    }
+  }
 
   if (
     !Array.isArray(config.actions) ||
@@ -693,11 +707,19 @@ function validateRecordConfig(config, is4D) {
         break;
       case 'highlightCells':
         if (!is4D) throw new Error(`actions[${index}] 操作只在四维模式可用。`);
-        console.log(action.highlightConfig);
-        validateHighlightConfig(
-          action.highlightConfig,
-          `actions[${index}].highlightConfig.`
-        );
+
+        for (const [color, cellsSelectorConfig] of Object.entries(
+          action.highlightConfig
+        )) {
+          if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+            throw new Error(
+              `actions[${index}].highlightConfig 的十六进制 RGBA 色码 ${color} 无效。`
+            );
+          validateCellsSelectorConfig(
+            cellsSelectorConfig,
+            `actions[${index}].highlightConfig.${color}.`
+          );
+        }
         break;
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
@@ -764,12 +786,12 @@ function validateRecordConfig(config, is4D) {
 }
 
 /**
- * 验证 highlightConfig 配置对象。
- * @param {object} config - 要验证的 highlightConfig 对象。
+ * 验证单个 highlightConfig 配置对象。
+ * @param {object | string} config - 要验证的单个 highlightConfig 对象。
  * @param {string} prefix - 错误提示的前缀。
  * @throws {Error} - 当配置无效时抛出错误。
  */
-function validateHighlightConfig(config, prefix = '') {
+function validateCellsSelectorConfig(config, prefix = '') {
   // 基础类型检查
   if (config === 'all') return;
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
@@ -1092,7 +1114,7 @@ export {
   create4DRotationMat,
   getSortedValuesDesc,
   validateRecordConfig,
-  validateHighlightConfig,
+  validateCellsSelectorConfig,
   parseJsonFileFromInput,
   calculateCentroid,
   findPlanesIntersection,
