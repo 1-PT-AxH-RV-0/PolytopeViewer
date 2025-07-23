@@ -123,6 +123,13 @@ class PolytopeRendererApp {
     this.isRecordingFlag = false;
     this.stopRecordFlag = false;
 
+    // 高亮用变量。
+    this.cells = [];
+    this.faces = [];
+    this.facesMap = {};
+    this.nHedraInCells = {};
+    this.highlightedPartGroup = new THREE.Group();
+
     // 其他变量。
     this.loadMeshPromise = null;
     this.is4D = false;
@@ -134,9 +141,6 @@ class PolytopeRendererApp {
       flatShading: true
     });
     this.editor = null;
-    this.cells = [];
-    this.faces = [];
-    this.nHedraInCells = {};
 
     this.init();
   }
@@ -348,7 +352,7 @@ class PolytopeRendererApp {
    */
   _initializeJsonEditor() {
     this.editor = new EditorView({
-      doc: '"all"',
+      doc: '{"0x555555FF": "all"}',
       extensions: [basicSetup, json(), oneDark, linter(jsonParseLinter())],
       parent: document.querySelector('#jsonEditor')
     });
@@ -635,8 +639,15 @@ class PolytopeRendererApp {
   loadMesh(meshData, material) {
     this.is4D = false;
     this.cells = [];
-    this.faces = [];
+    this.faces = meshData.faces;
+    this.facesMap = meshData.facesMap;
     this.nHedraInCells = {};
+    this.highlightedPartGroup.clear();
+
+    if (this.solidGroup) {
+      helperFunc.disposeGroup(this.solidGroup);
+      this.scene.remove(this.solidGroup);
+    }
     this.updateEnable();
     const container = new THREE.Object3D();
     const geometry = new THREE.BufferGeometry();
@@ -659,9 +670,9 @@ class PolytopeRendererApp {
       this.rotUni,
       this.ofs3Uni
     );
+    material.side = THREE.DoubleSide;
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.material.side = THREE.DoubleSide;
     this.updateScaleFactor(
       40 / helperFunc.getFarthestPointDist(meshData.vertices)
     );
@@ -674,6 +685,7 @@ class PolytopeRendererApp {
     container.add(wireframeGroup);
     container.add(verticesGroup);
     container.scale.setScalar(this.scaleFactor);
+    container.add(this.highlightedPartGroup);
 
     this.scene.add(container);
 
@@ -696,6 +708,7 @@ class PolytopeRendererApp {
     this.is4D = true;
     this.cells = meshData.cells;
     this.faces = meshData.faces;
+    this.facesMap = meshData.facesMap;
     this.nHedraInCells = {};
     meshData.cells.forEach((cell, cellIdx) => {
       if (Object.hasOwnProperty.call(this.nHedraInCells, cell.facesCount)) {
@@ -704,6 +717,12 @@ class PolytopeRendererApp {
         this.nHedraInCells[cell.facesCount] = [cellIdx];
       }
     });
+
+    if (this.solidGroup) {
+      helperFunc.disposeGroup(this.solidGroup);
+      this.scene.remove(this.solidGroup);
+    }
+    this.highlightedPartGroup.clear();
     this.updateEnable();
     const container = new THREE.Group();
     const geometry = new THREE.BufferGeometry();
@@ -742,9 +761,9 @@ class PolytopeRendererApp {
       this.projDistUni,
       this.isOrthoUni
     );
+    material.side = THREE.DoubleSide;
 
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.material.side = THREE.DoubleSide;
     this.projectionDistanceSlider.value =
       helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05;
     this.updateProjectionDistance();
@@ -769,6 +788,7 @@ class PolytopeRendererApp {
     container.add(wireframeGroup);
     container.add(verticesGroup);
     container.scale.setScalar(this.scaleFactor);
+    container.add(this.highlightedPartGroup);
 
     this.scene.add(container);
 
@@ -848,11 +868,6 @@ class PolytopeRendererApp {
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
   async loadMeshFromData(data, material) {
-    if (this.solidGroup) {
-      helperFunc.disposeGroup(this.solidGroup);
-      this.scene.remove(this.solidGroup);
-    }
-
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = data instanceof Object ? data : parseOFF(data);
     this.loadMeshPromise = this.processMeshData(mesh);
@@ -890,11 +905,6 @@ class PolytopeRendererApp {
    * @param {THREE.Material} material - 用于模型面的 THREE.Material 实例。
    */
   async loadMeshFrom4Data(data, material) {
-    if (this.solidGroup) {
-      helperFunc.disposeGroup(this.solidGroup);
-      this.scene.remove(this.solidGroup);
-    }
-
     if (this.loadMeshPromise) this.loadMeshPromise.abort();
     const mesh = data instanceof Object ? data : parse4OFF(data);
     this.loadMeshPromise = this.processMeshData(mesh, true);
@@ -958,164 +968,197 @@ class PolytopeRendererApp {
 
   /**
    * 高亮胞。
-   * @param {object | string} highlightConfig - 要高亮的胞的配置对象。
+   * @param {object} highlightConfig - 要高亮的胞的配置对象。
    * @throws {Error} - 当配置对象中描述的胞不存在时抛出，包含具体的位置。
    */
   highlightCells(highlightConfig) {
-    if (highlightConfig === 'all') {
-      const indices = [];
-      this.faces.forEach(face => indices.push(...face));
-      this.facesGroup.geometry.setIndex(indices);
-      this.facesGroup.geometry.computeVertexNormals();
+    this.highlightedPartGroup.clear();
+    for (const [color, cellsSelectorConfig] of Object.entries(
+      highlightConfig
+    )) {
+      if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+        throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
+      helperFunc.validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
 
-      return;
-    }
-    helperFunc.validateHighlightConfig(highlightConfig);
-    const highlightCellsIdx = [];
+      const highlightedPartGeo = this.facesGroup.geometry.clone();
+      const highlightedPartMaterial = shaderCompCallback.faceMaterial(
+        this.facesGroup.material,
+        this.rotUni,
+        this.ofsUni,
+        this.ofs3Uni,
+        this.projDistUni,
+        this.isOrthoUni
+      );
+      const colorNum = parseInt(color, 16);
+      const rgb = colorNum >> 8;
+      const a = colorNum & 0xff;
+      highlightedPartMaterial.color.set(rgb);
+      highlightedPartMaterial.transparent = a === 255 ? false : true;
+      highlightedPartMaterial.opacity = a / 255;
+      highlightedPartMaterial.visible = true;
 
-    // 验证 indices。
-    if (Object.hasOwnProperty.call(highlightConfig, 'indices')) {
-      for (const index of highlightConfig.indices) {
-        if (!this.cells[index]) {
-          throw new Error(`索引为 ${index} 的胞不存在。`);
-        }
+      if (cellsSelectorConfig === 'all') {
+        const indices = [];
+        this.faces.forEach(face => indices.push(...face));
+        highlightedPartGeo.setIndex(indices);
+        highlightedPartGeo.computeVertexNormals();
+        this.highlightedPartGroup.add(
+          new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
+        );
+
+        continue;
       }
-      highlightCellsIdx.push(...highlightConfig.indices);
-    }
+      const highlightCellsIdx = [];
 
-    // 验证 ranges。
-    if (Object.hasOwnProperty.call(highlightConfig, 'ranges')) {
-      for (const [i, range] of highlightConfig.ranges.entries()) {
-        const [start, end] = range;
-        if (!this.cells[start]) {
-          throw new Error(`ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`);
-        }
-        if (!this.cells[end - 1]) {
-          throw new Error(`ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
-        }
-        highlightCellsIdx.push(...helperFunc.range(start, end - 1));
-      }
-    }
-
-    // 验证 nHedra。
-    if (Object.hasOwnProperty.call(highlightConfig, 'nHedra')) {
-      for (const [i, item] of highlightConfig.nHedra.entries()) {
-        if (typeof item === 'number') {
-          const nFaces = item;
-          if (!this.nHedraInCells[nFaces]) {
-            throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
-          }
-          highlightCellsIdx.push(...this.nHedraInCells[nFaces]);
-        } else if (item instanceof Object) {
-          const { nFaces, ranges } = item;
-          if (!this.nHedraInCells[nFaces]) {
-            throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
-          }
-          const cells = [];
-          for (const [j, range] of ranges.entries()) {
-            const [start, end] = range;
-            if (start >= this.nHedraInCells[nFaces].length) {
-              throw new Error(
-                `nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`
-              );
-            }
-            if (end > this.nHedraInCells[nFaces].length) {
-              throw new Error(
-                `nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
-              );
-            }
-            cells.push(...this.nHedraInCells[nFaces].slice(...range));
-          }
-          highlightCellsIdx.push(...cells);
-        }
-      }
-    }
-
-    // 验证 exclude。
-    if (Object.hasOwnProperty.call(highlightConfig, 'exclude')) {
-      const exclude = highlightConfig.exclude;
-
-      if (Object.hasOwnProperty.call(exclude, 'indices')) {
-        for (const index of exclude.indices) {
+      // 验证 indices。
+      if (Object.hasOwnProperty.call(cellsSelectorConfig, 'indices')) {
+        for (const index of cellsSelectorConfig.indices) {
           if (!this.cells[index]) {
-            throw new Error(
-              `exclude.indices 中的索引 ${index} 对应的胞不存在。`
-            );
+            throw new Error(`索引为 ${index} 的胞不存在。`);
           }
         }
-        helperFunc.filterArray(highlightCellsIdx, exclude.indices);
+        highlightCellsIdx.push(...cellsSelectorConfig.indices);
       }
 
-      if (Object.hasOwnProperty.call(exclude, 'ranges')) {
-        for (const [i, range] of exclude.ranges.entries()) {
+      // 验证 ranges。
+      if (Object.hasOwnProperty.call(cellsSelectorConfig, 'ranges')) {
+        for (const [i, range] of cellsSelectorConfig.ranges.entries()) {
           const [start, end] = range;
           if (!this.cells[start]) {
             throw new Error(
-              `exclude.ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`
+              `ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`
             );
           }
           if (!this.cells[end - 1]) {
-            throw new Error(
-              `exclude.ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`
-            );
+            throw new Error(`ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
           }
-          helperFunc.filterArray(
-            highlightCellsIdx,
-            helperFunc.range(start, end - 1)
-          );
+          highlightCellsIdx.push(...helperFunc.range(start, end - 1));
         }
       }
 
-      if (Object.hasOwnProperty.call(exclude, 'nHedra')) {
-        for (const [i, item] of exclude.nHedra.entries()) {
+      // 验证 nHedra。
+      if (Object.hasOwnProperty.call(cellsSelectorConfig, 'nHedra')) {
+        for (const [i, item] of cellsSelectorConfig.nHedra.entries()) {
           if (typeof item === 'number') {
             const nFaces = item;
             if (!this.nHedraInCells[nFaces]) {
-              throw new Error(
-                `exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`
-              );
+              throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
             }
-            helperFunc.filterArray(
-              highlightCellsIdx,
-              this.nHedraInCells[nFaces]
-            );
+            highlightCellsIdx.push(...this.nHedraInCells[nFaces]);
           } else if (item instanceof Object) {
             const { nFaces, ranges } = item;
             if (!this.nHedraInCells[nFaces]) {
-              throw new Error(
-                `exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`
-              );
+              throw new Error(`nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`);
             }
             const cells = [];
             for (const [j, range] of ranges.entries()) {
               const [start, end] = range;
               if (start >= this.nHedraInCells[nFaces].length) {
                 throw new Error(
-                  `exclude.nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`
+                  `nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`
                 );
               }
               if (end > this.nHedraInCells[nFaces].length) {
                 throw new Error(
-                  `exclude.nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
+                  `nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
                 );
               }
               cells.push(...this.nHedraInCells[nFaces].slice(...range));
             }
-            helperFunc.filterArray(highlightCellsIdx, cells);
+            highlightCellsIdx.push(...cells);
           }
         }
       }
-    }
 
-    const indices = [];
-    for (const cellIdx of highlightCellsIdx) {
-      for (const faceIndex of this.cells[cellIdx].faceIndices) {
-        indices.push(...this.faces[faceIndex]);
+      // 验证 exclude。
+      if (Object.hasOwnProperty.call(cellsSelectorConfig, 'exclude')) {
+        const exclude = cellsSelectorConfig.exclude;
+
+        if (Object.hasOwnProperty.call(exclude, 'indices')) {
+          for (const index of exclude.indices) {
+            if (!this.cells[index]) {
+              throw new Error(
+                `exclude.indices 中的索引 ${index} 对应的胞不存在。`
+              );
+            }
+          }
+          helperFunc.filterArray(highlightCellsIdx, exclude.indices);
+        }
+
+        if (Object.hasOwnProperty.call(exclude, 'ranges')) {
+          for (const [i, range] of exclude.ranges.entries()) {
+            const [start, end] = range;
+            if (!this.cells[start]) {
+              throw new Error(
+                `exclude.ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`
+              );
+            }
+            if (!this.cells[end - 1]) {
+              throw new Error(
+                `exclude.ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`
+              );
+            }
+            helperFunc.filterArray(
+              highlightCellsIdx,
+              helperFunc.range(start, end - 1)
+            );
+          }
+        }
+
+        if (Object.hasOwnProperty.call(exclude, 'nHedra')) {
+          for (const [i, item] of exclude.nHedra.entries()) {
+            if (typeof item === 'number') {
+              const nFaces = item;
+              if (!this.nHedraInCells[nFaces]) {
+                throw new Error(
+                  `exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`
+                );
+              }
+              helperFunc.filterArray(
+                highlightCellsIdx,
+                this.nHedraInCells[nFaces]
+              );
+            } else if (item instanceof Object) {
+              const { nFaces, ranges } = item;
+              if (!this.nHedraInCells[nFaces]) {
+                throw new Error(
+                  `exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`
+                );
+              }
+              const cells = [];
+              for (const [j, range] of ranges.entries()) {
+                const [start, end] = range;
+                if (start >= this.nHedraInCells[nFaces].length) {
+                  throw new Error(
+                    `exclude.nHedra[${i}].ranges[${j}] 的起始索引 ${start} 超出范围。`
+                  );
+                }
+                if (end > this.nHedraInCells[nFaces].length) {
+                  throw new Error(
+                    `exclude.nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
+                  );
+                }
+                cells.push(...this.nHedraInCells[nFaces].slice(...range));
+              }
+              helperFunc.filterArray(highlightCellsIdx, cells);
+            }
+          }
+        }
       }
-    }
 
-    this.facesGroup.geometry.setIndex(indices);
-    this.facesGroup.geometry.computeVertexNormals();
+      const indices = [];
+      for (const cellIdx of highlightCellsIdx) {
+        for (const faceIndex of this.cells[cellIdx].faceIndices) {
+          indices.push(...this.faces[faceIndex]);
+        }
+      }
+
+      highlightedPartGeo.setIndex(indices);
+      highlightedPartGeo.computeVertexNormals();
+      this.highlightedPartGroup.add(
+        new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
+      );
+    }
   }
 
   /**
@@ -1331,6 +1374,8 @@ class PolytopeRendererApp {
 
     this.highlightCellsBtn.addEventListener('click', () => {
       const highlightConfig = JSON.parse(this.editor.state.doc.toString());
+      this.faceVisibleSwitcher.checked = false;
+      this.updateProperties();
       try {
         this.highlightCells(highlightConfig);
       } catch (e) {
@@ -1724,6 +1769,7 @@ class PolytopeRendererApp {
           this.recordStates.schleProjEnable = action.enable;
           break;
         case 'highlightCells':
+          this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
           this.recordStates.highlightConfig = action.highlightConfig;
       }
     }

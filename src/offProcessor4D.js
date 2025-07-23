@@ -143,7 +143,8 @@ function process4DMeshData(
     vertices: processedVertices,
     faces: processedFaces,
     edges,
-    cells: processedCells
+    cells: processedCells,
+    facesMap
   };
 }
 
