@@ -53,6 +53,47 @@ body {
   gap: 4px;
 }
 
+div:has(> div[id$="Slider"]) {
+    display: flex;
+    align-items: center;
+}
+
+div[id$="Slider"] .noUi-tooltip {
+    display: none;
+}
+
+div[id$="Slider"] .noUi-active .noUi-tooltip {
+    display: block;
+}
+
+div[id$="Slider"] {
+    height: 10px;
+    flex-grow: 0.8;
+}
+
+div[id$="Slider"] .noUi-connect {
+    background: #0075FF;
+}
+
+div[id$="Slider"] .noUi-handle {
+    height: 18px;
+    width: 18px;
+    top: -5px;
+    right: -9px;
+    border-radius: 9px;
+    background: #0075FF;
+    box-shadow: none;
+}
+
+div[id$="Slider"][disabled] :is(.noUi-handle, .noUi-connect) {
+  background: #CBCBCB;
+}
+
+div[id$="Slider"] .noUi-handle::before,
+div[id$="Slider"] .noUi-handle::after {
+  display: none
+}
+
 .sele-off {
   display: none;
   padding: 8px;
