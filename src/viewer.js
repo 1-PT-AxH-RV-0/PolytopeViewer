@@ -8,6 +8,8 @@ import { json } from '@codemirror/lang-json';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { linter } from '@codemirror/lint';
 import { jsonParseLinter } from '@codemirror/lang-json';
+import noUiSlider from 'nouislider';
+import 'nouislider/dist/nouislider.css';
 
 // 导入外部辅助函数和模块。
 import createAxes from './axesCreater.js';
@@ -165,6 +167,7 @@ class PolytopeRendererApp {
    */
   async init() {
     this._initializeDomElements();
+    this._initializeSliders();
     this._initializeRenderer();
     this._initializeScene();
     this._initializeCameras();
@@ -253,6 +256,48 @@ class PolytopeRendererApp {
     this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
       document.getElementById(`rot${i}Slider`)
     );
+  }
+  
+  /**
+   * 初始化滑块
+   */
+  _initializeSliders() {
+    noUiSlider.create(this.scaleFactorSlider, {
+      range: { min: 0.1, max: 120 },
+      start: 1,
+      tooltips: true,
+      connect: [true, false]
+    });
+    
+    noUiSlider.create(this.faceOpacitySlider, {
+      range: { min: 0.1, max: 1.0 },
+      start: 1,
+      tooltips: true,
+      connect: [true, false]
+    });
+    
+    noUiSlider.create(this.wireframeAndVerticesDimSlider, {
+      range: { min: 0.01, max: 3 },
+      start: 0.5,
+      tooltips: true,
+      connect: [true, false]
+    });
+    
+    noUiSlider.create(this.projectionDistanceSlider, {
+      range: { min: 0.01, max: 100 },
+      start: 1,
+      tooltips: true,
+      connect: [true, false]
+    });
+    
+    this.rotationSliders.forEach(slider => {
+      noUiSlider.create(slider, {
+        range: { min: 0, max: 360 },
+        start: 0,
+        tooltips: true,
+        connect: [true, false]
+      });
+    })
   }
 
   /**
@@ -764,15 +809,14 @@ class PolytopeRendererApp {
     material.side = THREE.DoubleSide;
 
     const mesh = new THREE.Mesh(geometry, material);
-    this.projectionDistanceSlider.value =
-      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05;
+    this.projectionDistanceSlider.noUiSlider.set(helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05);
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
         helperFunc.getFarthestPointDist(
           meshData.vertices.map(p => {
             if (!this.schleSwitcher.checked) return { x: p.x, y: p.y, z: p.z };
-            const d = +this.projectionDistanceSlider.value;
+            const d = this.projectionDistanceSlider.noUiSlider.get(true);
             const s = d / (d + p.w);
 
             return { x: p.x * s, y: p.y * s, z: p.z * s };
@@ -1188,19 +1232,19 @@ class PolytopeRendererApp {
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'opacity',
-      +this.faceOpacitySlider.value
+      +this.faceOpacitySlider.noUiSlider.get(true)
     );
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'transparent',
-      +this.faceOpacitySlider.value !== 1
+      +this.faceOpacitySlider.noUiSlider.get(true) !== 1
     );
     this.toggleCamera(this.perspSwitcher.checked);
 
     this.cylinderRadiusUni.value =
-      +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
+      this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
     this.sphereRadiusUni.value =
-      (+this.wireframeAndVerticesDimSlider.value / this.scaleFactor) * 2;
+      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor) * 2;
     this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
     this.ofs3Uni.value = new THREE.Vector3();
   }
@@ -1209,14 +1253,14 @@ class PolytopeRendererApp {
    * 更新用于 4D 投影距离的 Uniform 变量。
    */
   updateProjectionDistance() {
-    this.projDistUni.value = +this.projectionDistanceSlider.value;
+    this.projDistUni.value = this.projectionDistanceSlider.noUiSlider.get(true);
   }
 
   /**
    * 更新旋转 Uniform 变量，并在 3D 模式下直接修改 solidGroup 的旋转。
    */
   updateRotation() {
-    const rotations = this.rotationSliders.map(i => +i.value);
+    const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
     this.rotAngles = rotations;
     this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
   }
@@ -1224,14 +1268,15 @@ class PolytopeRendererApp {
   /**
    * 更新缩放因子。
    * @param {number} scaleFactor - 缩放因子。
+   * @param {booleam} updateSlider - 是否更新滑块值。
    */
-  updateScaleFactor(scaleFactor) {
+  updateScaleFactor(scaleFactor, updateSlider=true) {
     this.scaleFactor = scaleFactor;
-    this.scaleFactorSlider.value = scaleFactor;
+    if (updateSlider) this.scaleFactorSlider.noUiSlider.set(scaleFactor);
     this.cylinderRadiusUni.value =
-      +this.wireframeAndVerticesDimSlider.value / scaleFactor;
+      this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor;
     this.sphereRadiusUni.value =
-      (+this.wireframeAndVerticesDimSlider.value / scaleFactor) * 2;
+      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor) * 2;
     if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
     this.axesOffsetScaleUni.value = scaleFactor;
   }
@@ -1242,33 +1287,37 @@ class PolytopeRendererApp {
    */
   updateEnable(enable = true) {
     /**
-     * 禁用或启用页面上所有的 input 和 button 元素。
+     * 禁用或启用页面上所有的 UI 元素。
      * @param {boolean} enable - true 表示启用，false 表示禁用。
      */
-    const _toggleInputsAndButtons = enable => {
-      const elements = document.querySelectorAll('input, button');
+    const _toggleUIs = enable => {
+      const elements = document.querySelectorAll('input, button, div');
 
       elements.forEach(element => {
+        if (element.noUiSlider) {
+          element.noUiSlider[enable ? 'enable' : 'disable']()
+          return
+        };
         element.disabled = !enable;
       });
     };
 
-    _toggleInputsAndButtons(enable);
+    _toggleUIs(enable);
     this.stopRecordBtn.disabled = !this.isRecordingFlag;
     if (!enable) return;
-    this.projectionDistanceSlider.disabled = true;
     if (!this.schleSwitcher.disabled && !this.is4D) {
-      this.rotationSliders[2].value = 0;
-      this.rotationSliders[4].value = 0;
-      this.rotationSliders[5].value = 0;
+      this.rotationSliders[2].noUiSlider.set(0);
+      this.rotationSliders[4].noUiSlider.set(0);
+      this.rotationSliders[5].noUiSlider.set(0);
       this.updateRotation();
     }
-    this.projectionDistanceSlider.disabled = !this.is4D;
+    const enableStringBy4D = this.is4D ? 'enable' : 'disable';
+    this.projectionDistanceSlider.noUiSlider[enableStringBy4D]();
     this.schleSwitcher.disabled = !this.is4D;
     this.highlightCellsBtn.disabled = !this.is4D;
-    this.rotationSliders[2].disabled = !this.is4D;
-    this.rotationSliders[4].disabled = !this.is4D;
-    this.rotationSliders[5].disabled = !this.is4D;
+    this.rotationSliders[2].noUiSlider[enableStringBy4D]();
+    this.rotationSliders[4].noUiSlider[enableStringBy4D]();
+    this.rotationSliders[5].noUiSlider[enableStringBy4D]();
 
     this.startRecordBtn.disabled = this.isRecordingFlag;
   }
@@ -1324,36 +1373,36 @@ class PolytopeRendererApp {
         this.axisVisibleSwitcher.checked
       )
     );
-    this.scaleFactorSlider.addEventListener('input', () =>
-      this.updateScaleFactor(+this.scaleFactorSlider.value)
+    this.scaleFactorSlider.noUiSlider.on('update', () =>
+      this.updateScaleFactor(this.scaleFactorSlider.noUiSlider.get(true), false)
     );
-    this.faceOpacitySlider.addEventListener('input', () => {
+    this.faceOpacitySlider.noUiSlider.on('update', () => {
       helperFunc.changeMaterialProperty(
         this.facesGroup,
         'opacity',
-        +this.faceOpacitySlider.value
+        +this.faceOpacitySlider.noUiSlider.get(true)
       );
       helperFunc.changeMaterialProperty(
         this.facesGroup,
         'transparent',
-        +this.faceOpacitySlider.value !== 1
+        +this.faceOpacitySlider.noUiSlider.get(true) !== 1
       );
     });
-    this.wireframeAndVerticesDimSlider.addEventListener('input', () => {
+    this.wireframeAndVerticesDimSlider.noUiSlider.on('update', () => {
       this.cylinderRadiusUni.value =
-        +this.wireframeAndVerticesDimSlider.value / this.scaleFactor;
+        this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
       this.sphereRadiusUni.value =
-        (+this.wireframeAndVerticesDimSlider.value / this.scaleFactor) * 2;
+        (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor) * 2;
     });
 
-    this.projectionDistanceSlider.addEventListener(
-      'input',
+    this.projectionDistanceSlider.noUiSlider.on(
+      'update',
       this.updateProjectionDistance.bind(this)
     );
 
     this.rotationSliders.forEach((slider, i) => {
-      slider.addEventListener('input', () => {
-        this.rotAngles[i] = +slider.value;
+      slider.noUiSlider.on('update', () => {
+        this.rotAngles[i] = slider.noUiSlider.get(true);
         this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
       });
     });
@@ -1554,7 +1603,7 @@ class PolytopeRendererApp {
         this.cylinderRadiusUni.value * this.scaleFactor,
       projDist: this.recordConfig.initialProjDist ?? this.projDistUni.value,
       faceOpacity:
-        this.recordConfig.initialFaceOpacity ?? +this.faceOpacitySlider.value,
+        this.recordConfig.initialFaceOpacity ?? +this.faceOpacitySlider.noUiSlider.get(true),
       visibilities: this.recordConfig.initialVisibilities ?? {
         faces: this.faceVisibleSwitcher.checked,
         wireframe: this.wireframeVisibleSwitcher.checked,
