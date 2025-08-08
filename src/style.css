@@ -94,6 +94,14 @@ div[id$="Slider"] .noUi-handle::after {
   display: none
 }
 
+a.disable {
+  color: #CBCBCB;
+  pointer-events: none;
+}
+a.disable:any-link {
+  color: #CBCBCB;
+}
+
 .sele-off {
   display: none;
   padding: 8px;
