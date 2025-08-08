@@ -1,13 +1,13 @@
 import * as THREE from 'three';
+import YAML from 'js-yaml'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Nanobar from 'nanobar';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import WebMWriter from 'webm-writer';
 import { EditorView, basicSetup } from 'codemirror';
-import { json } from '@codemirror/lang-json';
+import { yaml } from '@codemirror/lang-yaml';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { linter } from '@codemirror/lint';
-import { jsonParseLinter } from '@codemirror/lang-json';
 import noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 
@@ -393,13 +393,25 @@ class PolytopeRendererApp {
   }
 
   /**
-    初始化 JSON 代码编辑器。
+    初始化代码编辑器。
    */
   _initializeJsonEditor() {
     this.editor = new EditorView({
-      doc: '{"0x555555FF": "all"}',
-      extensions: [basicSetup, json(), oneDark, linter(jsonParseLinter())],
-      parent: document.querySelector('#jsonEditor')
+      doc: '555555FF: all',
+      extensions: [basicSetup, yaml(), oneDark, linter(view => {
+          try {
+              YAML.load(view.state.doc.toString());
+          } catch (e) {
+              return [{
+                      from: e.mark.position - 1,
+                      message: e.reason,
+                      severity: 'error',
+                      to: e.mark.position - 1
+              }];
+          }
+          return [];
+      })],
+      parent: document.querySelector('#editor')
     });
   }
 
@@ -1020,7 +1032,7 @@ class PolytopeRendererApp {
     for (const [color, cellsSelectorConfig] of Object.entries(
       highlightConfig
     )) {
-      if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+      if (!/^[0-9a-fA-F]{8}$/.test(color))
         throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
       helperFunc.validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
 
@@ -1034,7 +1046,7 @@ class PolytopeRendererApp {
         this.isOrthoUni
       );
       const colorNum = parseInt(color, 16);
-      const rgb = colorNum >> 8;
+      const rgb = colorNum >>> 8;
       const a = colorNum & 0xff;
       highlightedPartMaterial.color.set(rgb);
       highlightedPartMaterial.transparent = a === 255 ? false : true;
@@ -1245,6 +1257,7 @@ class PolytopeRendererApp {
       this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
     this.sphereRadiusUni.value =
       (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor) * 2;
+    this.isOrthoUni.value = !this.schleSwitcher.checked
     this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
     this.ofs3Uni.value = new THREE.Vector3();
   }
@@ -1257,7 +1270,7 @@ class PolytopeRendererApp {
   }
 
   /**
-   * 更新旋转 Uniform 变量，并在 3D 模式下直接修改 solidGroup 的旋转。
+   * 更新旋转 Uniform 变量。
    */
   updateRotation() {
     const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
@@ -1291,13 +1304,21 @@ class PolytopeRendererApp {
      * @param {boolean} enable - true 表示启用，false 表示禁用。
      */
     const _toggleUIs = enable => {
-      const elements = document.querySelectorAll('input, button, div');
+      const elements = document.querySelectorAll('input, button, div, a');
 
       elements.forEach(element => {
         if (element.noUiSlider) {
           element.noUiSlider[enable ? 'enable' : 'disable']()
           return
         };
+        if (element.tagName === "A") {
+          if (enable) {
+            element.classList.remove(`disable`)
+          } else {
+            element.classList.add(`disable`)
+          }
+          return;
+        }
         element.disabled = !enable;
       });
     };
@@ -1422,7 +1443,7 @@ class PolytopeRendererApp {
     );
 
     this.highlightCellsBtn.addEventListener('click', () => {
-      const highlightConfig = JSON.parse(this.editor.state.doc.toString());
+      const highlightConfig = YAML.load(this.editor.state.doc.toString());
       this.faceVisibleSwitcher.checked = false;
       this.updateProperties();
       try {
@@ -1574,7 +1595,7 @@ class PolytopeRendererApp {
    */
   async startRecord() {
     try {
-      this.recordConfig = await helperFunc.parseJsonFileFromInput(
+      this.recordConfig = await helperFunc.parseYamlFileFromInput(
         this.configFileInput
       );
       helperFunc.validateRecordConfig(this.recordConfig, this.is4D);
@@ -1617,7 +1638,7 @@ class PolytopeRendererApp {
         this.recordConfig.initialSchleProjEnable ?? !this.isOrthoUni.value,
       highlightConfig:
         this.recordConfig.initialHighlightConfig ??
-        JSON.parse(this.editor.state.doc.toString())
+        YAML.load(this.editor.state.doc.toString())
     };
 
     const totalFrames = Math.max(
@@ -1625,7 +1646,7 @@ class PolytopeRendererApp {
         i.index = index;
         return i.end ?? i.at ?? -1;
       })
-    );
+    ) + (this.recordConfig.endExtraFrames ?? 30);
     this.rotAngles = [0, 0, 0, 0, 0, 0];
     this.rotUni.value = new THREE.Matrix4();
     this.stopRenderLoop();
@@ -1654,7 +1675,7 @@ class PolytopeRendererApp {
       this.updateProperties();
       this.updateProjectionDistance();
       this.updateRotation();
-      this.highlightCells(JSON.parse(this.editor.state.doc.toString()));
+      this.highlightCells(YAML.load(this.editor.state.doc.toString()));
 
       this._initializeControls();
       this.startRenderLoop();

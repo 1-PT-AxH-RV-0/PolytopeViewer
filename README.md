@@ -11,7 +11,7 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
 5. **信息展示**：在 canvas 左上角实时显示当前多面体的顶点、边、面和胞（四维情况下）的数量。
 6. **文件支持**：支持用户上传 OFF 格式文件（仅支持文件头为 OFF 的普通三维 OFF 文件和 4OFF 的四维 OFF 文件）。
 7. **可高亮胞**：支持从 [高亮配置文件](HighlightConfigFormat.md) 高亮特定的胞。
-8. **可导出视频**：支持通过 JSON 配置文件导出视频，配置文件格式请见 [ConfigFormat.md](ConfigFormat.md)。
+8. **可导出视频**：支持通过 YAML 配置文件导出视频，配置文件格式请见 [ConfigFormat.md](ConfigFormat.md)。
 
 ## 文件结构
 
@@ -80,3 +80,4 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
 
 1. 目前仅支持三维和四维 OFF 文件，二维、五维及更高维度文件不受支持，未来也不会考虑支持。
 2. 导出视频（录制）为测试功能，后续会完善。
+3. 所有配置文件均为 YAML 格式。

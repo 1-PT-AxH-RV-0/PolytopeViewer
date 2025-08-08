@@ -3,6 +3,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import { set } from 'lodash';
 import * as poly2tri from 'poly2tri';
+import YAML from 'js-yaml'
 import * as polygonClipping from 'polygon-clipping';
 import * as type from './type.js';
 
@@ -795,7 +796,7 @@ function validateCellsSelectorConfig(config, prefix = '') {
   // 基础类型检查
   if (config === 'all') return;
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
-    throw new Error('highlightConfig 必须是非数组的对象类型或为字符串 "all"。');
+    throw new Error(`${prefix} 必须是非数组的对象类型或为字符串 "all"。`);
   }
 
   // 检查是否包含有效配置项（排除 exclude 字段）
@@ -809,7 +810,7 @@ function validateCellsSelectorConfig(config, prefix = '') {
 
   if (!hasValidConfig && !config.exclude) {
     throw new Error(
-      'highlightConfig 必须包含至少一个有效配置项（indices/ranges/nHedra）或 exclude 配置。'
+      `${prefix} 必须包含至少一个有效配置项（indices/ranges/nHedra）或 exclude 配置。`
     );
   }
 
@@ -903,11 +904,11 @@ function validateCellsSelectorConfig(config, prefix = '') {
 }
 
 /**
- * 异步获取并解析用户选择的 JSON 文件。
+ * 异步获取并解析用户选择的 YAML 文件。
  * @param {HTMLInputElement} fileInput - 文件输入元素。
- * @returns {Promise<object>} 返回解析后的 JSON 对象。
+ * @returns {Promise<object>} 返回解析后的 YAML 对象。
  */
-function parseJsonFileFromInput(fileInput) {
+function parseYamlFileFromInput(fileInput) {
   return new Promise((resolve, reject) => {
     // 确保输入元素是文件类型
     if (fileInput.type !== 'file') {
@@ -930,8 +931,8 @@ function parseJsonFileFromInput(fileInput) {
 
       reader.onload = event => {
         try {
-          const jsonData = JSON.parse(event.target.result);
-          resolve(jsonData);
+          const data = YAML.load(event.target.result);
+          resolve(data);
         } catch (error) {
           reject(new Error('文件解析失败: ' + error.message));
         }
@@ -1115,7 +1116,7 @@ export {
   getSortedValuesDesc,
   validateRecordConfig,
   validateCellsSelectorConfig,
-  parseJsonFileFromInput,
+  parseYamlFileFromInput,
   calculateCentroid,
   findPlanesIntersection,
   filterArray
