@@ -1,12 +1,13 @@
 import * as THREE from 'three';
-import YAML from 'js-yaml'
+// eslint-disable-next-line no-unused-vars
+import { Button, Tab, Tooltip, Modal } from 'bootstrap';
+import YAML from 'js-yaml';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import Nanobar from 'nanobar';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import WebMWriter from 'webm-writer';
 import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { linter } from '@codemirror/lint';
 import noUiSlider from 'nouislider';
 import 'nouislider/dist/nouislider.css';
@@ -21,7 +22,7 @@ import { parse4OFF } from './offProcessor4D.js';
 import * as type from './type.js';
 
 // 导入样式。
-import './style.css';
+import './style.scss';
 
 window.WebMWriter = WebMWriter;
 window.download = function (data, filename, mimeType) {
@@ -40,12 +41,6 @@ window.download = function (data, filename, mimeType) {
  */
 class PolytopeRendererApp {
   constructor() {
-    // 导航栏元素。
-    this.ctrlsNav = null;
-    this.offsNav = null;
-    this.controlsPage = null;
-    this.seleOffPage = null;
-
     // 控制页元素。
     this.canvas = null;
     this.faceVisibleSwitcher = null;
@@ -69,6 +64,9 @@ class PolytopeRendererApp {
     this.configFileInput = null;
     this.highlightCellsBtn = null;
     this.rotationSliders = [];
+
+    this.errorModal = null;
+    this.errorMsg = null;
 
     // OFF 选择页元素。
     this.offSeleEle = null;
@@ -143,6 +141,7 @@ class PolytopeRendererApp {
       flatShading: true
     });
     this.editor = null;
+    this.errorModalBs = null;
 
     this.init();
   }
@@ -173,7 +172,15 @@ class PolytopeRendererApp {
     this._initializeCameras();
     this._initializeLights();
     this._initializeControls();
-    this._initializeJsonEditor();
+    this._initializeEditor();
+
+    // 为 OFF 列表的 a 元素加上类名。
+    document.querySelectorAll('a[data-path]').forEach(a => {
+      a.classList.add('list-group-item');
+      a.classList.add('list-group-item-action');
+    });
+    // 实例化错误弹窗
+    this.errorModalBs = new Modal(this.errorModal);
 
     this.axesGroup = await createAxes(
       this.scene,
@@ -204,11 +211,6 @@ class PolytopeRendererApp {
    */
   _initializeDomElements() {
     /* eslint-disable */
-    this.ctrlsNav = document.getElementById('ctrlsNav');
-    this.offsNav = document.getElementById('offsNav');
-    this.controlsPage = document.getElementById('controls');
-    this.seleOffPage = document.getElementById('seleOff');
-    
     this.canvas = document.getElementById('polytopeRenderer');
     this.faceVisibleSwitcher = document.getElementById('faceVisibleSwitcher');
     this.wireframeVisibleSwitcher = document.getElementById('wireframeVisibleSwitcher');
@@ -229,6 +231,9 @@ class PolytopeRendererApp {
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
     this.highlightCellsBtn = document.getElementById('highlightCells');
+    
+    this.errorModal = document.getElementById('errorModal');
+    this.errorMsg = document.getElementById('errorMsg');
 
     this.offSeleEle = document.getElementById('offSele');
     this.polyhedraSeleEle = document.getElementById('polyhedra');
@@ -257,47 +262,51 @@ class PolytopeRendererApp {
       document.getElementById(`rot${i}Slider`)
     );
   }
-  
+
   /**
    * 初始化滑块
    */
   _initializeSliders() {
     noUiSlider.create(this.scaleFactorSlider, {
-      range: { min: 0.1, max: 120 },
+      range: helperFunc.generateLogarithmicRange(0.1, 120),
       start: 1,
       tooltips: true,
       connect: [true, false]
     });
-    
+
     noUiSlider.create(this.faceOpacitySlider, {
       range: { min: 0.1, max: 1.0 },
       start: 1,
       tooltips: true,
       connect: [true, false]
     });
-    
+
     noUiSlider.create(this.wireframeAndVerticesDimSlider, {
-      range: { min: 0.01, max: 3 },
+      range: helperFunc.generateLogarithmicRange(0.01, 3),
       start: 0.5,
       tooltips: true,
       connect: [true, false]
     });
-    
+
     noUiSlider.create(this.projectionDistanceSlider, {
-      range: { min: 0.01, max: 100 },
+      range: helperFunc.generateLogarithmicRange(0.01, 100),
       start: 1,
       tooltips: true,
       connect: [true, false]
     });
-    
+
     this.rotationSliders.forEach(slider => {
       noUiSlider.create(slider, {
         range: { min: 0, max: 360 },
         start: 0,
-        tooltips: true,
+        tooltips: {
+          to: function (numericValue) {
+            return numericValue.toFixed(2) + '°';
+          }
+        },
         connect: [true, false]
       });
-    })
+    });
   }
 
   /**
@@ -395,22 +404,28 @@ class PolytopeRendererApp {
   /**
     初始化代码编辑器。
    */
-  _initializeJsonEditor() {
+  _initializeEditor() {
     this.editor = new EditorView({
       doc: '555555FF: all',
-      extensions: [basicSetup, yaml(), oneDark, linter(view => {
+      extensions: [
+        basicSetup,
+        yaml(),
+        linter(view => {
           try {
-              YAML.load(view.state.doc.toString());
+            YAML.load(view.state.doc.toString());
           } catch (e) {
-              return [{
-                      from: e.mark.position - 1,
-                      message: e.reason,
-                      severity: 'error',
-                      to: e.mark.position - 1
-              }];
+            return [
+              {
+                from: e.mark.position - 1,
+                message: e.reason,
+                severity: 'error',
+                to: e.mark.position - 1
+              }
+            ];
           }
           return [];
-      })],
+        })
+      ],
       parent: document.querySelector('#editor')
     });
   }
@@ -447,6 +462,15 @@ class PolytopeRendererApp {
   stopRenderLoop() {
     if (!this.isRenderingFlag) return;
     this.isRenderingFlag = false;
+  }
+
+  /**
+   * 触发错误弹窗。
+   * @param {string} msg - 错误信息。
+   */
+  triggerErrorDialog(msg) {
+    this.errorMsg.innerText = msg;
+    this.errorModalBs.show();
   }
 
   /**
@@ -821,7 +845,9 @@ class PolytopeRendererApp {
     material.side = THREE.DoubleSide;
 
     const mesh = new THREE.Mesh(geometry, material);
-    this.projectionDistanceSlider.noUiSlider.set(helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05);
+    this.projectionDistanceSlider.noUiSlider.set(
+      helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05
+    );
     this.updateProjectionDistance();
     this.updateScaleFactor(
       40 /
@@ -1254,10 +1280,13 @@ class PolytopeRendererApp {
     this.toggleCamera(this.perspSwitcher.checked);
 
     this.cylinderRadiusUni.value =
-      this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
+      this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+      this.scaleFactor;
     this.sphereRadiusUni.value =
-      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor) * 2;
-    this.isOrthoUni.value = !this.schleSwitcher.checked
+      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+        this.scaleFactor) *
+      2;
+    this.isOrthoUni.value = !this.schleSwitcher.checked;
     this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
     this.ofs3Uni.value = new THREE.Vector3();
   }
@@ -1281,15 +1310,16 @@ class PolytopeRendererApp {
   /**
    * 更新缩放因子。
    * @param {number} scaleFactor - 缩放因子。
-   * @param {booleam} updateSlider - 是否更新滑块值。
+   * @param {boolean} updateSlider - 是否更新滑块值。
    */
-  updateScaleFactor(scaleFactor, updateSlider=true) {
+  updateScaleFactor(scaleFactor, updateSlider = true) {
     this.scaleFactor = scaleFactor;
     if (updateSlider) this.scaleFactorSlider.noUiSlider.set(scaleFactor);
     this.cylinderRadiusUni.value =
       this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor;
     this.sphereRadiusUni.value =
-      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor) * 2;
+      (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor) *
+      2;
     if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
     this.axesOffsetScaleUni.value = scaleFactor;
   }
@@ -1304,22 +1334,21 @@ class PolytopeRendererApp {
      * @param {boolean} enable - true 表示启用，false 表示禁用。
      */
     const _toggleUIs = enable => {
-      const elements = document.querySelectorAll('input, button, div, a');
+      const elements = document.querySelectorAll(
+        'input, .btn-group button:not([data-bs-toggle="tooltip"]), div[id$="Slider"], a[data-path]'
+      );
 
       elements.forEach(element => {
-        if (element.noUiSlider) {
-          element.noUiSlider[enable ? 'enable' : 'disable']()
-          return
-        };
-        if (element.tagName === "A") {
-          if (enable) {
-            element.classList.remove(`disable`)
-          } else {
-            element.classList.add(`disable`)
-          }
-          return;
+        if (element.tagName === 'DIV') {
+          element.noUiSlider[enable ? 'enable' : 'disable']();
+        } else if (element.tagName === 'A') {
+          element.classList.toggle('disabled', !enable);
+        } else if (
+          element.tagName === 'INPUT' ||
+          element.tagName === 'BUTTON'
+        ) {
+          element.disabled = !enable;
         }
-        element.disabled = !enable;
       });
     };
 
@@ -1411,9 +1440,12 @@ class PolytopeRendererApp {
     });
     this.wireframeAndVerticesDimSlider.noUiSlider.on('update', () => {
       this.cylinderRadiusUni.value =
-        this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
+        this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+        this.scaleFactor;
       this.sphereRadiusUni.value =
-        (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor) * 2;
+        (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+          this.scaleFactor) *
+        2;
     });
 
     this.projectionDistanceSlider.noUiSlider.on(
@@ -1443,13 +1475,13 @@ class PolytopeRendererApp {
     );
 
     this.highlightCellsBtn.addEventListener('click', () => {
-      const highlightConfig = YAML.load(this.editor.state.doc.toString());
-      this.faceVisibleSwitcher.checked = false;
-      this.updateProperties();
       try {
+        const highlightConfig = YAML.load(this.editor.state.doc.toString());
+        this.faceVisibleSwitcher.checked = false;
+        this.updateProperties();
         this.highlightCells(highlightConfig);
       } catch (e) {
-        alert(e.message);
+        this.triggerErrorDialog(e.message);
         console.error(e);
       }
     });
@@ -1479,40 +1511,7 @@ class PolytopeRendererApp {
       });
     });
 
-    this.setupNavEventListeners();
-    this.setupCollapseEventListeners();
     this.setupSolidInfFamiliesEventListeners();
-  }
-
-  /**
-   * 设置导航栏的事件监听器。
-   */
-  setupNavEventListeners() {
-    this.ctrlsNav.addEventListener('click', () => {
-      this.controlsPage.style.display = 'flex';
-      this.seleOffPage.style.display = 'none';
-      this.ctrlsNav.classList.add('active');
-      this.offsNav.classList.remove('active');
-    });
-
-    this.offsNav.addEventListener('click', () => {
-      this.controlsPage.style.display = 'none';
-      this.seleOffPage.style.display = 'block';
-      this.ctrlsNav.classList.remove('active');
-      this.offsNav.classList.add('active');
-    });
-  }
-
-  /**
-   * 设置 OFF 文件分类的展开 / 收起的事件监听器。
-   */
-  setupCollapseEventListeners() {
-    this.offSeleEle.querySelectorAll('li:has(span)').forEach(li => {
-      li.querySelector('span').addEventListener('click', () => {
-        const ul = li.querySelector('ul');
-        ul.style.display = ul.style.display === 'none' ? null : 'none';
-      });
-    });
   }
 
   /**
@@ -1547,19 +1546,29 @@ class PolytopeRendererApp {
       const n = +this.stephanoidNInput.value;
       const a = +this.stephanoidAInput.value;
       const b = +this.stephanoidBInput.value;
-      await this.loadMeshFromData(
-        infFamilies.stephanoid(n, a, b),
-        this.initialMaterial
-      );
+      try {
+        await this.loadMeshFromData(
+          infFamilies.stephanoid(n, a, b),
+          this.initialMaterial
+        );
+      } catch (e) {
+        this.triggerErrorDialog(e.message);
+        console.error(e);
+      }
     });
 
     this.genDuoprismBtn.addEventListener('click', async () => {
       const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
       const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);
-      await this.loadMeshFrom4Data(
-        infFamilies.duoprism(m, n, s1, s2),
-        this.initialMaterial
-      );
+      try {
+        await this.loadMeshFrom4Data(
+          infFamilies.duoprism(m, n, s1, s2),
+          this.initialMaterial
+        );
+      } catch (e) {
+        this.triggerErrorDialog(e.message);
+        console.error(e);
+      }
     });
   }
 
@@ -1570,10 +1579,14 @@ class PolytopeRendererApp {
   handleFileInputChange(e) {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      this.triggerErrorDialog('文件大小不能超过 5 MiB。');
+      return;
+    }
 
     const reader = new FileReader();
-    reader.onload = async e => {
-      const data = e.target.result;
+    reader.onload = async event => {
+      const data = event.target.result;
 
       this.is4D =
         data
@@ -1581,10 +1594,17 @@ class PolytopeRendererApp {
           .filter(line => line.trim() !== '' && !line.startsWith('#'))[0]
           .trim() === '4OFF';
 
-      if (this.is4D) {
-        await this.loadMeshFrom4Data(data, this.initialMaterial);
-      } else {
-        await this.loadMeshFromData(data, this.initialMaterial);
+      try {
+        if (this.is4D) {
+          await this.loadMeshFrom4Data(data, this.initialMaterial);
+        } else {
+          await this.loadMeshFromData(data, this.initialMaterial);
+        }
+      } catch (e) {
+        this.triggerErrorDialog(e.message);
+        console.error(e);
+      } finally {
+        e.target.value = '';
       }
     };
     reader.readAsText(file);
@@ -1600,7 +1620,7 @@ class PolytopeRendererApp {
       );
       helperFunc.validateRecordConfig(this.recordConfig, this.is4D);
     } catch (e) {
-      alert(e.message);
+      this.triggerErrorDialog(e.message);
       console.error(e);
       return;
     }
@@ -1624,7 +1644,8 @@ class PolytopeRendererApp {
         this.cylinderRadiusUni.value * this.scaleFactor,
       projDist: this.recordConfig.initialProjDist ?? this.projDistUni.value,
       faceOpacity:
-        this.recordConfig.initialFaceOpacity ?? +this.faceOpacitySlider.noUiSlider.get(true),
+        this.recordConfig.initialFaceOpacity ??
+        +this.faceOpacitySlider.noUiSlider.get(true),
       visibilities: this.recordConfig.initialVisibilities ?? {
         faces: this.faceVisibleSwitcher.checked,
         wireframe: this.wireframeVisibleSwitcher.checked,
@@ -1641,12 +1662,13 @@ class PolytopeRendererApp {
         YAML.load(this.editor.state.doc.toString())
     };
 
-    const totalFrames = Math.max(
-      ...this.recordConfig.actions.map((i, index) => {
-        i.index = index;
-        return i.end ?? i.at ?? -1;
-      })
-    ) + (this.recordConfig.endExtraFrames ?? 30);
+    const totalFrames =
+      Math.max(
+        ...this.recordConfig.actions.map((i, index) => {
+          i.index = index;
+          return i.end ?? i.at ?? -1;
+        })
+      ) + (this.recordConfig.endExtraFrames ?? 30);
     this.rotAngles = [0, 0, 0, 0, 0, 0];
     this.rotUni.value = new THREE.Matrix4();
     this.stopRenderLoop();
@@ -1696,7 +1718,7 @@ class PolytopeRendererApp {
         this.genFrame(frameIndex);
         this.capturer.capture(this.canvas);
       } catch (e) {
-        alert(e.message);
+        this.triggerErrorDialog(e.message);
         _onStopRender(true);
         console.error(e);
         return;
@@ -1846,4 +1868,8 @@ class PolytopeRendererApp {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => new PolytopeRendererApp());
+new PolytopeRendererApp();
+const tooltipTriggerList = document.querySelectorAll(
+  '[data-bs-toggle="tooltip"]'
+);
+[...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl));

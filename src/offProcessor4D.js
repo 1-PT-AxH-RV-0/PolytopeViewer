@@ -19,7 +19,7 @@ function parse4OFF(data) {
   const lines = data
     .split('\n')
     .filter(line => line.trim() !== '' && !line.startsWith('#'));
-  if (lines[0].trim() !== '4OFF') throw new Error('Invalid 4OFF file format');
+  if (lines[0].trim() !== '4OFF') throw new Error('不是有效的 4OFF 文件。');
 
   const [nVertices, nFaces, , nCells] = lines[1]
     .trim()

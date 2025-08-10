@@ -1,0 +1,215 @@
+@use 'sass:math';
+@import './neededBootstrap';
+
+// 变量
+$slider-handle-size: 18px;
+$slider-track-height: 10px;
+$slider-color: $primary;
+$disabled-color: tint-color($secondary, 50%);
+$error-modal-bg: $danger;
+$error-modal-border-color: shade-color($danger, 20%);
+$error-modal-color: shade-color($danger, 80%);
+
+// 修改颜色
+.modal {
+  --bs-modal-bg: #{$error-modal-bg};
+  --bs-modal-border-color: #{$error-modal-border-color};
+  --bs-modal-header-border-color: #{$error-modal-border-color};
+  --bs-modal-color: #{$error-modal-color};
+}
+
+// 混合
+@mixin slider-styles {
+  width: 60%;
+  height: $slider-track-height;
+  margin-right: 9px;
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .noUi-connect {
+    background: $slider-color;
+  }
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .noUi-handle {
+    top: math.div($slider-track-height, -2);
+    right: math.div($slider-handle-size, -2);
+    width: $slider-handle-size;
+    height: $slider-handle-size;
+    background: $slider-color;
+    border-radius: math.div($slider-handle-size, 2);
+    box-shadow: none;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  /* stylelint-disable-next-line nesting-selector-no-missing-scoping-root, selector-class-pattern */
+  &[disabled] :is(.noUi-handle, .noUi-connect) {
+    background: $disabled-color;
+  }
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .noUi-tooltip {
+    display: none;
+  }
+
+  /* stylelint-disable-next-line selector-class-pattern */
+  .noUi-active .noUi-tooltip {
+    display: block;
+  }
+}
+
+// 基本样式
+body {
+  display: flex;
+  flex-direction: column;
+  width: 100dvw;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  font-family:
+    monospace,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Open Sans',
+    'Helvetica Neue',
+    sans-serif;
+
+  @media (aspect-ratio >= 1/1) {
+    flex-direction: row;
+  }
+
+  @media (aspect-ratio <= 1/1) {
+    flex-direction: column;
+  }
+}
+
+// 组件样式
+.polytope-renderer {
+  display: block;
+}
+
+.tabs {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.tab-content {
+  display: flex;
+  flex-grow: 1;
+  padding: 8px;
+  overflow: auto;
+
+  > .tab-pane {
+    flex-grow: 1;
+  }
+}
+
+div:has(> div[id$='Slider']) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+div[id$='Slider'] {
+  @include slider-styles;
+}
+
+.advanced-btns {
+  width: 100%;
+
+  > .btn-group {
+    display: flex;
+
+    > button:first-child {
+      width: 100%;
+    }
+  }
+}
+
+.editor {
+  margin-top: 16px;
+}
+
+.list-group-flush {
+  margin-bottom: 0;
+}
+
+a[data-path].disabled:any-link {
+  color: $disabled-color !important;
+  pointer-events: none;
+}
+
+// 折叠组件样式
+h1.accordion-header > .accordion-button {
+  font-weight: bold;
+}
+
+.sele-off {
+  .accordion-body {
+    padding: 0;
+  }
+
+  .accordion-button:not([data-radius]) {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+.last-list-item {
+  border-bottom-right-radius: var(--bs-list-group-border-radius) !important;
+  border-bottom-left-radius: var(--bs-list-group-border-radius) !important;
+}
+
+// 导航栏与输入框样式
+.nav {
+  display: flex;
+  width: 100%;
+}
+
+.file-input,
+.config-file-input {
+  display: none;
+}
+
+// 信息栏与进度条样式
+.info {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 0.5rem;
+  color: white;
+  pointer-events: none;
+}
+
+.prog {
+  font-size: 2rem;
+  color: white;
+  text-align: center;
+
+  &-container {
+    position: absolute;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.nanobar {
+  height: 12px;
+  margin: 0 auto;
+  border: solid 1px white;
+}
+
+.bar {
+  background-color: #25c4d3;
+}
