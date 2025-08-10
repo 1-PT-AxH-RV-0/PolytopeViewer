@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2531],{2531:function(c,e,s){c.exports=s.p+"assets/Bitruncated_icositetrachoron.4455c6838ac9ebdc75f0.off"}}]);

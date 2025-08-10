@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1999],{1999:function(e,s,c){e.exports=c.p+"assets/Rectified_icositetrachoron.6b8e0cc03955eaa555d2.off"}}]);

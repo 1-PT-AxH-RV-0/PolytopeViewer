@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7257],{7257:function(e,s,a){e.exports=a.p+"assets/Cantellated_hecatonicosachoron.a737167246991302ac30.off"}}]);

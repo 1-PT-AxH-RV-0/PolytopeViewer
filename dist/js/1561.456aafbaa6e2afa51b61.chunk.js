@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1561],{1561:function(e,s,t){e.exports=t.p+"assets/Omnitruncated_tesseract.e27d393793222f22adde.off"}}]);

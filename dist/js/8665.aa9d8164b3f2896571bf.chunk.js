@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8665],{8665:function(e,s,t){e.exports=t.p+"assets/Cantellated_tesseract.c86362fe2f9b3c17c5fe.off"}}]);

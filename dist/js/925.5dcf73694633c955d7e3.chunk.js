@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[925],{925:function(s,t,e){s.exports=e.p+"assets/Cantitruncated_icositetrachoron.885f72657787912bc33d.off"}}]);

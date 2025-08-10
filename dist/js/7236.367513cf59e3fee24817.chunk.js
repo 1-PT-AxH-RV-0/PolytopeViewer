@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7236],{7236:function(s,e,f){s.exports=f.p+"assets/Sirghi.f0f8e153b9193578c237.off"}}]);

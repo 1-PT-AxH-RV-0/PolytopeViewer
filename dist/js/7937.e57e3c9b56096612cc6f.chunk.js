@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7937],{7937:function(c,s,e){c.exports=e.p+"assets/Bitruncated_hecatonicosachoron.6a3d953fa100c1070c67.off"}}]);

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5914],{5914:(e,s,c)=>{e.exports=c.p+"assets/Rhombic_dodecahedron.off"}}]);

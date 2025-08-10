@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4491],{4491:function(e,s,f){e.exports=f.p+"assets/Hexacosichoron.fd60bf2defe703642447.off"}}]);

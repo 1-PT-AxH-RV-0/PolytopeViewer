@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3371],{3371:function(e,s,c){e.exports=c.p+"assets/Omnitruncated_icositetrachoron.b704104b7bedebc7e58c.off"}}]);

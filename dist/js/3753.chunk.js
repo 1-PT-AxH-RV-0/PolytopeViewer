@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3753],{3753:(e,s,t)=>{e.exports=t.p+"assets/Bitruncated_pentachoron.off"}}]);

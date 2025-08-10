@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5645],{5645:(e,s,a)=>{e.exports=a.p+"assets/Triaugmented_hexagonal_prism.off"}}]);

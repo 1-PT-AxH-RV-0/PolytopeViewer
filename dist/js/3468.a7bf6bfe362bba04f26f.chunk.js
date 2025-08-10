@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3468],{3468:function(e,s,f){e.exports=f.p+"assets/Cantellated_hexacosichoron.3a7ff9acf4fce400e016.off"}}]);

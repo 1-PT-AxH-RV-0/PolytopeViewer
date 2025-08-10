@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9871],{9871:function(s,e,b){s.exports=b.p+"assets/Rigogishi.b64c2c6356bb32ba788d.off"}}]);

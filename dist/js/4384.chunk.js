@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4384],{4384:(s,e,t)=>{s.exports=t.p+"assets/Cantitruncated_icositetrachoron.off"}}]);

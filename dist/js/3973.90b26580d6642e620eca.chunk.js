@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3973],{3973:function(e,s,c){e.exports=c.p+"assets/Rectified_hecatonicosachoron.a432fba34718d691c4a5.off"}}]);

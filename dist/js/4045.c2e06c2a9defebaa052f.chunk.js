@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4045],{4045:function(e,s,a){e.exports=a.p+"assets/Runcinated_icositetrachoron.4764fadba5d84faa5e23.off"}}]);

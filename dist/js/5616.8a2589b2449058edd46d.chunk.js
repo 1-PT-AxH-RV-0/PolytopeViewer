@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5616],{5616:function(e,c,s){e.exports=s.p+"assets/Rectified_hexacosichoron.9c3c109e83457d71c56e.off"}}]);

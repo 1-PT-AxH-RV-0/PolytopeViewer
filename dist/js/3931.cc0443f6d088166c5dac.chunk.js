@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3931],{3931:function(e,s,c){e.exports=c.p+"assets/Runcinated_hecatonicosachoron.f0893feddb55ebcfd628.off"}}]);

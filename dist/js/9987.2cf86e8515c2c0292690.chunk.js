@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9987],{9987:function(e,s,a){e.exports=a.p+"assets/Runcinated_tesseract.20e4a0e477a3ab8eb120.off"}}]);

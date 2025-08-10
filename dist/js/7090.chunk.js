@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[7090],{7090:(s,e,i)=>{s.exports=i.p+"assets/Metabidiminished_icosahedron.off"}}]);

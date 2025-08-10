@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[83],{83:function(e,s,t){e.exports=t.p+"assets/Cantitruncated_tesseract.60aff500f7665de663fb.off"}}]);

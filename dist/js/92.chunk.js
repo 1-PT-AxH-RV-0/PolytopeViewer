@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[92],{92:(s,e,a)=>{s.exports=a.p+"assets/Pentagonal_cupola.off"}}]);

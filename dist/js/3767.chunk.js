@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3767],{3767:(e,s,a)=>{e.exports=a.p+"assets/Elongated_pentagonal_gyrobirotunda.off"}}]);

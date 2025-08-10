@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4810],{4810:function(e,s,f){e.exports=f.p+"assets/Taghi.8a233ffe448a622e4017.off"}}]);

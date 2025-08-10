@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8834],{8834:function(s,e,c){s.exports=c.p+"assets/Tighi.e17d26715631bc73b83c.off"}}]);

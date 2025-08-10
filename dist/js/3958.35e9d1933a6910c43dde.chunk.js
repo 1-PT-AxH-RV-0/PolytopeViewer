@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3958],{3958:function(e,c,s){e.exports=s.p+"assets/Runcinated_great_grand_stellated_hecatonicosachoron.2c020b3378eecae78ecb.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3866],{3866:function(s,e,t){s.exports=t.p+"assets/Cantitruncated_hexacosichoron.255d80032140bf1b823b.off"}}]);

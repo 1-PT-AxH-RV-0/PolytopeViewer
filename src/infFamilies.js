@@ -194,7 +194,6 @@ function trapezohedron(n, s = 1) {
  */
 function stephanoid(n, a, b) {
   if (a === b || a + b >= n) {
-    alert('这个参数会生成退化的冠体。');
     throw new Error('这个参数会生成退化的冠体。');
   }
 
@@ -236,12 +235,13 @@ function stephanoid(n, a, b) {
 }
 
 /**
- * 生成 m-n 角双角柱的网格数据。
+ * 生成 m 角 n 角双角柱的网格数据。
  * @param {number} m - 第一个多边形的边数。
  * @param {number} n - 第二个多边形的边数。
  * @param {number} s1 - 第一个多边形的步长。
  * @param {number} s2 - 第二个多边形的步长。
  * @returns {type.NonTriMesh4D} 4D 网格数据对象。
+ * @throws {Error} - 当为复合双角柱时抛出。
  */
 function duoprism(m, n, s1 = 1, s2 = 1) {
   const polygon_edge_length1 = 2 * Math.sin((Math.PI * s1) / m);
@@ -351,7 +351,6 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
     // ))
     // }
     // console.log(cells.map(a => a.join(' ')).join('\n'))
-    alert('不支持复合双角柱。');
     throw new Error('不支持复合双角柱。');
   }
 

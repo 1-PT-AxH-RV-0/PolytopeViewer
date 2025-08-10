@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6931],{6931:function(c,e,s){c.exports=s.p+"assets/Runcinated_facted_hexacosichoron.7c223b2b2eb472bfa6cc.off"}}]);

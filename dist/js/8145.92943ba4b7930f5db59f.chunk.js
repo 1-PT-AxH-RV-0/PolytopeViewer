@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8145],{8145:function(s,e,t){s.exports=t.p+"assets/Bitruncated_tesseract.a90330d40371fb021c6b.off"}}]);

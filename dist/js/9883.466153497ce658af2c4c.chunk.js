@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9883],{9883:function(e,s,t){e.exports=t.p+"assets/Cantellated_icositetrachoron.919eb469063a02ca6335.off"}}]);

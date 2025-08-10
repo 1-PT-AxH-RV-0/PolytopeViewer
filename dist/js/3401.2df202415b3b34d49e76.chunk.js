@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[3401],{3401:function(s,c,e){s.exports=e.p+"assets/Omnitruncated_hecatonicosachoron.2429359c034f979785bd.off"}}]);

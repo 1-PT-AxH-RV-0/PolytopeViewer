@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4223],{4223:function(s,f,e){s.exports=e.p+"assets/Rigfix.bd701da4f38ab4fd407b.off"}}]);

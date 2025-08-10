@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1114],{1114:function(e,s,c){e.exports=c.p+"assets/Tigaghi.cd20545c33280e37ee66.off"}}]);

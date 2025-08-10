@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6538],{6538:function(e,s,a){e.exports=a.p+"assets/Omnitruncated_pentachoron.58a59946436a17b0fa28.off"}}]);

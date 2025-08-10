@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4853],{4853:(e,s,a)=>{e.exports=a.p+"assets/Runcinated_great_grand_stellated_hecatonicosachoron.off"}}]);

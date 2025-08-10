@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[9867],{9867:(e,s,o)=>{e.exports=o.p+"assets/Great_rhombicosidodecahedron.off"}}]);

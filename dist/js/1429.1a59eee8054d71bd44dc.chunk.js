@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1429],{1429:function(e,c,s){e.exports=s.p+"assets/Runcitruncated_hexadecachoron.56b6cad22c1dfe4247f4.off"}}]);

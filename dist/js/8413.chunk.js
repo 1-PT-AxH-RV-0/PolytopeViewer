@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8413],{8413:(s,e,p)=>{s.exports=p.p+"assets/Sirgax.off"}}]);

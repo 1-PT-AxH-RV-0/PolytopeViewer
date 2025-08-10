@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[1290],{1290:function(e,s,f){e.exports=f.p+"assets/Shihi(btf600).03bf56beb8442e954f92.off"}}]);

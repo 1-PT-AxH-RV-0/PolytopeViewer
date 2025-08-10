@@ -20,7 +20,7 @@ function parseOFF(data) {
   const lines = data
     .split('\n')
     .filter(line => line.trim() !== '' && !line.startsWith('#'));
-  if (lines[0].trim() !== 'OFF') throw new Error('Invalid OFF file format');
+  if (lines[0].trim() !== 'OFF') throw new Error('不是有效的 OFF 文件。');
 
   const [nVertices, nFaces] = lines[1].trim().split(/\s+/).map(Number);
   const vertices = [];

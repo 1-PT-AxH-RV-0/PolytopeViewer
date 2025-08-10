@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2707],{2707:(e,s,a)=>{e.exports=a.p+"assets/Parabigyrate_rhombicosidodecahedron.off"}}]);

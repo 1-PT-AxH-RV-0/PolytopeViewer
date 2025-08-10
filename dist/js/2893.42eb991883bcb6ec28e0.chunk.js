@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2893],{2893:function(s,e,f){s.exports=f.p+"assets/Tiffix.229b0a41a89507096893.off"}}]);

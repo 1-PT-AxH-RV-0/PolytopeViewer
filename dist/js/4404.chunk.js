@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4404],{4404:(s,e,p)=>{s.exports=p.p+"assets/Cube.off"}}]);

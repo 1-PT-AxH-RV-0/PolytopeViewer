@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[4999],{4999:function(e,s,f){e.exports=f.p+"assets/Taggix.49c7dd5bb5fed3ae0b2f.off"}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6574],{6574:function(e,s,c){e.exports=c.p+"assets/Hecatonicosachoron.e25ce54568ffbba2632e.off"}}]);

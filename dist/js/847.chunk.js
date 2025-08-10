@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[847],{3228:(e,s,t)=>{e.exports=t.p+"assets/Augmented_truncated_tetrahedron.off"}}]);

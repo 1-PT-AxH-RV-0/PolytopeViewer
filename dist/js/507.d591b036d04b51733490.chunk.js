@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[507],{507:function(c,s,e){c.exports=e.p+"assets/Runcitruncated_hecatonicosachoron.acdb01fc3345dc91a7d4.off"}}]);

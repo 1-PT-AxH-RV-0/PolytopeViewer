@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[347],{347:(s,e,i)=>{s.exports=i.p+"assets/Tridiminished_icosahedron.off"}}]);

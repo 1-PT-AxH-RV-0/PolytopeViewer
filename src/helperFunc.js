@@ -3,7 +3,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import { set } from 'lodash';
 import * as poly2tri from 'poly2tri';
-import YAML from 'js-yaml'
+import YAML from 'js-yaml';
 import * as polygonClipping from 'polygon-clipping';
 import * as type from './type.js';
 
@@ -917,7 +917,7 @@ function parseYamlFileFromInput(fileInput) {
     }
 
     // 设置临时事件处理程序
-    fileInput.addEventListener('change', function handleChange() {
+    fileInput.addEventListener('change', function handleChange(e) {
       // 移除事件监听器，避免多次触发
       fileInput.removeEventListener('change', handleChange);
 
@@ -927,6 +927,11 @@ function parseYamlFileFromInput(fileInput) {
       }
 
       const file = fileInput.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        reject(new Error('文件大小不能超过 5 MiB。'));
+        return;
+      }
+
       const reader = new FileReader();
 
       reader.onload = event => {
@@ -935,10 +940,13 @@ function parseYamlFileFromInput(fileInput) {
           resolve(data);
         } catch (error) {
           reject(new Error('文件解析失败: ' + error.message));
+        } finally {
+          e.target.value = '';
         }
       };
 
       reader.onerror = () => {
+        e.target.value = '';
         reject(new Error('文件读取失败。'));
       };
 
@@ -1096,6 +1104,52 @@ function filterArray(sourceArray, excludeArray) {
   return sourceArray;
 }
 
+/**
+ * 生成 noUiSlider 对数刻度 range 对象
+ * @param {number} min - 最小值(必须 >0)
+ * @param {number} max - 最大值(必须 >min)
+ * @param {number} base - 对数底数(默认 e)
+ * @param {number} segments - 中间分段数(默认 32)
+ * @returns {object} noUiSlider 的 range 配置对象
+ */
+function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
+  if (min <= 0 || max <= 0) {
+    throw new Error('最小值和最大值必须大于零。');
+  }
+  if (max <= min) {
+    throw new Error('最大值必须大于最小值。');
+  }
+  if (segments <= 0) {
+    throw new Error('分段数必须大于零。');
+  }
+
+  // 计算对数
+  const logMin = Math.log(min) / Math.log(base);
+  const logMax = Math.log(max) / Math.log(base);
+  const logRange = logMax - logMin;
+
+  const range = {
+    min: min,
+    max: max
+  };
+
+  // 生成中间点
+  for (let i = 1; i < segments; i++) {
+    // 计算对数位置
+    const logValue = logMin + (i / segments) * logRange;
+    // 转换回实际值
+    const value = Math.pow(base, logValue);
+    // 计算百分比位置
+    const percent = (i / segments) * 100;
+    // 保留三位小数百分比
+    const percentKey = percent.toFixed(3) + '%';
+
+    range[percentKey] = value;
+  }
+
+  return range;
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -1119,5 +1173,6 @@ export {
   parseYamlFileFromInput,
   calculateCentroid,
   findPlanesIntersection,
-  filterArray
+  filterArray,
+  generateLogarithmicRange
 };

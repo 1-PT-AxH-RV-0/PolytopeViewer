@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2118],{2118:(s,e,p)=>{s.exports=p.p+"assets/Tip.off"}}]);

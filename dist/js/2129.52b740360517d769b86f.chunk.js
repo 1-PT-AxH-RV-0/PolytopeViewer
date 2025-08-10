@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2129],{2129:function(s,e,f){s.exports=f.p+"assets/Gishi.2fda6f7c872d9185cbb0.off"}}]);

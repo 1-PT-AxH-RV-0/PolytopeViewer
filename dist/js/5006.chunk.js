@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[5006],{2625:(s,e,a)=>{s.exports=a.p+"assets/Triakis_icosahedron.off"}}]);

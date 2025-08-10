@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6909],{6909:function(s,f,e){s.exports=e.p+"assets/Righi.1285b1fa15510f9346f4.off"}}]);

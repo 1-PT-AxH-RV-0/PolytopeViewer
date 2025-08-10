@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[8315],{8315:(e,s,o)=>{e.exports=o.p+"assets/Trigyrate_rhombicosidodecahedron.off"}}]);
