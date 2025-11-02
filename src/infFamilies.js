@@ -85,16 +85,40 @@ function prism(n, s = 1) {
  * 生成 n 角反角柱的网格数据。
  * @param {number} n - 多边形的边数。
  * @param {number} s - 多边形的步长。
- * @returns {type.NonTriMesh3D} 网格数据对象。
+ * @returns {{data: type.NonTriMesh3D, neverRegular: boolean}} 网格数据对象和是否为正的。
  */
 function antiprism(n, s = 1) {
+  const res = {
+    neverRegular: false,
+    data: null
+  };
   const gcd = getGCD(n, s);
   const offset = n % 2 === 0 ? (Math.PI * 1) / n : 0;
 
-  const polygon_edge_length = 2 * Math.sin((Math.PI * s) / n);
-  const height = Math.sqrt(
-    polygon_edge_length ** 2 - 2 * (1 - Math.cos((Math.PI * s) / n))
+  // 正反角柱高度公式
+  /*
+  推导过程：
+
+  令正整数 n, s (n ≥ 3, s < n) 和正实数 h，
+  再令：
+  l = 2sin(sπ/n),
+  f(a, θ)=(a.x cosθ + a.z sinθ, a.y, -a.x sinθ + a.z cosθ),
+  p = (0, h/2, 1),
+  q = f(p, sπ/n),
+  d = distance(p, (q.x, -q.y, q.z))
+
+  解关于 h 的方程 d = l 即可得到下面这个式子。
+  注：方程仅在 s < 2n/3 时有实解。
+  */
+  let height = Math.sqrt(2) * Math.sqrt(
+      Math.cos(Math.PI * s / n) -
+      Math.cos(2 * Math.PI * s / n)
   );
+  
+  if (Number.isNaN(height)) {
+    height = 1;
+    res.neverRegular = true;
+  }
 
   const vertices = [];
   for (const sign of [1, -1]) {
@@ -128,7 +152,9 @@ function antiprism(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  return { vertices, faces, edges };
+  res.data = { vertices, faces, edges };
+
+  return res;
 }
 
 /**
@@ -189,15 +215,10 @@ function trapezohedron(n, s = 1) {
  * @param {number} n - 多边形的边数。
  * @param {number} a - 第一个基的步长。
  * @param {number} b - 第二个基的步长。
- * @throws {Error} - 当为退化情况（a=b 或 a+b>=n）时抛出。
  * @returns {type.NonTriMesh3D} 网格数据对象。
  */
 function stephanoid(n, a, b) {
-  if (a === b || a + b >= n) {
-    throw new Error('这个参数会生成退化的冠体。');
-  }
-
-  const vertices = (isOdd(a - b) ? antiprism(n) : prism(n)).vertices;
+  const vertices = (isOdd(a - b) ? antiprism(n).data : prism(n)).vertices;
 
   if (a > b) {
     [a, b] = [b, a];
