@@ -469,7 +469,7 @@ class PolytopeRendererApp {
    * @param {string} msg - 错误信息。
    */
   triggerErrorDialog(msg) {
-    this.errorMsg.innerText = msg;
+    this.errorMsg.innerHTML = msg;
     this.errorModalBs.show();
   }
 
@@ -1518,8 +1518,17 @@ class PolytopeRendererApp {
    * 设置立体无限家族的事件监听器。
    */
   setupSolidInfFamiliesEventListeners() {
+    const sGeNErrorHtml = '<math><mi>s</mi></math> 不能大于等于 <math><mi>n</mi></math>。';
+    const sGeNErrorText = 's 不能大于等于 n。';
     this.genPrismBtn.addEventListener('click', async () => {
       const [n, s] = this.prismNInput.value.split('/').map(i => +i);
+      
+      if (s >= n) {
+        this.triggerErrorDialog(sGeNErrorHtml);
+        console.error(sGeNErrorText);
+        return;
+      }
+      
       await this.loadMeshFromData(
         infFamilies.prism(n, s),
         this.initialMaterial
@@ -1528,14 +1537,33 @@ class PolytopeRendererApp {
 
     this.genAntiprismBtn.addEventListener('click', async () => {
       const [n, s] = this.antiprismNInput.value.split('/').map(i => +i);
+      
+      if (s >= n) {
+        this.triggerErrorDialog(sGeNErrorHtml);
+        console.error(sGeNErrorText);
+        return;
+      }
+      
+      const res = infFamilies.antiprism(n, s);
+      if (res.neverRegular) {
+        this.triggerErrorDialog('当 <math><mi>s</mi> <mo>&ge;</mo> <mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>3</mn></mfrac></math> 时，将无法得到正反角柱，将使用 1 作为高度。');
+      }
+
       await this.loadMeshFromData(
-        infFamilies.antiprism(n, s),
+        res.data,
         this.initialMaterial
       );
     });
 
     this.genTrapezohedronBtn.addEventListener('click', async () => {
       const [n, s] = this.trapezohedronNInput.value.split('/').map(i => +i);
+      
+      if (s >= n) {
+        this.triggerErrorDialog(sGeNErrorHtml);
+        console.error(sGeNErrorText);
+        return;
+      }
+      
       await this.loadMeshFromData(
         infFamilies.trapezohedron(n, s),
         this.initialMaterial
@@ -1546,6 +1574,13 @@ class PolytopeRendererApp {
       const n = +this.stephanoidNInput.value;
       const a = +this.stephanoidAInput.value;
       const b = +this.stephanoidBInput.value;
+      
+      if (a === b || a + b >= n) {
+        this.triggerErrorDialog('<math><mi>a</mi> <mo>&equals;</mo> <mi>b</mn></math> 或 <math><mi>a</mi> <mo>&plus;</mo> <mi>b</mi> <mo>&ge;</mo> <mi>n</mi></math> 会生成退化的冠体。');
+        console.error('a = b 或 a + b ≥ n 会生成退化的冠体。');
+        return;
+      }
+      
       try {
         await this.loadMeshFromData(
           infFamilies.stephanoid(n, a, b),
@@ -1560,6 +1595,19 @@ class PolytopeRendererApp {
     this.genDuoprismBtn.addEventListener('click', async () => {
       const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
       const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);
+      
+      if (s1 >= m) {
+        this.triggerErrorDialog('<math><msub><mi>s</mi><mn>1</mn></msub></math> 不能大于等于 <math><mi>m</mi></math>。');
+        console.error('s1 不能大于等于 m。');
+        return;
+      }
+
+      if (s2 >= n) {
+        this.triggerErrorDialog('<math><msub><mi>s</mi><mn>2</mn></msub></math> 不能大于等于 <math><mi>n</mi></math>。');
+        console.error('s2 不能大于等于 n。');
+        return;
+      }
+      
       try {
         await this.loadMeshFrom4Data(
           infFamilies.duoprism(m, n, s1, s2),
