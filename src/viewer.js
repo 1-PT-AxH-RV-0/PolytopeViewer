@@ -63,6 +63,7 @@ class PolytopeRendererApp {
     this.stopRecordBtn = null;
     this.configFileInput = null;
     this.highlightCellsBtn = null;
+    this.highlightFacesBtn = null
     this.rotationSliders = [];
 
     this.errorModal = null;
@@ -128,17 +129,19 @@ class PolytopeRendererApp {
     this.faces = [];
     this.facesMap = {};
     this.nHedraInCells = {};
+    this.ngonsInFaces = {};
     this.highlightedPartGroup = new THREE.Group();
 
     // 其他变量。
     this.loadMeshPromise = null;
     this.is4D = false;
     this.scaleFactor = 1;
-    this.initialMaterial = new THREE.MeshPhongMaterial({
-      color: 0x555555,
-      specular: 0x222222,
-      shininess: 50,
-      flatShading: true
+    this.initialMaterial = new THREE.MeshStandardMaterial({
+        color: 0x555555,
+        roughness: 0.7,
+        metalness: 0.1,
+        flatShading: true,
+        emissive: 0x000000
     });
     this.editor = null;
     this.errorModalBs = null;
@@ -231,6 +234,7 @@ class PolytopeRendererApp {
     this.stopRecordBtn = document.getElementById('stopRecord');
     this.configFileInput = document.getElementById('configFileInput');
     this.highlightCellsBtn = document.getElementById('highlightCells');
+    this.highlightFacesBtn = document.getElementById('highlightFaces');
     
     this.errorModal = document.getElementById('errorModal');
     this.errorMsg = document.getElementById('errorMsg');
@@ -361,7 +365,7 @@ class PolytopeRendererApp {
     this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
     this.camera.position.set(0, 0, 120);
   }
-
+  
   /**
    * 向场景中添加方向光和环境光。
    */
@@ -723,7 +727,9 @@ class PolytopeRendererApp {
     this.faces = meshData.faces;
     this.facesMap = meshData.facesMap;
     this.nHedraInCells = {};
+    this.ngonsInFaces = {};
     this.highlightedPartGroup.clear();
+    this.ngonsInFaces = meshData.ngonsInFaces;
 
     if (this.solidGroup) {
       helperFunc.disposeGroup(this.solidGroup);
@@ -790,7 +796,9 @@ class PolytopeRendererApp {
     this.cells = meshData.cells;
     this.faces = meshData.faces;
     this.facesMap = meshData.facesMap;
+    this.ngonsInFaces = {};
     this.nHedraInCells = {};
+    this.highlightedPartGroup.clear();
     meshData.cells.forEach((cell, cellIdx) => {
       if (Object.hasOwnProperty.call(this.nHedraInCells, cell.facesCount)) {
         this.nHedraInCells[cell.facesCount].push(cellIdx);
@@ -798,7 +806,7 @@ class PolytopeRendererApp {
         this.nHedraInCells[cell.facesCount] = [cellIdx];
       }
     });
-
+    
     if (this.solidGroup) {
       helperFunc.disposeGroup(this.solidGroup);
       this.scene.remove(this.solidGroup);
@@ -823,6 +831,7 @@ class PolytopeRendererApp {
       vertices4D[i * 4 + 1] = v.y;
       vertices4D[i * 4 + 2] = v.z;
       vertices4D[i * 4 + 3] = v.w;
+      const dist = v.x ** 2 + v.y ** 2 + v.z **2 + v.w ** 2
     });
     geometry.setAttribute(
       'position4D',
@@ -1242,6 +1251,80 @@ class PolytopeRendererApp {
       );
     }
   }
+  
+  /**
+   * 高亮面。
+   * @param {object} highlightConfig - 要高亮的面的配置对象。
+   * @throws {Error} - 当配置对象中描述的面不存在时抛出，包含具体的位置。（未完成）
+   */
+  highlightFaces(highlightConfig) {
+    this.highlightedPartGroup.clear();
+    for (const [color, facesSelectorConfig] of Object.entries(
+      highlightConfig
+    )) {
+      if (!/^[0-9a-fA-F]{8}$/.test(color))
+        throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
+
+      const highlightedPartGeo = this.facesGroup.geometry.clone();
+      const highlightedPartMaterial = shaderCompCallback.faceMaterial3D(
+        this.facesGroup.material,
+        this.rotUni,
+        this.ofs3Uni
+      );
+      const colorNum = parseInt(color, 16);
+      const rgb = colorNum >>> 8;
+      const a = colorNum & 0xff;
+      highlightedPartMaterial.color.set(rgb);
+      highlightedPartMaterial.transparent = a === 255 ? false : true;
+      highlightedPartMaterial.opacity = a / 255;
+      highlightedPartMaterial.visible = true;
+      
+      if (facesSelectorConfig === 'all') {
+        const indices = [];
+        this.faces.forEach(face => indices.push(...face));
+        highlightedPartGeo.setIndex(indices);
+        highlightedPartGeo.computeVertexNormals();
+        this.highlightedPartGroup.add(
+          new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
+        );
+
+        continue;
+      }
+      
+      const highlightFacesIdx = [];
+      if (Object.hasOwnProperty.call(facesSelectorConfig, 'indices')) {
+        for (const index of facesSelectorConfig.indices) {
+          if (!this.facesMap[index]) {
+            throw new Error(`索引为 ${index} 的面不存在。`);
+          }
+        }
+        highlightFacesIdx.push(...facesSelectorConfig.indices);
+      }
+      
+      if (Object.hasOwnProperty.call(facesSelectorConfig, 'ngons')) {
+        console.log(this.ngonsInFaces)
+        for (const n of facesSelectorConfig.ngons) {
+          if (!Object.hasOwnProperty.call(this.ngonsInFaces, n)) {
+            throw new Error(`${n} 边形的面不存在。`)
+          }
+          highlightFacesIdx.push(...this.ngonsInFaces[n])
+        }
+      }
+      
+      const indices = [];
+      for (const faceIndex of highlightFacesIdx) {
+        for (const triangleFacesIndex of this.facesMap[faceIndex]) {
+          indices.push(...this.faces[triangleFacesIndex]);
+        }
+      }
+
+      highlightedPartGeo.setIndex(indices);
+      highlightedPartGeo.computeVertexNormals();
+      this.highlightedPartGroup.add(
+        new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
+      );
+    }
+  }
 
   /**
    * 根据 UI 控件的状态更新模型的可见性、面不透明度、Uniform 值、摄像头模式以及线框和顶点的尺寸。
@@ -1364,6 +1447,7 @@ class PolytopeRendererApp {
     const enableStringBy4D = this.is4D ? 'enable' : 'disable';
     this.projectionDistanceSlider.noUiSlider[enableStringBy4D]();
     this.schleSwitcher.disabled = !this.is4D;
+    this.highlightFacesBtn.disabled = this.is4D;
     this.highlightCellsBtn.disabled = !this.is4D;
     this.rotationSliders[2].noUiSlider[enableStringBy4D]();
     this.rotationSliders[4].noUiSlider[enableStringBy4D]();
@@ -1480,6 +1564,17 @@ class PolytopeRendererApp {
         this.faceVisibleSwitcher.checked = false;
         this.updateProperties();
         this.highlightCells(highlightConfig);
+      } catch (e) {
+        this.triggerErrorDialog(e.message);
+        console.error(e);
+      }
+    });
+    this.highlightFacesBtn.addEventListener('click', () => {
+      try {
+        const highlightConfig = YAML.load(this.editor.state.doc.toString());
+        this.faceVisibleSwitcher.checked = false;
+        this.updateProperties();
+        this.highlightFaces(highlightConfig);
       } catch (e) {
         this.triggerErrorDialog(e.message);
         console.error(e);
@@ -1707,6 +1802,9 @@ class PolytopeRendererApp {
         this.recordConfig.initialSchleProjEnable ?? !this.isOrthoUni.value,
       highlightConfig:
         this.recordConfig.initialHighlightConfig ??
+        YAML.load(this.editor.state.doc.toString()),
+      highlightFacesConfig:
+        this.recordConfig.initialHighlightFacesConfig ??
         YAML.load(this.editor.state.doc.toString())
     };
 
@@ -1830,6 +1928,7 @@ class PolytopeRendererApp {
 
     this.toggleCamera(cameraIsPersp);
     this.highlightCells(this.recordStates.highlightConfig);
+    this.highlightFaces(this.recordStates.highlightFacesConfig);
 
     this.render();
   }
@@ -1911,6 +2010,9 @@ class PolytopeRendererApp {
         case 'highlightCells':
           this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
           this.recordStates.highlightConfig = action.highlightConfig;
+        case 'highlightFaces':
+          this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
+          this.recordStates.highlightFacesConfig = action.highlightConfig;
       }
     }
   }

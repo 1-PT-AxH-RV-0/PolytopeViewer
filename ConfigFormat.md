@@ -2,19 +2,20 @@
 
 ## 初始配置参数
 
-| 参数名                  | 类型              | 说明                        | 约束条件                                                                   |
-|-------------------------|-------------------|-----------------------------|----------------------------------------------------------------------------|
-| initialRot              | number[]          | 初始旋转角度                | 必须为包含 6 个实数的数组，索引 2、4、5 上的值在非 4D 模式下必须为 0       |
-| initialOfs              | number[]          | 初始偏移量（4D）            | 必须为包含 4 个实数的数组，只在 4D 模式下可用                              |
-| initialOfs3             | number[]          | 初始偏移量（3D）            | 必须为包含 3 个实数的数组                                                  |
-| initialVerticesEdgesDim | number            | 边和顶点的初始尺寸          | 必须为正实数                                                               |
-| initialProjDist         | number            | 初始投影距离（4D）          | 必须为正实数，只在 4D 模式下可用                                           |
-| initialFaceOpacity      | number            | 初始面透明度                | 必须为 0~1 之间的实数                                                      |
-| initialVisibilities     | object            | 初始可见性设置              | 键必须是 'faces'/'wireframe'/'vertices'/'axes'，值为布尔值                 |
-| initialCameraProjMethod | string            | 初始相机投影方法            | 必须是 'persp' 或 'ortho'                                                  |
-| initialSchleProjEnable  | boolean           | 是否启用施菜格尔投影（4D）  | 必须为布尔值，只在 4D 模式下可用                                           |
-| initialHighlightConfig  | object            | 初始胞高亮配置              | 必须符合 [高亮配置文件](HighlightConfigFormat.md) 格式，只在 4D 模式下可用 |
-| endExtraFrames          | number            | 末尾的额外帧数，默认 30(1s) | 必须为自然数                                                               |
+| 参数名                      | 类型              | 说明                        | 约束条件                                                                              |
+|-----------------------------|-------------------|-----------------------------|---------------------------------------------------------------------------------------|
+| initialRot                  | number[]          | 初始旋转角度                | 必须为包含 6 个实数的数组，索引 2、4、5 上的值在非 4D 模式下必须为 0                  |
+| initialOfs                  | number[]          | 初始偏移量（4D）            | 必须为包含 4 个实数的数组，只在 4D 模式下可用                                         |
+| initialOfs3                 | number[]          | 初始偏移量（3D）            | 必须为包含 3 个实数的数组                                                             |
+| initialVerticesEdgesDim     | number            | 边和顶点的初始尺寸          | 必须为正实数                                                                          |
+| initialProjDist             | number            | 初始投影距离（4D）          | 必须为正实数，只在 4D 模式下可用                                                      |
+| initialFaceOpacity          | number            | 初始面透明度                | 必须为 0~1 之间的实数                                                                 |
+| initialVisibilities         | object            | 初始可见性设置              | 键必须是 'faces'/'wireframe'/'vertices'/'axes'，值为布尔值                            |
+| initialCameraProjMethod     | string            | 初始相机投影方法            | 必须是 'persp' 或 'ortho'                                                             |
+| initialSchleProjEnable      | boolean           | 是否启用施菜格尔投影（4D）  | 必须为布尔值，只在 4D 模式下可用                                                      |
+| initialHighlightConfig      | object            | 初始胞高亮配置              | 必须符合 [高亮配置文件](HighlightConfigFormat.md) 格式，只在 4D 模式下可用            |
+| initialHighlightFacesConfig | object            | 初始面高亮配置              | 必须符合 [高亮配置文件](HighlightConfigFormat.md#面高亮配置) 格式，只在 3D 模式下可用 |
+| endExtraFrames              | number            | 末尾的额外帧数，默认 30(1s) | 必须为自然数                                                                          |
 
 ## 动作配置(actions)
 
@@ -41,6 +42,8 @@
 | setCameraProjMethod | projMethod      | string   | 投影方法                                               | 必须是 'persp' 或 'ortho'                                                |
 | setSchleProjEnable  | enable          | boolean  | 是否启用施莱格尔投影（4D）                             | 必须为布尔值（仅 4D 模式可用）                                           |
 | highlightCells      | highlightConfig | object   | 胞高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
+|                     | hideFaces(可选) | boolean  | 是否自动隐藏面，默认 true                              | 必须为布尔值                                                             |
+| highlightFaces      | highlightConfig | object   | 面高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
 |                     | hideFaces(可选) | boolean  | 是否自动隐藏面，默认 true                              | 必须为布尔值                                                             |
 
 ## 注意事项

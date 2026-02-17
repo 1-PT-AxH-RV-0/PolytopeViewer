@@ -59,6 +59,7 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
   let prevPostTime = performance.now();
 
   const facesMap = {};
+  const ngonsInFaces = {};
   faces.forEach((face, faceIndex) => {
     /**
      * 三角剖分单个面。
@@ -106,6 +107,12 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
       trianglesForFaceStartIndex,
       trianglesForFaceEndIndex
     );
+    
+    if (Object.hasOwnProperty.call(ngonsInFaces, face.length)) {
+      ngonsInFaces[face.length].push(faceIndex);
+    } else {
+      ngonsInFaces[face.length] = [faceIndex];
+    }
 
     processedItems++;
     // 每隔 200ms 发送一次进度。
@@ -119,7 +126,8 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
     vertices: processedVertices,
     faces: processedFaces,
     edges,
-    facesMap
+    facesMap,
+    ngonsInFaces
   };
 }
 

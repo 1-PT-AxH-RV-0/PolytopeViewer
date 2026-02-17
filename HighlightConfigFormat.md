@@ -1,6 +1,6 @@
 # highlightConfig 配置格式说明
 
-## 高亮配置参数
+## 胞高亮配置参数
 
 `highlightConfig` 用于配置需要高亮显示的胞。它是一个 `object` 类型，格式如下：
 
@@ -113,7 +113,7 @@ FF0000FF:
 - [示例2](#示例2：按面数选择) 中的胞为绿色
 - [示例3](#示例3：组合选择并排除) 中的胞为半透明蓝色
 
-## JSON Schema
+### JSON Schema
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -237,3 +237,7 @@ FF0000FF:
   "description": "胞高亮配置对象。"
 }
 ```
+
+## 面高亮配置
+
+未完成。
