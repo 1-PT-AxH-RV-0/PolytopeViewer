@@ -1,11 +1,7 @@
 import isOdd from 'is-odd';
 import { chunk } from 'lodash';
 import { getUniqueSortedPairs } from './helperFunc.js';
-import {
-  range,
-  calculateCentroid,
-  findPlanesIntersection
-} from './helperFunc.js';
+import { range } from './helperFunc.js';
 import * as type from './type.js';
 
 /**
@@ -110,11 +106,10 @@ function antiprism(n, s = 1) {
   解关于 h 的方程 d = l 即可得到下面这个式子。
   注：方程仅在 s < 2n/3 时有实解。
   */
-  let height = Math.sqrt(2) * Math.sqrt(
-      Math.cos(Math.PI * s / n) -
-      Math.cos(2 * Math.PI * s / n)
-  );
-  
+  let height =
+    Math.sqrt(2) *
+    Math.sqrt(Math.cos((Math.PI * s) / n) - Math.cos((2 * Math.PI * s) / n));
+
   if (Number.isNaN(height)) {
     height = 1;
     res.neverRegular = true;
@@ -167,21 +162,18 @@ function trapezohedron(n, s = 1) {
   const gcd = getGCD(n, s);
 
   let height =
-    Math.sqrt(2) * Math.sqrt(
-      Math.cos(Math.PI * s / n) -
-      Math.cos(2 * Math.PI * s / n)
-    );
+    Math.sqrt(2) *
+    Math.sqrt(Math.cos((Math.PI * s) / n) - Math.cos((2 * Math.PI * s) / n));
   if (Number.isNaN(height)) {
     height = 1;
   }
   const y =
-    -height *
-    (Math.cos(Math.PI*s/n) + 1) /
-    (2*Math.cos(Math.PI*s/n) - 2);
+    (-height * (Math.cos((Math.PI * s) / n) + 1)) /
+    (2 * Math.cos((Math.PI * s) / n) - 2);
 
   const vertices = [
-    {x: 0, y: y, z: 0},
-    {x: 0, y: -y, z: 0}
+    { x: 0, y: y, z: 0 },
+    { x: 0, y: -y, z: 0 }
   ];
   for (const i of polygonIndexIterator(n, s)) {
     for (const sign of [1, -1]) {
@@ -199,14 +191,14 @@ function trapezohedron(n, s = 1) {
     for (let i = n_ * componentIndex; i < n_ * (componentIndex + 1); i++) {
       const i1 = i * 2;
       const i2 = i1 + 1;
-      const i3 = ((i1 % (2 * n_) + 2) % (2 * n_)) + 2 * n_ * componentIndex;
-      const i4 = ((i1 % (2 * n_) + 3) % (2 * n_)) + 2 * n_ * componentIndex;
+      const i3 = (((i1 % (2 * n_)) + 2) % (2 * n_)) + 2 * n_ * componentIndex;
+      const i4 = (((i1 % (2 * n_)) + 3) % (2 * n_)) + 2 * n_ * componentIndex;
       faces.push([0, i1 + 2, i2 + 2, i3 + 2]);
       faces.push([1, i2 + 2, i3 + 2, i4 + 2]);
     }
   }
 
-  vertices.forEach(v => v.y /= 2);
+  vertices.forEach(v => (v.y /= 2));
 
   const edges = getUniqueSortedPairs(faces).map(edge =>
     edge.map(index => vertices[index])

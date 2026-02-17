@@ -63,7 +63,7 @@ class PolytopeRendererApp {
     this.stopRecordBtn = null;
     this.configFileInput = null;
     this.highlightCellsBtn = null;
-    this.highlightFacesBtn = null
+    this.highlightFacesBtn = null;
     this.rotationSliders = [];
 
     this.errorModal = null;
@@ -137,11 +137,11 @@ class PolytopeRendererApp {
     this.is4D = false;
     this.scaleFactor = 1;
     this.initialMaterial = new THREE.MeshStandardMaterial({
-        color: 0x555555,
-        roughness: 0.7,
-        metalness: 0.1,
-        flatShading: true,
-        emissive: 0x000000
+      color: 0x555555,
+      roughness: 0.7,
+      metalness: 0.1,
+      flatShading: true,
+      emissive: 0x000000
     });
     this.editor = null;
     this.errorModalBs = null;
@@ -365,28 +365,28 @@ class PolytopeRendererApp {
     this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
     this.camera.position.set(0, 0, 120);
   }
-  
+
   /**
    * 向场景中添加方向光和环境光。
    */
   _initializeLights() {
-const ambientLight = new THREE.AmbientLight(0xffffff, 6);
-this.scene.add(ambientLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 6);
+    this.scene.add(ambientLight);
 
-const hemiLight = new THREE.HemisphereLight(0x88ccff, 0xffaa66, 8);
-this.scene.add(hemiLight);
+    const hemiLight = new THREE.HemisphereLight(0x88ccff, 0xffaa66, 8);
+    this.scene.add(hemiLight);
 
-const dirLight = new THREE.DirectionalLight(0xffffff, 10);
-dirLight.position.set(2, 3, 2);
-this.scene.add(dirLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 10);
+    dirLight.position.set(2, 3, 2);
+    this.scene.add(dirLight);
 
-const pointLight1 = new THREE.PointLight(0xffeedd, 8);
-pointLight1.position.set(-2, 1, 2);
-this.scene.add(pointLight1);
+    const pointLight1 = new THREE.PointLight(0xffeedd, 8);
+    pointLight1.position.set(-2, 1, 2);
+    this.scene.add(pointLight1);
 
-const pointLight2 = new THREE.PointLight(0xffffff, 7);
-pointLight2.position.set(1, -1, -2);
-this.scene.add(pointLight2);
+    const pointLight2 = new THREE.PointLight(0xffffff, 7);
+    pointLight2.position.set(1, -1, -2);
+    this.scene.add(pointLight2);
   }
 
   /**
@@ -804,7 +804,7 @@ this.scene.add(pointLight2);
         this.nHedraInCells[cell.facesCount] = [cellIdx];
       }
     });
-    
+
     if (this.solidGroup) {
       helperFunc.disposeGroup(this.solidGroup);
       this.scene.remove(this.solidGroup);
@@ -829,7 +829,6 @@ this.scene.add(pointLight2);
       vertices4D[i * 4 + 1] = v.y;
       vertices4D[i * 4 + 2] = v.z;
       vertices4D[i * 4 + 3] = v.w;
-      const dist = v.x ** 2 + v.y ** 2 + v.z **2 + v.w ** 2
     });
     geometry.setAttribute(
       'position4D',
@@ -1249,7 +1248,7 @@ this.scene.add(pointLight2);
       );
     }
   }
-  
+
   /**
    * 高亮面。
    * @param {object} highlightConfig - 要高亮的面的配置对象。
@@ -1276,7 +1275,7 @@ this.scene.add(pointLight2);
       highlightedPartMaterial.transparent = a === 255 ? false : true;
       highlightedPartMaterial.opacity = a / 255;
       highlightedPartMaterial.visible = true;
-      
+
       if (facesSelectorConfig === 'all') {
         const indices = [];
         this.faces.forEach(face => indices.push(...face));
@@ -1288,7 +1287,7 @@ this.scene.add(pointLight2);
 
         continue;
       }
-      
+
       const highlightFacesIdx = [];
       if (Object.hasOwnProperty.call(facesSelectorConfig, 'indices')) {
         for (const index of facesSelectorConfig.indices) {
@@ -1298,17 +1297,17 @@ this.scene.add(pointLight2);
         }
         highlightFacesIdx.push(...facesSelectorConfig.indices);
       }
-      
+
       if (Object.hasOwnProperty.call(facesSelectorConfig, 'ngons')) {
-        console.log(this.ngonsInFaces)
+        console.log(this.ngonsInFaces);
         for (const n of facesSelectorConfig.ngons) {
           if (!Object.hasOwnProperty.call(this.ngonsInFaces, n)) {
-            throw new Error(`${n} 边形的面不存在。`)
+            throw new Error(`${n} 边形的面不存在。`);
           }
-          highlightFacesIdx.push(...this.ngonsInFaces[n])
+          highlightFacesIdx.push(...this.ngonsInFaces[n]);
         }
       }
-      
+
       const indices = [];
       for (const faceIndex of highlightFacesIdx) {
         for (const triangleFacesIndex of this.facesMap[faceIndex]) {
@@ -1611,17 +1610,18 @@ this.scene.add(pointLight2);
    * 设置立体无限家族的事件监听器。
    */
   setupSolidInfFamiliesEventListeners() {
-    const sGeNErrorHtml = '<math><mi>s</mi></math> 不能大于等于 <math><mi>n</mi></math>。';
+    const sGeNErrorHtml =
+      '<math><mi>s</mi></math> 不能大于等于 <math><mi>n</mi></math>。';
     const sGeNErrorText = 's 不能大于等于 n。';
     this.genPrismBtn.addEventListener('click', async () => {
       const [n, s] = this.prismNInput.value.split('/').map(i => +i);
-      
+
       if (s >= n) {
         this.triggerErrorDialog(sGeNErrorHtml);
         console.error(sGeNErrorText);
         return;
       }
-      
+
       await this.loadMeshFromData(
         infFamilies.prism(n, s),
         this.initialMaterial
@@ -1630,33 +1630,32 @@ this.scene.add(pointLight2);
 
     this.genAntiprismBtn.addEventListener('click', async () => {
       const [n, s] = this.antiprismNInput.value.split('/').map(i => +i);
-      
+
       if (s >= n) {
         this.triggerErrorDialog(sGeNErrorHtml);
         console.error(sGeNErrorText);
         return;
       }
-      
+
       const res = infFamilies.antiprism(n, s);
       if (res.neverRegular) {
-        this.triggerErrorDialog('当 <math><mi>s</mi> <mo>&ge;</mo> <mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>3</mn></mfrac></math> 时，将无法得到正反角柱，将使用 1 作为高度。');
+        this.triggerErrorDialog(
+          '当 <math><mi>s</mi> <mo>&ge;</mo> <mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>3</mn></mfrac></math> 时，将无法得到正反角柱，将使用 1 作为高度。'
+        );
       }
 
-      await this.loadMeshFromData(
-        res.data,
-        this.initialMaterial
-      );
+      await this.loadMeshFromData(res.data, this.initialMaterial);
     });
 
     this.genTrapezohedronBtn.addEventListener('click', async () => {
       const [n, s] = this.trapezohedronNInput.value.split('/').map(i => +i);
-      
+
       if (s >= n) {
         this.triggerErrorDialog(sGeNErrorHtml);
         console.error(sGeNErrorText);
         return;
       }
-      
+
       await this.loadMeshFromData(
         infFamilies.trapezohedron(n, s),
         this.initialMaterial
@@ -1667,13 +1666,15 @@ this.scene.add(pointLight2);
       const n = +this.stephanoidNInput.value;
       const a = +this.stephanoidAInput.value;
       const b = +this.stephanoidBInput.value;
-      
+
       if (a === b || a + b >= n) {
-        this.triggerErrorDialog('<math><mi>a</mi> <mo>&equals;</mo> <mi>b</mn></math> 或 <math><mi>a</mi> <mo>&plus;</mo> <mi>b</mi> <mo>&ge;</mo> <mi>n</mi></math> 会生成退化的冠体。');
+        this.triggerErrorDialog(
+          '<math><mi>a</mi> <mo>&equals;</mo> <mi>b</mn></math> 或 <math><mi>a</mi> <mo>&plus;</mo> <mi>b</mi> <mo>&ge;</mo> <mi>n</mi></math> 会生成退化的冠体。'
+        );
         console.error('a = b 或 a + b ≥ n 会生成退化的冠体。');
         return;
       }
-      
+
       try {
         await this.loadMeshFromData(
           infFamilies.stephanoid(n, a, b),
@@ -1688,19 +1689,23 @@ this.scene.add(pointLight2);
     this.genDuoprismBtn.addEventListener('click', async () => {
       const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
       const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);
-      
+
       if (s1 >= m) {
-        this.triggerErrorDialog('<math><msub><mi>s</mi><mn>1</mn></msub></math> 不能大于等于 <math><mi>m</mi></math>。');
+        this.triggerErrorDialog(
+          '<math><msub><mi>s</mi><mn>1</mn></msub></math> 不能大于等于 <math><mi>m</mi></math>。'
+        );
         console.error('s1 不能大于等于 m。');
         return;
       }
 
       if (s2 >= n) {
-        this.triggerErrorDialog('<math><msub><mi>s</mi><mn>2</mn></msub></math> 不能大于等于 <math><mi>n</mi></math>。');
+        this.triggerErrorDialog(
+          '<math><msub><mi>s</mi><mn>2</mn></msub></math> 不能大于等于 <math><mi>n</mi></math>。'
+        );
         console.error('s2 不能大于等于 n。');
         return;
       }
-      
+
       try {
         await this.loadMeshFrom4Data(
           infFamilies.duoprism(m, n, s1, s2),
@@ -1765,12 +1770,18 @@ this.scene.add(pointLight2);
       console.error(e);
       return;
     }
-    
+
     this.recordConfig.actions.forEach((action, idx, actions) => {
-      if (Object.hasOwnProperty.call(action, 'start') &&
-          Object.hasOwnProperty.call(action, 'end'))
-        actions[idx].interps = (action.interp === 'sin' ? helperFunc.sineInterpolation : helperFunc.linearInterpolation)(action.end - action.start + 1)
-    })
+      if (
+        Object.hasOwnProperty.call(action, 'start') &&
+        Object.hasOwnProperty.call(action, 'end')
+      )
+        actions[idx].interps = (
+          action.interp === 'sin'
+            ? helperFunc.sineInterpolation
+            : helperFunc.linearInterpolation
+        )(action.end - action.start + 1);
+    });
 
     this.isRecordingFlag = true;
     this.updateEnable(false);
@@ -1974,16 +1985,14 @@ this.scene.add(pointLight2);
           );
           break;
         case 'setVerticesEdgesDim':
-          this.recordStates.verticesEdgesDim +=
-            action.dimOfs * interps[prog]
+          this.recordStates.verticesEdgesDim += action.dimOfs * interps[prog];
           if (this.recordStates.verticesEdgesDim <= 0)
             throw new Error(
               `actions[${action.index}] 错误地导致边和顶点的尺寸为负数。`
             );
           break;
         case 'setProjDist':
-          this.recordStates.projDist +=
-            action.projDistOfs * interps[prog];
+          this.recordStates.projDist += action.projDistOfs * interps[prog];
           if (this.recordStates.projDist <= 0)
             throw new Error(
               `actions[${action.index}] 错误地导致投影距离为负数。`
@@ -2012,9 +2021,11 @@ this.scene.add(pointLight2);
         case 'highlightCells':
           this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
           this.recordStates.highlightConfig = action.highlightConfig;
+          break;
         case 'highlightFaces':
           this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
           this.recordStates.highlightFacesConfig = action.highlightConfig;
+          break;
       }
     }
   }
