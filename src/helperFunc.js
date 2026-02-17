@@ -620,6 +620,25 @@ function validateRecordConfig(config, is4D) {
     }
   }
 
+  if (config.initialHighlightFacesConfig !== undefined) {
+    if (is4D)
+      throw new Error('initialHighlightFacesConfig 字段的只在 3D 模式下可用。');
+    for (const [color, facesSelectorConfig] of Object.entries(
+      config.initialHighlightFacesConfig
+    )) {
+      if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+        throw new Error(
+          `initialHighlightFacesConfig 的十六进制 RGBA 色码 ${color} 无效。`
+        );
+      /* 未完成
+        validateFacesSelectorConfig(
+          facesSelectorConfig,
+          `initialHighlightFacesConfig.${color}.`
+        );
+      */
+    }
+  }
+
   if (
     !Array.isArray(config.actions) ||
     config.actions.some(i => !(i instanceof Object))
@@ -720,6 +739,24 @@ function validateRecordConfig(config, is4D) {
             cellsSelectorConfig,
             `actions[${index}].highlightConfig.${color}.`
           );
+        }
+        break;
+      case 'highlightFaces':
+        if (is4D) throw new Error(`actions[${index}] 操作只在三维模式可用。`);
+
+        for (const [color, facesSelectorConfig] of Object.entries(
+          action.highlightConfig
+        )) {
+          if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
+            throw new Error(
+              `actions[${index}].highlightConfig 的十六进制 RGBA 色码 ${color} 无效。`
+            );
+          /* 未完成
+            validateFacesSelectorConfig(
+              facesSelectorConfig,
+              `actions[${index}].highlightConfig.${color}.`
+            );
+          */
         }
         break;
       default:

@@ -180,7 +180,8 @@ function sphereMaterial(
       #include <begin_vertex>
       // 将顶点按球体半径缩放，再加上中心点的 3D 投影
       vec3 center3D = schlegelProjection(rotation4D * center4D + offset4D);
-      transformed = transformed * radius + center3D + offset3D;
+      float radius_scale = length(center3D) / length(center4D);
+      transformed = transformed * radius * radius_scale + center3D + offset3D;
       `
     );
   };
@@ -251,11 +252,22 @@ function cylinderMaterial(
         '#include <begin_vertex>',
         `
       #include <begin_vertex>
-      // 将模型顶点在 x, z 方向缩放至所需半径（让圆柱变粗/细）
-      transformed.x *= radius;
-      transformed.z *= radius;
+      float v1_radius_scale = length(pv1) / length(v1);
+      float v2_radius_scale = length(pv2) / length(v2);
+
       transformed.y += 0.5;
-      // 将顶点旋转平移到合适位置
+      // 判断顶点在哪一头
+      vec3 transformed_simulation = transformCylinderPoint(transformed, pv1, pv2);
+      
+      vec3 diff1 = transformed_simulation - pv1;
+      vec3 diff2 = transformed_simulation - pv2;
+      
+      bool closerToPv1 = dot(diff1, diff1) < dot(diff2, diff2);
+      
+      // 缩放成锥台
+      float radius_scale = closerToPv1 ? v1_radius_scale : v2_radius_scale;
+      transformed.x *= radius * radius_scale;
+      transformed.z *= radius * radius_scale;
       transformed = transformCylinderPoint(transformed, pv1, pv2) + offset3D;
       `
       );
