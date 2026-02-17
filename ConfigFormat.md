@@ -20,11 +20,12 @@
 ## 动作配置(actions)
 
 ### 通用字段
-| 字段      | 类型    | 说明                             | 约束条件                |
-|-----------|---------|----------------------------------|-------------------------|
-| type      | string  | 动作类型                         | 必须是支持的类型之一    |
-| start/end | number  | 动作开始 / 结束帧（部分类型适用）| ≥0 的整数，且 end≥start |
-| at        | number  | 执行动作的帧（部分类型适用）     | ≥0 的整数               |
+| 字段      | 类型              | 说明                             | 约束条件                     |
+|-----------|-------------------|----------------------------------|------------------------------|
+| type      | string            | 动作类型                         | 必须是支持的类型之一         |
+| start/end | number            | 动作开始 / 结束帧（部分类型适用）| ≥0 的整数，且 end≥start      |
+| interp    | 'sin' \| 'linear' | 动作过渡插值函数（部分类型适用） | 正弦插值或线性插值，默认线性 |
+| at        | number            | 执行动作的帧（部分类型适用）     | ≥0 的整数                    |
 
 ### 动作类型说明
 
@@ -53,8 +54,8 @@
   - 要么只有 `at` 字段。
 
 2. 字段适用性:
-  - `start/end` 适用于: rot、trans4、trans3、setVerticesEdgesDim、setProjDist 和 setFaceOpacity；
-  - `at` 适用于: setVisibility、setCameraProjMethod、highlightCells 和 setSchleProjEnable。
+  - `start/end & interp` 适用于: rot、trans4、trans3、setVerticesEdgesDim、setProjDist 和 setFaceOpacity；
+  - `at` 适用于: setVisibility、setCameraProjMethod、highlightCells、highlightFaces 和 setSchleProjEnable。
 
 3. 4D专用功能:
   - initialOfs、initialProjDist、initialSchleProjEnable, initialHighlightConfig；
@@ -104,11 +105,13 @@ actions:
     end: 90
     angle: 180
     plane: 1                     # xz平面（即 y 轴）
+    interp: sin                  # 正弦过渡
   
   - type: trans3                 # 平移动画
     start: 60                    # 从第 60 帧开始
     end: 120                     # 到第 120 帧结束
     ofs: [2, 1, 0]               # x+2, y+1
+    interp: linear               # 线性过渡
   
   - type: setVisibility          # 瞬时动作（显示线框）
     at: 90
@@ -238,286 +241,4 @@ actions:
         exclude: { ranges: [[10, 20]] }
       00FF00AA:
         indices: [30, 35, 40]
-```
-
-## JSON Schema
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "4D/3D几何体录制配置文件",
-  "description": "控制几何体动画录制过程的配置文件",
-  "$defs": {
-    "rangeItem": {
-      "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
-      "items": [
-        { "type": "integer", "minimum": 0 },
-        { "type": "integer", "minimum": 0 }
-      ],
-      "additionalItems": false,
-      "validRange": true
-    },
-    "nHedraItem": {
-      "oneOf": [
-        { "type": "integer", "minimum": 4 },
-        {
-          "type": "object",
-          "properties": {
-            "nFaces": { "type": "integer", "minimum": 4 },
-            "ranges": { "type": "array", "items": { "$ref": "#/$defs/rangeItem" } }
-          },
-          "required": ["nFaces", "ranges"],
-          "additionalProperties": false
-        }
-      ]
-    },
-    "highlightConfig": {
-      "type": "object",
-      "patternProperties": {
-        "^[0-9a-fA-F]{8}$": {
-          "oneOf": [
-            { "type": "string", "const": "all" },
-            {
-              "type": "object",
-              "properties": {
-                "indices": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
-                "ranges": { "type": "array", "items": { "$ref": "#/$defs/rangeItem" } },
-                "nHedra": { "type": "array", "items": { "$ref": "#/$defs/nHedraItem" } },
-                "exclude": { "$ref": "#/$defs/excludeConfig" }
-              },
-              "additionalProperties": false
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "excludeConfig": {
-      "type": "object",
-      "properties": {
-        "indices": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
-        "ranges": { "type": "array", "items": { "$ref": "#/$defs/rangeItem" } },
-        "nHedra": { "type": "array", "items": { "$ref": "#/$defs/nHedraItem" } }
-      },
-      "additionalProperties": false
-    },
-    "actionSchema": {
-      "type": "object",
-      "properties": {
-        "type": { 
-          "type": "string",
-          "enum": [
-            "rot", "trans4", "trans3", "setVerticesEdgesDim",
-            "setProjDist", "setFaceOpacity", "setVisibility",
-            "setCameraProjMethod", "setSchleProjEnable", "highlightCells"
-          ]
-        },
-        "start": { "type": "integer", "minimum": 0 },
-        "end": { "type": "integer", "minimum": 0 },
-        "at": { "type": "integer", "minimum": 0 },
-        "angle": { "type": "number" },
-        "plane": { "type": "integer", "minimum": 0, "maximum": 5 },
-        "ofs": { 
-          "oneOf": [
-            { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
-            { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 }
-          ]
-        },
-        "dimOfs": { "type": "number" },
-        "projDistOfs": { "type": "number" },
-        "faceOpacityOfs": { "type": "number", "minimum": 0, "maximum": 1 },
-        "target": { "type": "string", "enum": ["faces", "wireframe", "vertices", "axes"] },
-        "visibility": { "type": "boolean" },
-        "projMethod": { "type": "string", "enum": ["persp", "ortho"] },
-        "enable": { "type": "boolean" },
-        "highlightConfig": { "$ref": "#/$defs/highlightConfig" },
-        "hideFaces": { "type": "boolean" },
-        "validFieldRange": true
-      },
-      "required": ["type"],
-      "oneOf": [
-        {
-          "properties": {
-            "type": { 
-              "enum": [
-                "rot", "trans4", "trans3", 
-                "setVerticesEdgesDim", "setProjDist", "setFaceOpacity"
-              ]
-            },
-            "required": ["start", "end"],
-            "not": { "required": ["at"] }
-          }
-        },
-        {
-          "properties": {
-            "type": { 
-              "enum": [
-                "setVisibility", "setCameraProjMethod",
-                "setSchleProjEnable", "highlightCells"
-              ]
-            },
-            "required": ["at"],
-            "not": { "required": ["start", "end"] }
-          }
-        }
-      ],
-      "dependencies": {
-        "plane": {
-          "properties": {
-            "type": { "const": "rot" }
-          }
-        },
-        "ofs": {
-          "properties": {
-            "type": { "enum": ["trans4", "trans3"] }
-          }
-        },
-        "dimOfs": {
-          "properties": {
-            "type": { "const": "setVerticesEdgesDim" }
-          }
-        },
-        "projDistOfs": {
-          "properties": {
-            "type": { "const": "setProjDist" }
-          }
-        },
-        "faceOpacityOfs": {
-          "properties": {
-            "type": { "const": "setFaceOpacity" }
-          }
-        },
-        "target": {
-          "properties": {
-            "type": { "const": "setVisibility" }
-          }
-        },
-        "visibility": {
-          "properties": {
-            "type": { "const": "setVisibility" }
-          }
-        },
-        "projMethod": {
-          "properties": {
-            "type": { "const": "setCameraProjMethod" }
-          }
-        },
-        "enable": {
-          "properties": {
-            "type": { "const": "setSchleProjEnable" }
-          }
-        },
-        "highlightConfig": {
-          "properties": {
-            "type": { "const": "highlightCells" }
-          }
-        }
-      }
-    }
-  },
-  "type": "object",
-  "properties": {
-    "initialRot": {
-      "type": "array",
-      "items": { "type": "number" },
-      "minItems": 6,
-      "maxItems": 6,
-      "description": "初始旋转角度(6个数字)"
-    },
-    "initialOfs": {
-      "type": "array",
-      "items": { "type": "number" },
-      "minItems": 4,
-      "maxItems": 4,
-      "description": "4D初始偏移量"
-    },
-    "initialOfs3": {
-      "type": "array",
-      "items": { "type": "number" },
-      "minItems": 3,
-      "maxItems": 3,
-      "description": "3D初始偏移量"
-    },
-    "initialVerticesEdgesDim": {
-      "type": "number",
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "description": "边和顶点初始尺寸"
-    },
-    "initialProjDist": {
-      "type": "number",
-      "minimum": 0,
-      "exclusiveMinimum": true,
-      "description": "4D投影距离"
-    },
-    "initialFaceOpacity": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 1,
-      "description": "初始面透明度"
-    },
-    "initialVisibilities": {
-      "type": "object",
-      "properties": {
-        "faces": { "type": "boolean" },
-        "wireframe": { "type": "boolean" },
-        "vertices": { "type": "boolean" },
-        "axes": { "type": "boolean" }
-      },
-      "additionalProperties": false,
-      "description": "初始可见性设置"
-    },
-    "initialCameraProjMethod": {
-      "type": "string",
-      "enum": ["persp", "ortho"],
-      "description": "初始相机投影方法"
-    },
-    "initialSchleProjEnable": {
-      "type": "boolean",
-      "description": "是否启用施莱格尔投影"
-    },
-    "initialHighlightConfig": {
-      "$ref": "#/$defs/highlightConfig",
-      "description": "初始胞高亮配置"
-    },
-    "endExtraFrames": {
-      "type": "integer",
-      "minimum": 0,
-      "description": "末尾额外帧数"
-    },
-    "actions": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/actionSchema" },
-      "description": "动作序列"
-    }
-  },
-  "additionalProperties": false,
-  "if": {
-    "is4D": true
-  },
-  "then": {
-    "properties": {
-      "initialOfs": false,
-      "initialProjDist": false,
-      "initialSchleProjEnable": false,
-      "initialHighlightConfig": false,
-      "actions": {
-        "items": {
-          "properties": {
-            "type": {
-              "not": { 
-                "enum": ["trans4", "setProjDist", "setSchleProjEnable", "highlightCells"] 
-              }
-            },
-            "plane": {
-              "not": { "enum": [2, 4, 5] }
-            }
-          }
-        }
-      }
-    }
-  },
-  "else": true
-}
 ```

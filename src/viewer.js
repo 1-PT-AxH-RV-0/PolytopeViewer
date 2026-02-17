@@ -1767,6 +1767,12 @@ class PolytopeRendererApp {
       console.error(e);
       return;
     }
+    
+    this.recordConfig.actions.forEach((action, idx, actions) => {
+      if (Object.hasOwnProperty.call(action, 'start') &&
+          Object.hasOwnProperty.call(action, 'end'))
+        actions[idx].interps = (action.interp === 'sin' ? helperFunc.sineInterpolation : helperFunc.linearInterpolation)(action.end - action.start + 1)
+    })
 
     this.isRecordingFlag = true;
     this.updateEnable(false);
@@ -1940,13 +1946,15 @@ class PolytopeRendererApp {
    */
   updateRecordStates(frameIndex) {
     const currrentActions = this.recordConfig.actions.filter(
-      i => (i.start <= frameIndex && frameIndex < i.end) || frameIndex === i.at
+      i => (i.start <= frameIndex && frameIndex <= i.end) || frameIndex === i.at
     );
     for (const action of currrentActions) {
+      const prog = frameIndex - action.start;
+      const interps = action.interps;
       switch (action.type) {
         case 'rot': {
           const rotAng = [0, 0, 0, 0, 0, 0];
-          rotAng[action.plane] = action.angle / (action.end - action.start);
+          rotAng[action.plane] = action.angle * interps[prog];
           if (this.recordStates.rots[action.index]) {
             this.recordStates.rots[action.index].multiply(
               helperFunc.create4DRotationMat(...rotAng)
@@ -1959,21 +1967,17 @@ class PolytopeRendererApp {
         }
         case 'trans4':
           this.recordStates.ofs.add(
-            new THREE.Vector4(...action.ofs).divideScalar(
-              action.end - action.start
-            )
+            new THREE.Vector4(...action.ofs).multiplyScalar(interps[prog])
           );
           break;
         case 'trans3':
           this.recordStates.ofs3.add(
-            new THREE.Vector3(...action.ofs).divideScalar(
-              action.end - action.start
-            )
+            new THREE.Vector3(...action.ofs).multiplyScalar(interps[prog])
           );
           break;
         case 'setVerticesEdgesDim':
           this.recordStates.verticesEdgesDim +=
-            action.dimOfs / (action.end - action.start);
+            action.dimOfs * interps[prog]
           if (this.recordStates.verticesEdgesDim <= 0)
             throw new Error(
               `actions[${action.index}] 错误地导致边和顶点的尺寸为负数。`
@@ -1981,7 +1985,7 @@ class PolytopeRendererApp {
           break;
         case 'setProjDist':
           this.recordStates.projDist +=
-            action.projDistOfs / (action.end - action.start);
+            action.projDistOfs * interps[prog];
           if (this.recordStates.projDist <= 0)
             throw new Error(
               `actions[${action.index}] 错误地导致投影距离为负数。`
@@ -1989,7 +1993,7 @@ class PolytopeRendererApp {
           break;
         case 'setFaceOpacity':
           this.recordStates.faceOpacity +=
-            action.faceOpacityOfs / (action.end - action.start);
+            action.faceOpacityOfs * interps[prog];
           if (
             this.recordStates.faceOpacity < 0 ||
             this.recordStates.faceOpacity > 1

@@ -1,8 +1,8 @@
 # highlightConfig 配置格式说明
 
-## 胞高亮配置参数
+`highlightConfig` 用于配置需要高亮显示的胞/面。它是一个 `object` 类型，格式如下：
 
-`highlightConfig` 用于配置需要高亮显示的胞。它是一个 `object` 类型，格式如下：
+## 胞高亮配置参数
 
 | 参数名 | 类型   | 说明         | 约束条件                                          |
 |--------|--------|--------------|---------------------------------------------------|
@@ -113,131 +113,28 @@ FF0000FF:
 - [示例2](#示例2：按面数选择) 中的胞为绿色
 - [示例3](#示例3：组合选择并排除) 中的胞为半透明蓝色
 
-### JSON Schema
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "胞高亮配置。",
-  "description": "配置需要高亮显示的胞。",
-  "$defs": {
-    "rangeItem": {
-      "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
-      "items": [
-        {
-          "type": "integer",
-          "minimum": 0,
-          "description": "范围起始索引（包含）。"
-        },
-        {
-          "type": "integer",
-          "minimum": 0,
-          "description": "范围结束索引（不包含）。"
-        }
-      ],
-      "additionalItems": false,
-      "validRange": true,
-      "description": "范围 [start, end)。",
-    },
-    "nHedraItem": {
-      "oneOf": [
-        {
-          "type": "integer",
-          "minimum": 4,
-          "description": "按面数选择胞。"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "nFaces": {
-              "type": "integer",
-              "minimum": 4,
-              "description": "胞的面数。"
-            },
-            "ranges": {
-              "type": "array",
-              "items": { "$ref": "#/$defs/rangeItem" },
-              "validRange": true,
-              "description": "选取范围。"
-            }
-          },
-          "required": ["nFaces", "ranges"],
-          "additionalProperties": false,
-          "description": "按面数和范围选择胞。"
-        }
-      ]
-    },
-    "excludeConfig": {
-      "type": "object",
-      "properties": {
-        "indices": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "ranges": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/rangeItem" }
-        },
-        "nHedra": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/nHedraItem" }
-        }
-      },
-      "additionalProperties": false,
-      "description": "排除配置。"
-    },
-    "cellsSelectorConfig": {
-      "oneOf": [
-        {
-          "type": "string",
-          "const": "all",
-          "description": "选择所有胞。"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "indices": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "minimum": 0,
-                "description": "胞索引。"
-              },
-              "description": "直接指定要选择的胞索引数组。"
-            },
-            "ranges": {
-              "type": "array",
-              "items": { "$ref": "#/$defs/rangeItem" },
-              "description": "指定要选择的胞范围数组。"
-            },
-            "nHedra": {
-              "type": "array",
-              "items": { "$ref": "#/$defs/nHedraItem" },
-              "description": "根据面数选择胞。"
-            },
-            "exclude": { "$ref": "#/$defs/excludeConfig" }
-          },
-          "additionalProperties": false,
-          "description": "胞选择器配置对象。"
-        }
-      ]
-    }
-  },
-  "type": "object",
-  "patternProperties": {
-    "^[0-9a-fA-F]{8}$": {
-      "$ref": "#/$defs/cellsSelectorConfig"
-    }
-  },
-  "additionalProperties": false,
-  "description": "胞高亮配置对象。"
-}
+## 面高亮配置参数
+
+| 参数名 | 类型   | 说明         | 约束条件                                          |
+|--------|--------|--------------|---------------------------------------------------|
+| 键     | number | 高亮的颜色   | 满足正则 `^[0-9a-fA-F]{8}$`，即 16 进制 RGBA 色码 |
+| 值     | object | 面选择器配置 | 见 [面选择器配置格式](#面选择器配置格式)          |
+
+### 面选择器配置格式
+
+#### 特殊情况
+
+可以直接为字符串 `"all"`，表示高亮所有面。
+
+#### 包含配置
+
+| 参数名  | 类型     | 说明                       | 约束条件               |
+|---------|----------|----------------------------|------------------------|
+| indices | number[] | 直接指定要选择的面索引数组 | 数组元素必须为非负整数 |
+| ngons   | number[] | 根据边数选择面             | 数字必须为正整数       |
+
+示例：
+```yaml
+AA0000FF: { indices: [0] }
+00FF00FF: { ngons: [4] }
 ```
-
-## 面高亮配置
-
-未完成。

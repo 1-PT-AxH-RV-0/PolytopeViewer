@@ -780,7 +780,8 @@ function validateRecordConfig(config, is4D) {
           'setVisibility',
           'setCameraProjMethod',
           'setSchleProjEnable',
-          'highlightCells'
+          'highlightCells',
+          'highlightFaces'
         ].includes(action.type)
       ) {
         throw new Error(
@@ -798,22 +799,37 @@ function validateRecordConfig(config, is4D) {
           `actions[${index}] 的 start 和 end 字段必须均为大于等于 0 的整数，且 end 大于等于 start。`
         );
       }
+      if (
+        Object.hasOwnProperty.call(action, 'interp') &&
+        action.interp !== 'sin' &&
+        action.interp !== 'linear'
+      ) {
+        throw new Error(
+          `actions[${index}] 的 interp 字段必须为 sin 或 linear。`
+        );
+      }
+          
     } else if (Object.hasOwnProperty.call(action, 'at')) {
       if (
         ![
           'setVisibility',
           'setCameraProjMethod',
           'setSchleProjEnable',
-          'highlightCells'
+          'highlightCells',
+          'highlightFaces'
         ].includes(action.type)
       ) {
         throw new Error(
-          `actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable、highlightCells。`
+          `actions[${index}] 的 at 字段值只适用于以下类型的操作：setVisibility、setCameraProjMethod、setSchleProjEnable、highlightCells, highlightFaces。`
         );
       }
       if (!Number.isInteger(action.at) || action.at < 0)
         throw new Error(
           `actions[${index}] 的 at 字段必须为大于等于 0 的整数。`
+        );
+      if (Object.hasOwnProperty.call(action, 'interp'))
+        throw new Error(
+          `actions[${index}] 为瞬时操，不能用interp字段。`
         );
     } else {
       throw new Error(
@@ -1187,6 +1203,31 @@ function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
   return range;
 }
 
+function sineInterpolation(steps) {
+    const result = [];
+    
+    for (let i = 0; i < steps; i++) {
+        // 当前点的角度（从0到π）
+        const angle1 = (i / steps) * Math.PI;
+        // 下一个点的角度
+        const angle2 = ((i + 1) / steps) * Math.PI;
+        
+        // 计算函数值：sin(x-π/2)/2 + 0.5
+        const val1 = Math.sin(angle1 - Math.PI/2) / 2 + 0.5;
+        const val2 = Math.sin(angle2 - Math.PI/2) / 2 + 0.5;
+        
+        // 两点差值
+        result.push(val2 - val1);
+    }
+    
+    return result;
+}
+
+function linearInterpolation(steps) {
+    const stepValue = 1 / steps;
+    return new Array(steps).fill(stepValue);
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   inverseRotatePoint,
@@ -1211,5 +1252,7 @@ export {
   calculateCentroid,
   findPlanesIntersection,
   filterArray,
-  generateLogarithmicRange
+  generateLogarithmicRange,
+  sineInterpolation,
+  linearInterpolation
 };
