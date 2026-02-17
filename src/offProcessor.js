@@ -107,7 +107,7 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
       trianglesForFaceStartIndex,
       trianglesForFaceEndIndex
     );
-    
+
     if (Object.hasOwnProperty.call(ngonsInFaces, face.length)) {
       ngonsInFaces[face.length].push(faceIndex);
     } else {
