@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6981],{6981:function(s,e,f){s.exports=f.p+"assets/20Oct.33f94b645a3fd36429c2.off"}}]);

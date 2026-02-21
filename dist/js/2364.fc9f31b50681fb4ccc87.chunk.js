@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[2364],{2364:function(s,e,c){s.exports=c.p+"assets/10Oct1st.366842ebda3dca2c5bf3.off"}}]);
