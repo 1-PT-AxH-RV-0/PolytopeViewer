@@ -180,7 +180,7 @@ function sphereMaterial(
       #include <begin_vertex>
       // 将顶点按球体半径缩放，再加上中心点的 3D 投影
       vec3 center3D = schlegelProjection(rotation4D * center4D + offset4D);
-      float radius_scale = length(center3D) / length(center4D);
+      float radius_scale = max(length(center3D) / length(center4D), 0.1);
       transformed = transformed * radius * radius_scale + center3D + offset3D;
       `
     );
@@ -252,8 +252,8 @@ function cylinderMaterial(
         '#include <begin_vertex>',
         `
       #include <begin_vertex>
-      float v1_radius_scale = length(pv1) / length(v1);
-      float v2_radius_scale = length(pv2) / length(v2);
+      float v1_radius_scale = max(length(pv1) / length(v1), 0.1);
+      float v2_radius_scale = max(length(pv2) / length(v2), 0.1);
 
       transformed.y += 0.5;
       // 判断顶点在哪一头

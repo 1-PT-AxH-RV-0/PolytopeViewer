@@ -370,23 +370,31 @@ class PolytopeRendererApp {
    * 向场景中添加方向光和环境光。
    */
   _initializeLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 6);
+    // 环境光 - 基础照明
+    const ambientLight = new THREE.AmbientLight(0xffffff, 3.6);
     this.scene.add(ambientLight);
-
-    const hemiLight = new THREE.HemisphereLight(0x88ccff, 0xffaa66, 8);
-    this.scene.add(hemiLight);
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 10);
-    dirLight.position.set(2, 3, 2);
-    this.scene.add(dirLight);
-
-    const pointLight1 = new THREE.PointLight(0xffeedd, 8);
-    pointLight1.position.set(-2, 1, 2);
-    this.scene.add(pointLight1);
-
-    const pointLight2 = new THREE.PointLight(0xffffff, 7);
-    pointLight2.position.set(1, -1, -2);
-    this.scene.add(pointLight2);
+    
+    // 主光
+    const sunLight = new THREE.DirectionalLight(0xfff5d1, 10.8);
+    sunLight.position.set(3, 5, 4);
+    sunLight.castShadow = true;
+    sunLight.receiveShadow = true;
+    this.scene.add(sunLight);
+    
+    // 背光
+    const backLight = new THREE.DirectionalLight(0xccddff, 4.8);
+    backLight.position.set(-3, 2, -4);
+    this.scene.add(backLight);
+    
+    // 侧面补光
+    const fillLight = new THREE.DirectionalLight(0xffffff, 3.0);
+    fillLight.position.set(-2, 1, 2);
+    this.scene.add(fillLight);
+    
+    // 底部补光
+    const bottomLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    bottomLight.position.set(0, -2, 0);
+    this.scene.add(bottomLight);
   }
 
   /**
