@@ -2,5 +2,6 @@
   "server": {
     "baseDir": "dist",
     "index": "index.html"
-  }
+  },
+  "open": false
 }
