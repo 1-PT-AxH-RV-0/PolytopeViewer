@@ -154,31 +154,30 @@ function getUniqueSortedPairs(arrays) {
  * @throws {Error} 当输入向量太小或线性相关时抛出错误。
  */
 function rotate4DPointsToXY(points) {
-  // 1. 提取前三个点
+  if (points.length < 3) throw new Error('至少需要三个点');
+
   const p0 = points[0];
   const p1 = points[1];
   const p2 = points[2];
 
-  // 2. 计算向量 u 和 v
+  // 计算两个方向向量
   const u = [p1.x - p0.x, p1.y - p0.y, p1.z - p0.z, p1.w - p0.w];
   const v = [p2.x - p0.x, p2.y - p0.y, p2.z - p0.z, p2.w - p0.w];
 
-  // 3. 归一化 u 得到  q1
-  const normU = Math.sqrt(u.reduce((sum, val) => sum + val * val, 0));
-  if (normU < 1e-10) throw new Error('Vector u is too small.');
+  // 归一化 u 得到 q1
+  const normU = Math.hypot(...u);
+  if (normU < 1e-10) throw new Error('向量 u 模长过小');
   const q1 = u.map(x => x / normU);
 
-  // 4. 计算 v 在 u 上的投影并正交化
-  const dotUV = v.reduce((sum, val, i) => sum + val * u[i], 0);
+  // 计算 v 在 u 上的投影并正交化
+  const dotUV = u.reduce((sum, val, i) => sum + val * v[i], 0);
   const projUV = u.map(x => (dotUV / (normU * normU)) * x);
   const vOrtho = v.map((val, i) => val - projUV[i]);
-  const normVOrtho = Math.sqrt(vOrtho.reduce((sum, val) => sum + val * val, 0));
-  if (normVOrtho < 1e-10) throw new Error('Vectors are linearly dependent.');
+  const normVOrtho = Math.hypot(...vOrtho);
+  if (normVOrtho < 1e-10) throw new Error('向量线性相关');
   const q2 = vOrtho.map(x => x / normVOrtho);
 
-  // 5. 构造与 q1,q2 正交的基向量
-  const basis = [q1, q2];
-  const orthoVecs = [];
+  // 构建与 q1, q2 正交的基向量 q3, q4
   const stdBasis = [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
@@ -186,30 +185,45 @@ function rotate4DPointsToXY(points) {
     [0, 0, 0, 1]
   ];
 
+  const basis = [q1, q2];
+  const orthoVecs = [];
+
   for (const e of stdBasis) {
-    let vec = [...e];
+    // Gram-Schmidt 正交化
+    let vec = e.slice();
     for (const b of basis) {
       const dot = vec.reduce((sum, val, i) => sum + val * b[i], 0);
       vec = vec.map((val, i) => val - dot * b[i]);
     }
-    const norm = Math.sqrt(vec.reduce((sum, val) => sum + val * val, 0));
+    const norm = Math.hypot(...vec);
     if (norm > 1e-6) {
-      orthoVecs.push(vec.map(x => x / norm));
-      basis.push(vec.map(x => x / norm));
+      const normalized = vec.map(x => x / norm);
+      orthoVecs.push(normalized);
+      basis.push(normalized);
       if (orthoVecs.length >= 2) break;
     }
   }
 
-  if (orthoVecs.length < 2) throw new Error('Failed to find orthogonal basis');
+  if (orthoVecs.length < 2) throw new Error('无法构造完备标准正交基');
   const [q3, q4] = orthoVecs;
 
-  // 6. 构造旋转矩阵（行向量为 q1, q2, q3, q4）
-  const rotationMatrix = [q1, q2, q3, q4];
+  // 构造旋转矩阵（行向量为 q1, q2, q3, q4）
+  let rotationMatrix = [q1, q2, q3, q4];
 
-  // 7. 应用旋转矩阵
+  // 确保行列式为 +1（纯旋转）
+  const det = compute4x4Determinant(rotationMatrix);
+  if (Math.abs(det - 1) > 1e-8) {
+    if (Math.abs(det + 1) < 1e-8) {
+      // 行列式为 -1，翻转第四行（q4）的符号
+      rotationMatrix[3] = rotationMatrix[3].map(x => -x);
+    } else {
+      throw new Error(`矩阵行列式异常: ${det}`);
+    }
+  }
+
+  // 应用旋转矩阵
   const rotatedPoints = points.map(p => apply4DMatrix(p, rotationMatrix));
 
-  // 8. 提取结果
   const firstRotated = rotatedPoints[0];
   return {
     rotated: rotatedPoints,
@@ -217,6 +231,39 @@ function rotate4DPointsToXY(points) {
     z: firstRotated.z,
     w: firstRotated.w
   };
+}
+
+/**
+ * 计算 4x4 矩阵的行列式（行主序）
+ * @param {type.RotationMatrix} m - 4x4 矩阵
+ * @returns {number} 行列式值
+ */
+function compute4x4Determinant(m) {
+  // 3x3 子式辅助函数
+  function det3x3(m3) {
+    return m3[0][0] * (m3[1][1]*m3[2][2] - m3[1][2]*m3[2][1])
+         - m3[0][1] * (m3[1][0]*m3[2][2] - m3[1][2]*m3[2][0])
+         + m3[0][2] * (m3[1][0]*m3[2][1] - m3[1][1]*m3[2][0]);
+  }
+
+  // 拉普拉斯展开第一行
+  return m[0][0] * det3x3([
+    [m[1][1], m[1][2], m[1][3]],
+    [m[2][1], m[2][2], m[2][3]],
+    [m[3][1], m[3][2], m[3][3]]
+  ]) - m[0][1] * det3x3([
+    [m[1][0], m[1][2], m[1][3]],
+    [m[2][0], m[2][2], m[2][3]],
+    [m[3][0], m[3][2], m[3][3]]
+  ]) + m[0][2] * det3x3([
+    [m[1][0], m[1][1], m[1][3]],
+    [m[2][0], m[2][1], m[2][3]],
+    [m[3][0], m[3][1], m[3][3]]
+  ]) - m[0][3] * det3x3([
+    [m[1][0], m[1][1], m[1][2]],
+    [m[2][0], m[2][1], m[2][2]],
+    [m[3][0], m[3][1], m[3][2]]
+  ]);
 }
 
 /**

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[6219],{6219:function(e,s,t){e.exports=t.p+"assets/Cantitruncated_hecatonicosachoron.676573018b214e72203a.off"}}]);
