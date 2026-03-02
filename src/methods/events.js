@@ -3,34 +3,38 @@ import * as helperFunc from '../helperFunc.js';
 import infFamilies from '../infFamilies.js';
 
 export function setupEventListeners() {
-  this.faceVisibleSwitcher.addEventListener('change', () =>
+  this.faceVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'visible',
       this.faceVisibleSwitcher.checked
     )
-  );
-  this.wireframeVisibleSwitcher.addEventListener('change', () =>
+    this.requestSingleRender();
+  });
+  this.wireframeVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.wireframeGroup,
       'visible',
       this.wireframeVisibleSwitcher.checked
     )
-  );
-  this.verticesVisibleSwitcher.addEventListener('change', () =>
+    this.requestSingleRender();
+  });
+  this.verticesVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.verticesGroup,
       'visible',
       this.verticesVisibleSwitcher.checked
     )
-  );
-  this.axisVisibleSwitcher.addEventListener('change', () =>
+    this.requestSingleRender();
+  });
+  this.axisVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.axesGroup,
       'visible',
       this.axisVisibleSwitcher.checked
     )
-  );
+    this.requestSingleRender();
+  });
   this.scaleFactorSlider.noUiSlider.on('update', () =>
     this.updateScaleFactor(this.scaleFactorSlider.noUiSlider.get(true), false)
   );
@@ -45,6 +49,7 @@ export function setupEventListeners() {
       'transparent',
       +this.faceOpacitySlider.noUiSlider.get(true) !== 1
     );
+    this.requestSingleRender();
   });
   this.wireframeAndVerticesDimSlider.noUiSlider.on('update', () => {
     this.cylinderRadiusUni.value =
@@ -54,6 +59,7 @@ export function setupEventListeners() {
       (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
         this.scaleFactor) *
       2;
+    this.requestSingleRender();
   });
 
   this.projectionDistanceSlider.noUiSlider.on(
@@ -65,6 +71,7 @@ export function setupEventListeners() {
     slider.noUiSlider.on('update', () => {
       this.rotAngles[i] = slider.noUiSlider.get(true);
       this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
+      this.requestSingleRender();
     });
   });
 
@@ -73,7 +80,10 @@ export function setupEventListeners() {
   );
   this.schleSwitcher.addEventListener(
     'change',
-    () => (this.isOrthoUni.value = !this.schleSwitcher.checked)
+    () => {
+      this.isOrthoUni.value = !this.schleSwitcher.checked;
+      this.requestSingleRender();
+    }
   );
 
   this.uploadOffBtn.addEventListener('click', () => this.fileInput.click());
@@ -129,6 +139,28 @@ export function setupEventListeners() {
       );
     });
   });
+  
+  this.canvas.addEventListener('mousedown', () => {
+    this.userInteracting = true;
+    this._onInteractionStart();
+  });
+
+  window.addEventListener('mouseup', () => {
+    this.userInteracting = false;
+    this._onInteractionEnd();
+  });
+
+  this.canvas.addEventListener('touchstart', () => {
+    this.userInteracting = true;
+    this._onInteractionStart();
+  });
+
+  window.addEventListener('touchend', () => {
+    this.userInteracting = false;
+    this._onInteractionEnd();
+  });
+
+  this.canvas.addEventListener('wheel', this._onWheel.bind(this));
 
   this.setupSolidInfFamiliesEventListeners();
 }
@@ -274,4 +306,34 @@ export function handleFileInputChange(e) {
     }
   };
   reader.readAsText(file);
+}
+
+export function _onInteractionStart() {
+  if (this.interactionTimer) {
+    clearTimeout(this.interactionTimer);
+    this.interactionTimer = null;
+  }
+  if (!this.isRenderingFlag) {
+    this.isRenderingFlag = true;
+    this._startLoop();
+  }
+}
+
+export function _onInteractionEnd() {
+  if (this.interactionTimer) clearTimeout(this.interactionTimer);
+  this.interactionTimer = setTimeout(() => {
+    this.interactionTimer = null;
+    if (!this.userInteracting && !this.wheelTimer) {
+      this.isRenderingFlag = false;
+    }
+  }, 250);
+}
+
+export function _onWheel() {
+  this._onInteractionStart();
+  if (this.wheelTimer) clearTimeout(this.wheelTimer);
+  this.wheelTimer = setTimeout(() => {
+    this.wheelTimer = null;
+    this._onInteractionEnd();
+  }, 250);
 }
