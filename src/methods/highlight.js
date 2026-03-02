@@ -191,6 +191,8 @@ export function highlightCells(highlightConfig) {
       new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
     );
   }
+  
+  this.requestSingleRender();
 }
 
 export function highlightFaces(highlightConfig) {
@@ -260,4 +262,6 @@ export function highlightFaces(highlightConfig) {
       new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
     );
   }
+  
+  this.requestSingleRender();
 }

@@ -149,6 +149,11 @@ class PolytopeRendererApp {
     });
     this.editor = null;
     this.errorModalBs = null;
+    
+    this.renderRequested = false;      // 是否有活跃的 requestAnimationFrame
+    this.interactionTimer = null;      // 延迟停止渲染的定时器
+    this.userInteracting = false;      // 鼠标或触摸按下状态
+    this.wheelTimer = null;            // 滚轮停止检测定时器
 
     this.init();
   }
@@ -211,6 +216,7 @@ class PolytopeRendererApp {
 
     this.setupEventListeners();
     this.startRenderLoop();
+    this.requestSingleRender();
   }
 }
 

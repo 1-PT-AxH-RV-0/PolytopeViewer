@@ -44,16 +44,20 @@ export function updateProperties() {
   this.isOrthoUni.value = !this.schleSwitcher.checked;
   this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
   this.ofs3Uni.value = new THREE.Vector3();
+  
+  this.requestSingleRender();
 }
 
 export function updateProjectionDistance() {
   this.projDistUni.value = this.projectionDistanceSlider.noUiSlider.get(true);
+  this.requestSingleRender();
 }
 
 export function updateRotation() {
   const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
   this.rotAngles = rotations;
   this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
+  this.requestSingleRender();
 }
 
 export function updateScaleFactor(scaleFactor, updateSlider = true) {
@@ -66,6 +70,7 @@ export function updateScaleFactor(scaleFactor, updateSlider = true) {
     2;
   if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
   this.axesOffsetScaleUni.value = scaleFactor;
+  this.requestSingleRender();
 }
 
 export function updateEnable(enable = true) {
@@ -125,4 +130,5 @@ export function toggleCamera(isPersp) {
   this.camera.position.copy(oldCamera.position);
   this.camera.rotation.copy(oldCamera.rotation);
   this._initializeControls();
+  this.requestSingleRender();
 }

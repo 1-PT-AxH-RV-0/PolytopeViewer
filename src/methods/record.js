@@ -106,7 +106,9 @@ export async function startRecord() {
     this.highlightCells(YAML.load(this.editor.state.doc.toString()));
 
     this._initializeControls();
-    this.startRenderLoop();
+
+    this.isRenderingFlag = false;
+    this.requestSingleRender();
 
     this.updateEnable();
   };
