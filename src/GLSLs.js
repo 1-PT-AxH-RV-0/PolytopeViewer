@@ -1,57 +1,90 @@
-const transformCylinderPoint = `
-vec3 transformCylinderPoint(vec3 point, vec3 v1, vec3 v2) {
-    // Compute direction and length
+const getCylinderTransform = `
+mat4 getCylinderTransform(vec3 v1, vec3 v2, float radius) {
     vec3 d = v2 - v1;
     float d_length = length(d);
     
-    vec3 d_ = d;
-    d_.y = 0.0;
-    if (length(d_) < 1e-6) {
-      vec3 scaled_point = point * vec3(1.0, d_length, 1.0);
-      if (v2.y > v1.y) return scaled_point + v1;
-      if (v2.y < v1.y) return scaled_point + v2;
-    }
-    
-    // If v1 and v2 are too close, return v1 (or discard)
+    // 如果两端点重合，返回将任意点映射到 v1 的矩阵（线性部分为零）
     if (d_length < 1e-6) {
-        return v1; // Or handle as error
+        return mat4(vec4(0.0), vec4(0.0), vec4(0.0), vec4(v1, 1.0));
     }
-    vec3 d_normalized = d / d_length;
-
-    // Step 1: Scale along y-axis
-    vec3 scaled_point = point * vec3(1.0, d_length, 1.0);
-
-    // Step 2: Rotate y-axis to d_normalized
-    vec3 y_axis = vec3(0.0, 1.0, 0.0);
-    float dot_product = dot(y_axis, d_normalized);
     
-    // Handle parallel cases (dot_product ≈ ±1)
-    if (abs(dot_product) > 0.99999) {
-        if (dot_product < 0.0) {
-            // Opposite direction: rotate 180° around x-axis
-            scaled_point.y = -scaled_point.y; // Equivalent to 180° rotation
-        }
-        // Else: same direction, no rotation needed
-    } else {
-        // General case: compute rotation axis and angle
-        vec3 rotation_axis = normalize(cross(d_normalized, y_axis));
-        float rotation_angle = acos(clamp(dot_product, -1.0, 1.0));
+    // 检查 d 是否几乎平行于 y 轴（水平分量为零）
+    vec3 d_horiz = d;
+    d_horiz.y = 0.0;
+    if (length(d_horiz) < 1e-6) {
+        // 平行情况：先移至原点，再缩放，最后平移
+        mat4 S = mat4(1.0);
+        S[1][1] = d_length;
+        S[0][0] = radius;
+        S[2][2] = radius;
         
-        // Rodrigues' rotation formula
-        float cos_angle = cos(rotation_angle);
-        float sin_angle = sin(rotation_angle);
+        // 平移量根据 v1 和 v2 的 y 坐标决定（与原函数行为一致）
+        vec3 t = (v2.y > v1.y) ? v1 : v2;
+        mat4 T = mat4(1.0);
+        T[3] = vec4(t, 1.0);
+
+        // 移至原点
+        mat4 T2 = mat4(1.0);
+        T2[3] = vec4(0.0, 0.5, 0.0, 1.0);
+        
+        return T * S * T2;
+    }
+    
+    // 一般情况：计算从 y 轴到 d 方向的旋转
+    vec3 d_norm = normalize(d);
+    vec3 y_axis = vec3(0.0, 1.0, 0.0);
+    float dot_prod = dot(y_axis, d_norm);
+    
+    mat4 R; // 旋转矩阵（4x4）
+    
+    // 处理接近平行的情况，避免数值不稳定
+    if (abs(dot_prod) > 0.99999) {
+        if (dot_prod < 0.0) {
+            // 方向相反：绕 x 轴旋转 180°
+            R = mat4(1.0);
+            R[1][1] = -1.0;
+            R[2][2] = -1.0;
+        } else {
+            // 方向相同：单位矩阵
+            R = mat4(1.0);
+        }
+    } else {
+        // 使用罗德里格斯旋转公式构造 3x3 旋转矩阵
+        vec3 axis = normalize(cross(d_norm, y_axis));
+        float angle = acos(clamp(dot_prod, -1.0, 1.0));
+        float c = cos(angle);
+        float s = sin(angle);
         
         mat3 K = mat3(
-            0.0, -rotation_axis.z, rotation_axis.y,
-            rotation_axis.z, 0.0, -rotation_axis.x,
-            -rotation_axis.y, rotation_axis.x, 0.0
+            0.0, -axis.z, axis.y,
+            axis.z, 0.0, -axis.x,
+            -axis.y, axis.x, 0.0
         );
-        mat3 R = mat3(1.0) + sin_angle * K + (1.0 - cos_angle) * (K * K);
-        scaled_point = R * scaled_point;
+        mat3 R3 = mat3(1.0) + s * K + (1.0 - c) * (K * K);
+        
+        // 扩展为 4x4 矩阵
+        R = mat4(vec4(R3[0], 0.0),
+                 vec4(R3[1], 0.0),
+                 vec4(R3[2], 0.0),
+                 vec4(0.0, 0.0, 0.0, 1.0));
     }
-
-    // Step 3: Translate to v1
-    return scaled_point + v1;
+    
+    // 缩放矩阵（沿 y 轴缩放 d_length，xz轴缩放radius）
+    mat4 S = mat4(1.0);
+    S[1][1] = d_length;
+    S[0][0] = radius;
+    S[2][2] = radius;
+    
+    // 平移矩阵（一般情况平移至 v1）
+    mat4 T = mat4(1.0);
+    T[3] = vec4(v1, 1.0);
+    
+    // 平移矩阵2（平移中心至原点）
+    mat4 T2 = mat4(1.0);
+    T2[3] = vec4(0.0, 0.5, 0.0, 1.0);
+    
+    // 组合变换：先移至原点，再缩放，再旋转，最后平移
+    return T * R * S * T2;
 }
 `;
 
@@ -64,5 +97,5 @@ vec3 schlegelProjection(vec4 point4D) {
 
 export default {
   schlegelProjection,
-  transformCylinderPoint
+  getCylinderTransform
 };
