@@ -22,8 +22,7 @@ function createMaterial(color) {
   return new THREE.MeshStandardMaterial({
     color: color,
     roughness: 0.3,
-    metalness: 0.0,
-    flatShading: true
+    metalness: 0.0
   });
 }
 
@@ -63,7 +62,7 @@ function createAxisCylinderMesh(
   offsetScaleUni
 ) {
   const geometry = toBufferGeometry(
-    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 10)
+    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 32)
   );
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
@@ -107,7 +106,7 @@ function createAxisConeMesh(
   ofs3Uni,
   offsetScaleUni
 ) {
-  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 10));
+  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 32));
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
   const lenArr = new Float32Array(vertexCount);

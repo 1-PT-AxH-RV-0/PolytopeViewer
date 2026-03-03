@@ -141,12 +141,13 @@ class PolytopeRendererApp {
     this.is4D = false;
     this.scaleFactor = 1;
     this.initialMaterial = new THREE.MeshStandardMaterial({
-      color: 0x555555,
-      roughness: 0.7,
-      metalness: 0.1,
+      color: 0x50078C,
+      roughness: 0.3,
+      metalness: 0.25,
       flatShading: true,
-      emissive: 0x000000
-    });
+      emissive: 0x112233,
+      emissiveIntensity: 1.0,
+    })
     this.editor = null;
     this.errorModalBs = null;
     
