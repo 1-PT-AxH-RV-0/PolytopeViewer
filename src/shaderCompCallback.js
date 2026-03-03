@@ -61,7 +61,7 @@ function cylinderMaterial3D(material, cylinderRadiusUni, rotUni, ofs3Uni) {
       uniform float radius;
       uniform mat4 rotation4D;
       uniform vec3 offset3D;
-      ${shaderFuncs.transformCylinderPoint}
+      ${shaderFuncs.getCylinderTransform}
       ${shader.vertexShader}
     `;
 
@@ -70,23 +70,22 @@ function cylinderMaterial3D(material, cylinderRadiusUni, rotUni, ofs3Uni) {
         '#include <defaultnormal_vertex>',
         `
       #include <defaultnormal_vertex>
-      // 计算法向量。
-      vec3 transformedV1 = (rotation4D * vec4(v1, 0)).xyz;
-      vec3 transformedV2 = (rotation4D * vec4(v2, 0)).xyz;
+      // 计算旋转后坐标
+      vec3 pv1 = (rotation4D * vec4(v1, 0)).xyz;
+      vec3 pv2 = (rotation4D * vec4(v2, 0)).xyz;
+      // 计算圆柱矩阵
+      mat4 cylinderTransform = getCylinderTransform(pv1, pv2, radius);
+      mat3 cylinderNormalTransform = mat3(transpose(inverse(cylinderTransform)));
       
-      objectNormal = transformCylinderPoint(objectNormal, transformedV1, transformedV2);
-      transformedNormal = normalMatrix * objectNormal;
+      // 计算法线
+      transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
       `
       )
       .replace(
         '#include <begin_vertex>',
         `
       #include <begin_vertex>
-      // 让圆柱变粗/细。
-      transformed.x *= radius;
-      transformed.z *= radius;
-      transformed.y += 0.5;
-      transformed = transformCylinderPoint(transformed, transformedV1, transformedV2);
+      transformed = (cylinderTransform * vec4(transformed, 1)).xyz;
       transformed += offset3D;
       `
       );
@@ -231,7 +230,7 @@ function cylinderMaterial(
       uniform vec3 offset3D;
       
       ${shaderFuncs.schlegelProjection}
-      ${shaderFuncs.transformCylinderPoint}
+      ${shaderFuncs.getCylinderTransform}
       ${shader.vertexShader}
     `;
 
@@ -239,37 +238,34 @@ function cylinderMaterial(
       .replace(
         '#include <defaultnormal_vertex>',
         `
-      #include <defaultnormal_vertex>
-      // 计算 4D 空间中圆柱两端点的投影
-      vec3 pv1 = schlegelProjection(rotation4D * v1 + offset4D);
-      vec3 pv2 = schlegelProjection(rotation4D * v2 + offset4D);
-      // 计算法向量
-      objectNormal = transformCylinderPoint(objectNormal, pv1, pv2);
-      transformedNormal = normalMatrix * objectNormal;
-      `
-      )
-      .replace(
+        #include <defaultnormal_vertex>
+        // 计算 4D 空间中圆柱两端点的投影
+        vec3 pv1 = schlegelProjection(rotation4D * v1 + offset4D);
+        vec3 pv2 = schlegelProjection(rotation4D * v2 + offset4D);
+        
+        // 计算法线
+        mat3 cylinderNormalTransform = mat3(transpose(inverse(getCylinderTransform(pv1, pv2, 0.001))));
+        transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
+        `
+      ).replace(
         '#include <begin_vertex>',
         `
-      #include <begin_vertex>
-      float v1_radius_scale = max(length(pv1) / length(v1), 0.1);
-      float v2_radius_scale = max(length(pv2) / length(v2), 0.1);
-
-      transformed.y += 0.5;
-      // 判断顶点在哪一头
-      vec3 transformed_simulation = transformCylinderPoint(transformed, pv1, pv2);
-      
-      vec3 diff1 = transformed_simulation - pv1;
-      vec3 diff2 = transformed_simulation - pv2;
-      
-      bool closerToPv1 = dot(diff1, diff1) < dot(diff2, diff2);
-      
-      // 缩放成锥台
-      float radius_scale = closerToPv1 ? v1_radius_scale : v2_radius_scale;
-      transformed.x *= radius * radius_scale;
-      transformed.z *= radius * radius_scale;
-      transformed = transformCylinderPoint(transformed, pv1, pv2) + offset3D;
-      `
+        #include <begin_vertex>
+        // 计算两端的缩放
+        float v1_radius_scale = max(length(pv1) / length(v1), 0.1);
+        float v2_radius_scale = max(length(pv2) / length(v2), 0.1);
+        // 判断顶点在哪头并选择正确的缩放
+        mat4 cylinderTransformSimulation = getCylinderTransform(pv1, pv2, 0.001);
+        vec3 transformed_simulation = (cylinderTransformSimulation * vec4(transformed, 1.0)).xyz;
+        vec3 diff1 = transformed_simulation - pv1;
+        vec3 diff2 = transformed_simulation - pv2;
+        bool closerToPv1 = dot(diff1, diff1) < dot(diff2, diff2);
+        float radius_scale = closerToPv1 ? v1_radius_scale : v2_radius_scale;
+        
+        // 计算圆柱矩阵并应用
+        mat4 cylinderTransform = getCylinderTransform(pv1, pv2, radius * radius_scale);
+        transformed = (cylinderTransform * vec4(transformed, 1.0)).xyz + offset3D;
+        `
       );
   };
 
@@ -355,7 +351,7 @@ function axisMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       uniform vec3 offset3D;
       uniform float offsetScale;
       
-      ${shaderFuncs.transformCylinderPoint}
+      ${shaderFuncs.getCylinderTransform}
       ${shader.vertexShader}
     `;
 
@@ -410,7 +406,7 @@ function axisConeMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       uniform vec3 offset3D;
       uniform float offsetScale;
 
-      ${shaderFuncs.transformCylinderPoint}
+      ${shaderFuncs.getCylinderTransform}
       ${shader.vertexShader}
     `;
 
@@ -465,7 +461,7 @@ function axisLabelMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       uniform vec3 offset3D;
       uniform float offsetScale;
 
-      ${shaderFuncs.transformCylinderPoint}
+      ${shaderFuncs.getCylinderTransform}
       ${shader.vertexShader}
     `;
 
