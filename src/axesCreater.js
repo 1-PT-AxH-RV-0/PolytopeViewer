@@ -62,7 +62,7 @@ function createAxisCylinderMesh(
   offsetScaleUni
 ) {
   const geometry = toBufferGeometry(
-    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 32)
+    new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, 1, 128)
   );
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
@@ -106,7 +106,7 @@ function createAxisConeMesh(
   ofs3Uni,
   offsetScaleUni
 ) {
-  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 32));
+  const geometry = toBufferGeometry(new THREE.ConeGeometry(coneRadius, 1, 128));
   const vertexCount = geometry.attributes.position.count;
   const axisArr = new Uint32Array(vertexCount);
   const lenArr = new Float32Array(vertexCount);
