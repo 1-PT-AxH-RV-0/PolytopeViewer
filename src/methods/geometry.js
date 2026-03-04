@@ -8,8 +8,8 @@ export function createWireframeAndVertices(
   {
     cylinderMaterial,
     sphereMaterial,
-    cylinderColor = 0x777777,
-    sphereColor = 0xffd700
+    cylinderColor = 0xB0C4DE,
+    sphereColor = 0xF2C3A7
   } = {}
 ) {
   let defaultCylinderMaterial =
@@ -115,8 +115,8 @@ export function create4DWireframeAndVertices(
   {
     cylinderMaterial,
     sphereMaterial,
-    cylinderColor = 0x777777,
-    sphereColor = 0xffd700
+    cylinderColor = 0xB0C4DE,
+    sphereColor = 0xF2C3A7
   } = {}
 ) {
   let defaultCylinderMaterial =

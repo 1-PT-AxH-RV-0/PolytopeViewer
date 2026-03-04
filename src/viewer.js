@@ -112,7 +112,7 @@ class PolytopeRendererApp {
     this.projDistUni = { value: 2.0 };
     this.isOrthoUni = { value: 0 };
     this.cylinderRadiusUni = { value: 0.5 };
-    this.sphereRadiusUni = { value: 1.0 };
+    this.sphereRadiusUni = { value: 1.5 };
 
     // 渲染用变量。
     this.renderer = null;
@@ -150,11 +150,13 @@ class PolytopeRendererApp {
     })
     this.editor = null;
     this.errorModalBs = null;
+    this.sphereRadiusRatio = 3; // 球与圆柱的半径比
     
-    this.renderRequested = false;      // 是否有活跃的 requestAnimationFrame
-    this.interactionTimer = null;      // 延迟停止渲染的定时器
-    this.userInteracting = false;      // 鼠标或触摸按下状态
-    this.wheelTimer = null;            // 滚轮停止检测定时器
+    // 渲染循环
+    this.renderRequested = false; // 是否有活跃的 requestAnimationFrame
+    this.interactionTimer = null; // 延迟停止渲染的定时器
+    this.userInteracting = false; // 鼠标或触摸按下状态
+    this.wheelTimer = null;       // 滚轮停止检测定时器
 
     this.init();
   }
