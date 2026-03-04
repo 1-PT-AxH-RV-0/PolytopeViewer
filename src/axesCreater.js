@@ -11,7 +11,7 @@ const cylinderRadius = 0.5;
 const coneRadius = 2;
 const coneHeight = 6;
 const textSize = 5;
-const textOffset = 7;
+const textOffset = 4;
 
 /**
  * 创建标准材质。

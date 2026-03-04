@@ -40,7 +40,7 @@ export function updateProperties() {
   this.sphereRadiusUni.value =
     (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
       this.scaleFactor) *
-    2;
+    this.sphereRadiusRatio;
   this.isOrthoUni.value = !this.schleSwitcher.checked;
   this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
   this.ofs3Uni.value = new THREE.Vector3();
@@ -67,7 +67,7 @@ export function updateScaleFactor(scaleFactor, updateSlider = true) {
     this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor;
   this.sphereRadiusUni.value =
     (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor) *
-    2;
+    this.sphereRadiusRatio;
   if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
   this.axesOffsetScaleUni.value = scaleFactor;
   this.requestSingleRender();

@@ -58,7 +58,7 @@ export function setupEventListeners() {
     this.sphereRadiusUni.value =
       (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
         this.scaleFactor) *
-      2;
+      this.sphereRadiusRatio;
     this.requestSingleRender();
   });
 

@@ -165,7 +165,7 @@ export function genFrame(frameIndex) {
   this.rotUni.value = rot;
   this.ofsUni.value = ofs;
   this.ofs3Uni.value = ofs3;
-  this.sphereRadiusUni.value = (verticesEdgesDim * 2) / this.scaleFactor;
+  this.sphereRadiusUni.value = (verticesEdgesDim * this.sphereRadiusRatio) / this.scaleFactor;
   this.cylinderRadiusUni.value = verticesEdgesDim / this.scaleFactor;
   this.projDistUni.value = projDist;
   this.isOrthoUni.value = !schleProjEnable;

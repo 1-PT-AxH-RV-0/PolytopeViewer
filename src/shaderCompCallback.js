@@ -355,25 +355,38 @@ function axisMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       ${shader.vertexShader}
     `;
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `
-      #include <begin_vertex>
-      // 根据 axis 决定投影到四维哪条轴上
-      vec4 v = vec4(0.0);
-      if (axis == 0u) v.x = 1.0;
-      else if (axis == 1u) v.y = 1.0;
-      else if (axis == 2u) v.z = 1.0;
-      else if (axis == 3u) v.w = 1.0;
-      // 投影并计算缩放，使圆柱长度符合 len
-      vec3 vProj = (rotation4D * v).xyz;
-      float s = length(vProj) / length(v);
-      float scale = len / length(vProj) * s;
-      vProj *= scale;
-      // 旋转与平移
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), -vProj + offset4D.xyz * offsetScale, vProj + offset4D.xyz * offsetScale) + offset3D * offsetScale;
-      `
-    );
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <defaultnormal_vertex>',
+        `
+        #include <defaultnormal_vertex>
+        // 根据 axis 决定投影到四维哪条轴上
+        vec4 v = vec4(0.0);
+        if (axis == 0u) v.x = 1.0;
+        else if (axis == 1u) v.y = 1.0;
+        else if (axis == 2u) v.z = 1.0;
+        else if (axis == 3u) v.w = 1.0;
+        // 投影并计算缩放，使圆柱长度符合 len
+        vec3 vProj = (rotation4D * v).xyz;
+        float s = length(vProj) / length(v);
+        float scale = len / length(vProj) * s;
+        vProj *= scale;
+        
+        // 计算圆柱矩阵
+        mat4 cylinderTransform = getCylinderTransform(-vProj + offset4D.xyz * offsetScale, vProj + offset4D.xyz * offsetScale, 1.0);
+        mat3 cylinderNormalTransform = mat3(transpose(inverse(cylinderTransform)));
+        
+        // 计算法线
+        transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
+        `
+      ).replace(
+        '#include <begin_vertex>',
+        `
+        #include <begin_vertex>
+        // 旋转与平移
+        transformed = (cylinderTransform * vec4(position, 1.0)).xyz + offset3D * offsetScale;
+        `
+      );
   };
 
   return material;
@@ -410,25 +423,38 @@ function axisConeMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       ${shader.vertexShader}
     `;
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `
-      #include <begin_vertex>
-      // 同 axisMaterial，但是底部坐标变成了坐标轴圆柱的结束坐标。
-      vec4 v = vec4(0.0);
-      if (axis == 0u) v.x = 1.0;
-      else if (axis == 1u) v.y = 1.0;
-      else if (axis == 2u) v.z = 1.0;
-      else if (axis == 3u) v.w = 1.0;
-      vec3 vProj = (rotation4D * v).xyz;
-      float s = length(vProj) / length(v);
-      float scale1 = len / length(vProj) * s;
-      float scale2 = (len * s + height) / length(vProj);
-      vec3 vProj1 = vProj * scale1;
-      vec3 vProj2 = vProj * scale2;
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale) + offset3D * offsetScale;
-      `
-    );
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <defaultnormal_vertex>',
+        `
+        #include <defaultnormal_vertex>
+        // 同 axisMaterial，但是底部坐标变成了坐标轴圆柱的结束坐标。
+        vec4 v = vec4(0.0);
+        if (axis == 0u) v.x = 1.0;
+        else if (axis == 1u) v.y = 1.0;
+        else if (axis == 2u) v.z = 1.0;
+        else if (axis == 3u) v.w = 1.0;
+        vec3 vProj = (rotation4D * v).xyz;
+        float s = length(vProj) / length(v);
+        float scale1 = len / length(vProj) * s;
+        float scale2 = (len * s + height) / length(vProj);
+        vec3 vProj1 = vProj * scale1;
+        vec3 vProj2 = vProj * scale2;
+        
+        // 计算圆柱矩阵
+        mat4 cylinderTransform = getCylinderTransform(vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale, 1.0);
+        mat3 cylinderNormalTransform = mat3(transpose(inverse(cylinderTransform)));
+        
+        // 计算法线
+        transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
+        `
+      ).replace(
+        '#include <begin_vertex>',
+        `
+        #include <begin_vertex>
+        transformed = (cylinderTransform * vec4(position, 1.0)).xyz + offset3D * offsetScale;
+        `
+      );
   };
 
   return material;
@@ -465,25 +491,39 @@ function axisLabelMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
       ${shader.vertexShader}
     `;
 
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `
-      #include <begin_vertex>
-      // 类似 axisCone，但是往坐标轴方向上偏移了一些。
-      vec4 v = vec4(0.0);
-      if (axis == 0u) v.x = 1.0;
-      else if (axis == 1u) v.y = 1.0;
-      else if (axis == 2u) v.z = 1.0;
-      else if (axis == 3u) v.w = 1.0;
-      vec3 vProj = (rotation4D * v).xyz;
-      float s = length(vProj) / length(v);
-      float scale1 = (len * s + offset) / length(vProj);
-      float scale2 = (len * s + offset + 1.0) / length(vProj);
-      vec3 vProj1 = vProj * scale1;
-      vec3 vProj2 = vProj * scale2;
-      transformed = transformCylinderPoint(position + vec3(0.0, 0.5, 0.0), vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale) + offset3D * offsetScale;
-      `
-    );
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <defaultnormal_vertex>',
+        `
+        #include <defaultnormal_vertex>
+        // 类似 axisCone，但是往坐标轴方向上偏移了一些。
+        vec4 v = vec4(0.0);
+        if (axis == 0u) v.x = 1.0;
+        else if (axis == 1u) v.y = 1.0;
+        else if (axis == 2u) v.z = 1.0;
+        else if (axis == 3u) v.w = 1.0;
+        vec3 vProj = (rotation4D * v).xyz;
+        float s = length(vProj) / length(v);
+        float scale1 = (len * s + offset) / length(vProj);
+        float scale2 = (len * s + offset + 1.0) / length(vProj);
+        vec3 vProj1 = vProj * scale1;
+        vec3 vProj2 = vProj * scale2;
+        
+        // 计算圆柱矩阵
+        mat4 cylinderTransform = getCylinderTransform(vProj1 + offset4D.xyz * offsetScale, vProj2 + offset4D.xyz * offsetScale, 1.0);
+        mat3 cylinderNormalTransform = mat3(transpose(inverse(cylinderTransform)));
+        
+        // 计算法线
+        transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
+        `
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `
+        #include <begin_vertex>
+        transformed = (cylinderTransform * vec4(position, 1.0)).xyz + offset3D * offsetScale;
+        `
+      );
   };
 
   return material;
