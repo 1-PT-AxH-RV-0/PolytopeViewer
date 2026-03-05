@@ -386,6 +386,12 @@ function axisMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
         // 旋转与平移
         transformed = (cylinderTransform * vec4(position, 1.0)).xyz + offset3D * offsetScale;
         `
+      ).replace(
+        '#include <project_vertex>',
+        `
+        #include <project_vertex>
+        gl_Position.z += -1e-5 * (1.0 - length((rotation4D * v).xyz)) * gl_Position.w;
+        `
       );
   };
 

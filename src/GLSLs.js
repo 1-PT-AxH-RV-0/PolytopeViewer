@@ -18,16 +18,20 @@ mat4 getCylinderTransform(vec3 v1, vec3 v2, float radius) {
         S[0][0] = radius;
         S[2][2] = radius;
         
-        // 平移量根据 v1 和 v2 的 y 坐标决定（与原函数行为一致）
-        vec3 t = (v2.y > v1.y) ? v1 : v2;
+        // 若v2在下，则绕z轴转180度
+        mat4 R = mat4(1.0);
+        R[0][0] = (v2.y > v1.y) ? 1.0 : -1.0;
+        R[1][1] = (v2.y > v1.y) ? 1.0 : -1.0;
+        
+        // 平移到v1
         mat4 T = mat4(1.0);
-        T[3] = vec4(t, 1.0);
+        T[3] = vec4(v1, 1.0);
 
         // 移至原点
         mat4 T2 = mat4(1.0);
         T2[3] = vec4(0.0, 0.5, 0.0, 1.0);
         
-        return T * S * T2;
+        return T * R * S * T2;
     }
     
     // 一般情况：计算从 y 轴到 d 方向的旋转
