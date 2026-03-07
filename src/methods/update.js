@@ -7,16 +7,7 @@ export function updateProperties() {
     'visible',
     this.faceVisibleSwitcher.checked
   );
-  helperFunc.changeMaterialProperty(
-    this.wireframeGroup,
-    'visible',
-    this.wireframeVisibleSwitcher.checked
-  );
-  helperFunc.changeMaterialProperty(
-    this.verticesGroup,
-    'visible',
-    this.verticesVisibleSwitcher.checked
-  );
+  this.updateWireframeAndVerticesVisibilities()
   helperFunc.changeMaterialProperty(
     this.axesGroup,
     'visible',
@@ -35,12 +26,14 @@ export function updateProperties() {
   this.toggleCamera(this.perspSwitcher.checked);
 
   this.cylinderRadiusUni.value =
-    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
-    this.scaleFactor;
+    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
   this.sphereRadiusUni.value =
-    (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
-      this.scaleFactor) *
+    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor *
     this.sphereRadiusRatio;
+  this.separationDistUni.value =
+    this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
+  this.faceScaleUni.value =
+    this.faceScaleSlider.noUiSlider.get(true);
   this.isOrthoUni.value = !this.schleSwitcher.checked;
   this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
   this.ofs3Uni.value = new THREE.Vector3();
@@ -53,6 +46,44 @@ export function updateProjectionDistance() {
   this.requestSingleRender();
 }
 
+export function updateWireframeAndVerticesVisibilities() {
+  helperFunc.changeMaterialProperty(
+    this.wireframeGroup,
+    'visible',
+    this.is4D || (this.wireframeVisibleSwitcher.checked && this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1)
+  )
+  helperFunc.changeMaterialProperty(
+    this.verticesGroup,
+    'visible',
+    this.is4D || (this.verticesVisibleSwitcher.checked && this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1)
+  )
+  helperFunc.changeMaterialProperty(
+    this.separatedWireframeGroup,
+    'visible',
+    !this.is4D && this.wireframeVisibleSwitcher.checked && (this.separationDistSlider.noUiSlider.get(true) !== 0 || this.faceScaleSlider.noUiSlider.get(true) !== 1)
+  )
+  helperFunc.changeMaterialProperty(
+    this.separatedVerticesGroup,
+    'visible',
+    !this.is4D && this.verticesVisibleSwitcher.checked && (this.separationDistSlider.noUiSlider.get(true) !== 0 || this.faceScaleSlider.noUiSlider.get(true) !== 1)
+  )
+  
+  this.requestSingleRender();
+}
+
+export function updateSeparationDist() {
+  this.separationDistUni.value =
+    this.separationDistSlider.noUiSlider.get(true) /
+    this.scaleFactor;
+  this.updateWireframeAndVerticesVisibilities()
+}
+
+export function updateFaceScale() {
+  this.faceScaleUni.value =
+    this.faceScaleSlider.noUiSlider.get(true);
+  this.updateWireframeAndVerticesVisibilities()
+}
+
 export function updateRotation() {
   const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
   this.rotAngles = rotations;
@@ -63,13 +94,15 @@ export function updateRotation() {
 export function updateScaleFactor(scaleFactor, updateSlider = true) {
   this.scaleFactor = scaleFactor;
   if (updateSlider) this.scaleFactorSlider.noUiSlider.set(scaleFactor);
-  this.cylinderRadiusUni.value =
-    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor;
-  this.sphereRadiusUni.value =
-    (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / scaleFactor) *
-    this.sphereRadiusRatio;
   if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
   this.axesOffsetScaleUni.value = scaleFactor;
+  this.cylinderRadiusUni.value =
+    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
+  this.sphereRadiusUni.value =
+    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor *
+    this.sphereRadiusRatio;
+  this.separationDistUni.value =
+    this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
   this.requestSingleRender();
 }
 
@@ -107,6 +140,7 @@ export function updateEnable(enable = true) {
     this.updateRotation();
   }
   const enableStringBy4D = this.is4D ? 'enable' : 'disable';
+  const enableStringBy3D = !this.is4D ? 'enable' : 'disable';
   this.projectionDistanceSlider.noUiSlider[enableStringBy4D]();
   this.schleSwitcher.disabled = !this.is4D;
   this.highlightFacesBtn.disabled = this.is4D;
@@ -114,6 +148,7 @@ export function updateEnable(enable = true) {
   this.rotationSliders[2].noUiSlider[enableStringBy4D]();
   this.rotationSliders[4].noUiSlider[enableStringBy4D]();
   this.rotationSliders[5].noUiSlider[enableStringBy4D]();
+  this.separationDistSlider.noUiSlider[enableStringBy3D]();
 
   this.startRecordBtn.disabled = this.isRecordingFlag;
 }

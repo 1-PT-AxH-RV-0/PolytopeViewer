@@ -85,18 +85,20 @@ export async function loadMeshFromData(data, material) {
   this.infoDis.innerText = info;
 
   const {
-    scaleFactor,
     solidGroup,
     facesGroup,
     wireframeGroup,
-    verticesGroup
+    verticesGroup,
+    separatedWireframeGroup,
+    separatedVerticesGroup
   } = this.loadMesh(processedMesh, material);
 
-  this.scaleFactor = scaleFactor;
   this.solidGroup = solidGroup;
   this.facesGroup = facesGroup;
   this.wireframeGroup = wireframeGroup;
   this.verticesGroup = verticesGroup;
+  this.separatedWireframeGroup = separatedWireframeGroup;
+  this.separatedVerticesGroup = separatedVerticesGroup;
 
   this.updateProperties();
 }
@@ -118,14 +120,12 @@ export async function loadMeshFrom4Data(data, material) {
   this.infoDis.innerText = info;
 
   const {
-    scaleFactor,
     solidGroup,
     facesGroup,
     wireframeGroup,
     verticesGroup
   } = this.load4DMesh(processedMesh, material);
 
-  this.scaleFactor = scaleFactor;
   this.solidGroup = solidGroup;
   this.facesGroup = facesGroup;
   this.wireframeGroup = wireframeGroup;
@@ -172,29 +172,6 @@ export function loadMesh(meshData, material) {
   }
   this.updateEnable();
   const container = new THREE.Object3D();
-  const geometry = new THREE.BufferGeometry();
-
-  const vertices = new Float32Array(meshData.vertices.length * 3);
-  meshData.vertices.forEach((v, i) => {
-    vertices[i * 3] = v.x;
-    vertices[i * 3 + 1] = v.y;
-    vertices[i * 3 + 2] = v.z;
-  });
-  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-
-  const indices = [];
-  meshData.faces.forEach(face => indices.push(...face));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-
-  material = shaderCompCallback.faceMaterial3D(
-    material,
-    this.rotUni,
-    this.ofs3Uni
-  );
-  material.side = THREE.DoubleSide;
-
-  const mesh = new THREE.Mesh(geometry, material);
   this.updateScaleFactor(
     40 / helperFunc.getFarthestPointDist(meshData.vertices)
   );
@@ -202,21 +179,25 @@ export function loadMesh(meshData, material) {
   const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
     meshData.edges
   );
+  const { facesGroup, separatedWireframeGroup, separatedVerticesGroup} = this.createSeparatedFacesGroup(meshData, material);
 
-  container.add(mesh);
   container.add(wireframeGroup);
   container.add(verticesGroup);
-  container.scale.setScalar(this.scaleFactor);
+  container.add(separatedWireframeGroup);
+  container.add(separatedVerticesGroup);
+  container.add(facesGroup);
   container.add(this.highlightedPartGroup);
+  container.scale.setScalar(this.scaleFactor);
 
   this.scene.add(container);
 
   return {
-    scaleFactor: this.scaleFactor,
     solidGroup: container,
-    facesGroup: mesh,
+    facesGroup,
     wireframeGroup,
-    verticesGroup
+    verticesGroup,
+    separatedWireframeGroup,
+    separatedVerticesGroup
   };
 }
 
@@ -312,7 +293,6 @@ export function load4DMesh(meshData, material) {
   this.scene.add(container);
 
   return {
-    scaleFactor: this.scaleFactor,
     solidGroup: container,
     facesGroup: mesh,
     wireframeGroup,

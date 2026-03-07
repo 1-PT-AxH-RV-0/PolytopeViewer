@@ -9,7 +9,7 @@ export async function startRecord() {
     this.recordConfig = await helperFunc.parseYamlFileFromInput(
       this.configFileInput
     );
-    helperFunc.validateRecordConfig(this.recordConfig, this.is4D);
+    helperFunc.validateRecordConfig.call(this, this.recordConfig, this.is4D);
   } catch (e) {
     this.triggerErrorDialog(e.message);
     console.error(e);
@@ -21,11 +21,7 @@ export async function startRecord() {
       Object.hasOwnProperty.call(action, 'start') &&
       Object.hasOwnProperty.call(action, 'end')
     )
-      actions[idx].interps = (
-        action.interp === 'sin'
-          ? helperFunc.sineInterpolation
-          : helperFunc.linearInterpolation
-      )(action.end - action.start + 1);
+      actions[idx].interps = this.interpFuncMap.get(action.interp ?? 'linear')(action.end - action.start + 1);
   });
 
   this.isRecordingFlag = true;
@@ -46,6 +42,12 @@ export async function startRecord() {
       this.recordConfig.initialVerticesEdgesDim ??
       this.cylinderRadiusUni.value * this.scaleFactor,
     projDist: this.recordConfig.initialProjDist ?? this.projDistUni.value,
+    separationDist:
+      this.recordConfig.initialSeparationDist ??
+      this.separationDistSlider.noUiSlider.get(true),
+    faceScale:
+      this.recordConfig.initialFaceScale ??
+      this.faceScaleSlider.noUiSlider.get(true),
     faceOpacity:
       this.recordConfig.initialFaceOpacity ??
       +this.faceOpacitySlider.noUiSlider.get(true),
@@ -65,7 +67,10 @@ export async function startRecord() {
       YAML.load(this.editor.state.doc.toString()),
     highlightFacesConfig:
       this.recordConfig.initialHighlightFacesConfig ??
-      YAML.load(this.editor.state.doc.toString())
+      YAML.load(this.editor.state.doc.toString()),
+    scaleFactor:
+      this.recordConfig.initialScaleFactor ??
+      this.scaleFactor
   };
 
   const totalFrames =
@@ -77,14 +82,14 @@ export async function startRecord() {
     ) + (this.recordConfig.endExtraFrames ?? 30);
   this.rotAngles = [0, 0, 0, 0, 0, 0];
   this.rotUni.value = new THREE.Matrix4();
-  this.stopRenderLoop();
   this.controls.dispose();
 
   this.capturer = new CCapture({
     format: 'webm',
     framerate: 30,
     name: 'Animation',
-    verbose: true
+    verbose: true,
+    quality: 75
   });
   this.capturer.start();
 
@@ -103,8 +108,8 @@ export async function startRecord() {
     this.updateProperties();
     this.updateProjectionDistance();
     this.updateRotation();
-    this.highlightCells(YAML.load(this.editor.state.doc.toString()));
-
+    if (this.is4D) this.highlightCells(YAML.load(this.editor.state.doc.toString()));
+    if (!this.is4D) this.highlightFaces(YAML.load(this.editor.state.doc.toString()));
     this._initializeControls();
 
     this.isRenderingFlag = false;
@@ -150,7 +155,10 @@ export function genFrame(frameIndex) {
     faceOpacity,
     visibilities,
     cameraIsPersp,
-    schleProjEnable
+    schleProjEnable,
+    separationDist,
+    faceScale,
+    scaleFactor
   } = this.recordStates;
   const rot = helperFunc
     .getSortedValuesDesc(rots)
@@ -165,10 +173,13 @@ export function genFrame(frameIndex) {
   this.rotUni.value = rot;
   this.ofsUni.value = ofs;
   this.ofs3Uni.value = ofs3;
-  this.sphereRadiusUni.value = (verticesEdgesDim * this.sphereRadiusRatio) / this.scaleFactor;
-  this.cylinderRadiusUni.value = verticesEdgesDim / this.scaleFactor;
+  this.sphereRadiusUni.value = (verticesEdgesDim * this.sphereRadiusRatio) / scaleFactor;
+  this.cylinderRadiusUni.value = verticesEdgesDim / scaleFactor;
   this.projDistUni.value = projDist;
+  this.separationDistUni.value = separationDist / scaleFactor;
+  this.faceScaleUni.value = faceScale;
   this.isOrthoUni.value = !schleProjEnable;
+  this.axesOffsetScaleUni.value = scaleFactor;
 
   helperFunc.changeMaterialProperty(this.facesGroup, 'opacity', faceOpacity);
   helperFunc.changeMaterialProperty(
@@ -179,14 +190,34 @@ export function genFrame(frameIndex) {
 
   /* eslint-disable */
   helperFunc.changeMaterialProperty(this.facesGroup, 'visible', visibilities.faces ?? true);
-  helperFunc.changeMaterialProperty(this.wireframeGroup, 'visible', visibilities.wireframe ?? true);
-  helperFunc.changeMaterialProperty(this.verticesGroup, 'visible', visibilities.vertices ?? true);
+  helperFunc.changeMaterialProperty(
+    this.wireframeGroup,
+    'visible',
+    (visibilities.wireframe ?? true) && (separationDist ?? 0) === 0 && (faceScale ?? 1) === 1
+  )
+  helperFunc.changeMaterialProperty(
+    this.verticesGroup,
+    'visible',
+    (visibilities.vertices ?? true) && (separationDist ?? 0) === 0 && (faceScale ?? 1) === 1
+  )
+  helperFunc.changeMaterialProperty(
+    this.separatedWireframeGroup,
+    'visible',
+    (visibilities.wireframe ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1)
+  )
+  helperFunc.changeMaterialProperty(
+    this.separatedVerticesGroup,
+    'visible',
+    (visibilities.vertices ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1)
+  )
   helperFunc.changeMaterialProperty(this.axesGroup, 'visible', visibilities.axes ?? true);
   /* eslint-enable */
 
   this.toggleCamera(cameraIsPersp);
-  this.highlightCells(this.recordStates.highlightConfig);
-  this.highlightFaces(this.recordStates.highlightFacesConfig);
+  if (this.is4D) this.highlightCells(this.recordStates.highlightConfig);
+  if (!this.is4D) this.highlightFaces(this.recordStates.highlightFacesConfig);
+  
+  if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
 
   this.render();
 }
@@ -236,6 +267,12 @@ export function updateRecordStates(frameIndex) {
             `actions[${action.index}] 错误地导致投影距离为负数。`
           );
         break;
+      case 'setSeparationDist':
+        this.recordStates.separationDist += action.sepDistOfs * interps[prog];
+        break;
+      case 'setFaceScale':
+        this.recordStates.faceScale += action.faceScaleOfs * interps[prog];
+        break;
       case 'setFaceOpacity':
         this.recordStates.faceOpacity +=
           action.faceOpacityOfs * interps[prog];
@@ -261,8 +298,14 @@ export function updateRecordStates(frameIndex) {
         this.recordStates.highlightConfig = action.highlightConfig;
         break;
       case 'highlightFaces':
-        this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
         this.recordStates.highlightFacesConfig = action.highlightConfig;
+        break;
+      case 'setScaleFactor':
+        this.recordStates.scaleFactor += action.scaleFactorOfs * interps[prog];
+        if (this.recordStates.scaleFactor <= 0)
+          throw new Error(
+            `actions[${action.index}] 错误地导致缩放因子非正。`
+          );
         break;
     }
   }

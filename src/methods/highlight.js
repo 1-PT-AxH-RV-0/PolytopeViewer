@@ -3,6 +3,16 @@ import YAML from 'js-yaml';
 import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
+function changeFaceColor(faces, colorInt) {
+  if (faces instanceof THREE.Group) {
+    faces.children.forEach(f => changeFaceColor(f, colorInt))
+  } else if (faces instanceof THREE.Mesh) {
+    faces.material.color.set(colorInt.rgb)
+    faces.material.transparent = colorInt.a !== 1
+    faces.material.opacity = colorInt.a
+  }
+}
+
 export function highlightCells(highlightConfig) {
   this.highlightedPartGroup.clear();
   for (const [color, cellsSelectorConfig] of Object.entries(
@@ -197,35 +207,17 @@ export function highlightCells(highlightConfig) {
 
 export function highlightFaces(highlightConfig) {
   this.highlightedPartGroup.clear();
+  changeFaceColor(this.facesGroup, {rgb: 0, a: 0});
   for (const [color, facesSelectorConfig] of Object.entries(
     highlightConfig
   )) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
 
-    const highlightedPartGeo = this.facesGroup.geometry.clone();
-    const highlightedPartMaterial = shaderCompCallback.faceMaterial3D(
-      this.facesGroup.material,
-      this.rotUni,
-      this.ofs3Uni
-    );
-    const colorNum = parseInt(color, 16);
-    const rgb = colorNum >>> 8;
-    const a = colorNum & 0xff;
-    highlightedPartMaterial.color.set(rgb);
-    highlightedPartMaterial.transparent = a === 255 ? false : true;
-    highlightedPartMaterial.opacity = a / 255;
-    highlightedPartMaterial.visible = true;
+    const colorInt = helperFunc.colorStrToInt(color);
 
     if (facesSelectorConfig === 'all') {
-      const indices = [];
-      this.faces.forEach(face => indices.push(...face));
-      highlightedPartGeo.setIndex(indices);
-      highlightedPartGeo.computeVertexNormals();
-      this.highlightedPartGroup.add(
-        new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
-      );
-
+      changeFaceColor(this.facesGroup, colorInt);
       continue;
     }
 
@@ -249,18 +241,10 @@ export function highlightFaces(highlightConfig) {
       }
     }
 
-    const indices = [];
-    for (const faceIndex of highlightFacesIdx) {
-      for (const triangleFacesIndex of this.facesMap[faceIndex]) {
-        indices.push(...this.faces[triangleFacesIndex]);
-      }
+    for (const idx of highlightFacesIdx) {
+      const face = this.facesGroup.children[idx];
+      changeFaceColor(face, colorInt);
     }
-
-    highlightedPartGeo.setIndex(indices);
-    highlightedPartGeo.computeVertexNormals();
-    this.highlightedPartGroup.add(
-      new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
-    );
   }
   
   this.requestSingleRender();
