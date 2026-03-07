@@ -147,13 +147,13 @@ class PolytopeRendererApp {
     this.is4D = false;
     this.scaleFactor = 1;
     this.initialMaterial = new THREE.MeshStandardMaterial({
-      color: 0x50078C,
-      roughness: 0.3,
-      metalness: 0.25,
+      color: 0x3f7dbd,
+      roughness: 0.2,
+      metalness: 0.1,
+      emissive: 0x000000,
       flatShading: true,
-      emissive: 0x112233,
-      emissiveIntensity: 1.0,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
+      emissiveIntensity: 1
     })
     this.editor = null;
     this.errorModalBs = null;
@@ -221,8 +221,8 @@ class PolytopeRendererApp {
     this._initializeSliders();
     this._initializeRenderer();
     this._initializeScene();
+    this._initializeEnv();
     this._initializeCameras();
-    this._initializeLights();
     this._initializeControls();
     this._initializeEditor();
 

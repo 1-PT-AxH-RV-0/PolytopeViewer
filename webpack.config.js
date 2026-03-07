@@ -66,7 +66,7 @@ module.exports = ({
         }
       },
       {
-        test: /\.off$/i,
+        test: /\.(off|hdr)$/i,
         type: 'asset',
         parser: {
           dataUrlCondition: {
