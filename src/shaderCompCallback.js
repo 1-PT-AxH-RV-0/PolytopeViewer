@@ -7,9 +7,22 @@ import shaderFuncs from './GLSLs.js';
  * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
  * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
  * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param separationDistUni
+ * @param faceScaleUni
+ * @param faceCenterUni
+ * @param faceNormalUni
  * @returns {THREE.Material} - 新材质实例。
  */
-function sphereMaterial3D(material, sphereRadiusUni, rotUni, ofs3Uni, separationDistUni, faceScaleUni, faceCenterUni, faceNormalUni) {
+function sphereMaterial3D(
+  material,
+  sphereRadiusUni,
+  rotUni,
+  ofs3Uni,
+  separationDistUni,
+  faceScaleUni,
+  faceCenterUni,
+  faceNormalUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
@@ -20,7 +33,7 @@ function sphereMaterial3D(material, sphereRadiusUni, rotUni, ofs3Uni, separation
     shader.uniforms.faceScale = faceScaleUni;
     shader.uniforms.faceCenter = faceCenterUni;
     shader.uniforms.faceNormal = faceNormalUni;
-    
+
     shader.vertexShader = `
       attribute vec3 pos;
       uniform float radius;
@@ -55,9 +68,22 @@ function sphereMaterial3D(material, sphereRadiusUni, rotUni, ofs3Uni, separation
  * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
  * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
  * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
+ * @param separationDistUni
+ * @param faceScaleUni
+ * @param faceCenterUni
+ * @param faceNormalUni
  * @returns {THREE.Material} - 新材质实例。
  */
-function cylinderMaterial3D(material, cylinderRadiusUni, rotUni, ofs3Uni, separationDistUni, faceScaleUni, faceCenterUni, faceNormalUni) {
+function cylinderMaterial3D(
+  material,
+  cylinderRadiusUni,
+  rotUni,
+  ofs3Uni,
+  separationDistUni,
+  faceScaleUni,
+  faceCenterUni,
+  faceNormalUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
@@ -114,7 +140,25 @@ function cylinderMaterial3D(material, cylinderRadiusUni, rotUni, ofs3Uni, separa
   return material;
 }
 
-function faceMaterial3D(material, rotUni, ofs3Uni, separationDistUni, faceScaleUni, faceCenterUni, faceNormalUni) {
+/**
+ *
+ * @param material
+ * @param rotUni
+ * @param ofs3Uni
+ * @param separationDistUni
+ * @param faceScaleUni
+ * @param faceCenterUni
+ * @param faceNormalUni
+ */
+function faceMaterial3D(
+  material,
+  rotUni,
+  ofs3Uni,
+  separationDistUni,
+  faceScaleUni,
+  faceCenterUni,
+  faceNormalUni
+) {
   material = material.clone();
 
   material.onBeforeCompile = shader => {
@@ -270,7 +314,8 @@ function cylinderMaterial(
         mat3 cylinderNormalTransform = mat3(transpose(inverse(getCylinderTransform(pv1, pv2, 0.001))));
         transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
         `
-      ).replace(
+      )
+      .replace(
         '#include <begin_vertex>',
         `
         #include <begin_vertex>
@@ -402,14 +447,16 @@ function axisMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
         // 计算法线
         transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
         `
-      ).replace(
+      )
+      .replace(
         '#include <begin_vertex>',
         `
         #include <begin_vertex>
         // 旋转与平移
         transformed = (cylinderTransform * vec4(position, 1.0)).xyz + offset3D * offsetScale;
         `
-      ).replace(
+      )
+      .replace(
         '#include <project_vertex>',
         `
         #include <project_vertex>
@@ -477,7 +524,8 @@ function axisConeMaterial(material, rotUni, ofsUni, ofs3Uni, offsetScaleUni) {
         // 计算法线
         transformedNormal = normalMatrix * cylinderNormalTransform * objectNormal;
         `
-      ).replace(
+      )
+      .replace(
         '#include <begin_vertex>',
         `
         #include <begin_vertex>

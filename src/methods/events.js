@@ -2,23 +2,32 @@ import YAML from 'js-yaml';
 import * as helperFunc from '../helperFunc.js';
 import infFamilies from '../infFamilies.js';
 
+/**
+ *
+ */
 export function setupEventListeners() {
   this.faceVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.facesGroup,
       'visible',
       this.faceVisibleSwitcher.checked
-    )
+    );
     this.requestSingleRender();
   });
-  this.wireframeVisibleSwitcher.addEventListener('change', this.updateWireframeAndVerticesVisibilities.bind(this));
-  this.verticesVisibleSwitcher.addEventListener('change', this.updateWireframeAndVerticesVisibilities.bind(this));
+  this.wireframeVisibleSwitcher.addEventListener(
+    'change',
+    this.updateWireframeAndVerticesVisibilities.bind(this)
+  );
+  this.verticesVisibleSwitcher.addEventListener(
+    'change',
+    this.updateWireframeAndVerticesVisibilities.bind(this)
+  );
   this.axisVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.axesGroup,
       'visible',
       this.axisVisibleSwitcher.checked
-    )
+    );
     this.requestSingleRender();
   });
   this.scaleFactorSlider.noUiSlider.on('update', () =>
@@ -56,10 +65,7 @@ export function setupEventListeners() {
     'update',
     this.updateSeparationDist.bind(this)
   );
-  this.faceScaleSlider.noUiSlider.on(
-    'update',
-    this.updateFaceScale.bind(this)
-  );
+  this.faceScaleSlider.noUiSlider.on('update', this.updateFaceScale.bind(this));
 
   this.rotationSliders.forEach((slider, i) => {
     slider.noUiSlider.on('update', () => {
@@ -72,13 +78,10 @@ export function setupEventListeners() {
   this.perspSwitcher.addEventListener('change', () =>
     this.toggleCamera(this.perspSwitcher.checked)
   );
-  this.schleSwitcher.addEventListener(
-    'change',
-    () => {
-      this.isOrthoUni.value = !this.schleSwitcher.checked;
-      this.requestSingleRender();
-    }
-  );
+  this.schleSwitcher.addEventListener('change', () => {
+    this.isOrthoUni.value = !this.schleSwitcher.checked;
+    this.requestSingleRender();
+  });
 
   this.uploadOffBtn.addEventListener('click', () => this.fileInput.click());
   this.fileInput.addEventListener(
@@ -132,7 +135,7 @@ export function setupEventListeners() {
       );
     });
   });
-  
+
   this.canvas.addEventListener('mousedown', () => {
     this.userInteracting = true;
     this._onInteractionStart();
@@ -158,6 +161,9 @@ export function setupEventListeners() {
   this.setupSolidInfFamiliesEventListeners();
 }
 
+/**
+ *
+ */
 export function setupSolidInfFamiliesEventListeners() {
   const sGeNErrorHtml =
     '<math><mi>s</mi></math> 不能大于等于 <math><mi>n</mi></math>。';
@@ -171,10 +177,7 @@ export function setupSolidInfFamiliesEventListeners() {
       return;
     }
 
-    await this.loadMeshFromData(
-      infFamilies.prism(n, s),
-      this.initialMaterial
-    );
+    await this.loadMeshFromData(infFamilies.prism(n, s), this.initialMaterial);
   });
 
   this.genAntiprismBtn.addEventListener('click', async () => {
@@ -267,6 +270,10 @@ export function setupSolidInfFamiliesEventListeners() {
   });
 }
 
+/**
+ *
+ * @param e
+ */
 export function handleFileInputChange(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -301,6 +308,9 @@ export function handleFileInputChange(e) {
   reader.readAsText(file);
 }
 
+/**
+ *
+ */
 export function _onInteractionStart() {
   if (this.interactionTimer) {
     clearTimeout(this.interactionTimer);
@@ -312,6 +322,9 @@ export function _onInteractionStart() {
   }
 }
 
+/**
+ *
+ */
 export function _onInteractionEnd() {
   if (this.interactionTimer) clearTimeout(this.interactionTimer);
   this.interactionTimer = setTimeout(() => {
@@ -323,6 +336,9 @@ export function _onInteractionEnd() {
   }, 250);
 }
 
+/**
+ *
+ */
 export function _onWheel() {
   this._onInteractionStart();
   if (this.wheelTimer) clearTimeout(this.wheelTimer);

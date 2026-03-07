@@ -1,5 +1,6 @@
-import * as THREE from 'three';
-
+/**
+ *
+ */
 export function render() {
   this.controls.update();
   this.renderer.render(this.scene, this.camera);

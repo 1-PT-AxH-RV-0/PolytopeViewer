@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import YAML from 'js-yaml';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
-import WebMWriter from 'webm-writer';
 import * as helperFunc from '../helperFunc.js';
 
+/**
+ *
+ */
 export async function startRecord() {
   try {
     this.recordConfig = await helperFunc.parseYamlFileFromInput(
@@ -21,7 +23,9 @@ export async function startRecord() {
       Object.hasOwnProperty.call(action, 'start') &&
       Object.hasOwnProperty.call(action, 'end')
     )
-      actions[idx].interps = this.interpFuncMap.get(action.interp ?? 'linear')(action.end - action.start + 1);
+      actions[idx].interps = this.interpFuncMap.get(action.interp ?? 'linear')(
+        action.end - action.start + 1
+      );
   });
 
   this.isRecordingFlag = true;
@@ -68,9 +72,7 @@ export async function startRecord() {
     highlightFacesConfig:
       this.recordConfig.initialHighlightFacesConfig ??
       YAML.load(this.editor.state.doc.toString()),
-    scaleFactor:
-      this.recordConfig.initialScaleFactor ??
-      this.scaleFactor
+    scaleFactor: this.recordConfig.initialScaleFactor ?? this.scaleFactor
   };
 
   const totalFrames =
@@ -108,8 +110,10 @@ export async function startRecord() {
     this.updateProperties();
     this.updateProjectionDistance();
     this.updateRotation();
-    if (this.is4D) this.highlightCells(YAML.load(this.editor.state.doc.toString()));
-    if (!this.is4D) this.highlightFaces(YAML.load(this.editor.state.doc.toString()));
+    if (this.is4D)
+      this.highlightCells(YAML.load(this.editor.state.doc.toString()));
+    if (!this.is4D)
+      this.highlightFaces(YAML.load(this.editor.state.doc.toString()));
     this._initializeControls();
 
     this.isRenderingFlag = false;
@@ -143,6 +147,10 @@ export async function startRecord() {
   _renderLoop();
 }
 
+/**
+ *
+ * @param frameIndex
+ */
 export function genFrame(frameIndex) {
   this.updateRecordStates(frameIndex);
 
@@ -173,7 +181,8 @@ export function genFrame(frameIndex) {
   this.rotUni.value = rot;
   this.ofsUni.value = ofs;
   this.ofs3Uni.value = ofs3;
-  this.sphereRadiusUni.value = (verticesEdgesDim * this.sphereRadiusRatio) / scaleFactor;
+  this.sphereRadiusUni.value =
+    (verticesEdgesDim * this.sphereRadiusRatio) / scaleFactor;
   this.cylinderRadiusUni.value = verticesEdgesDim / scaleFactor;
   this.projDistUni.value = projDist;
   this.separationDistUni.value = separationDist / scaleFactor;
@@ -216,12 +225,16 @@ export function genFrame(frameIndex) {
   this.toggleCamera(cameraIsPersp);
   if (this.is4D) this.highlightCells(this.recordStates.highlightConfig);
   if (!this.is4D) this.highlightFaces(this.recordStates.highlightFacesConfig);
-  
+
   if (this.solidGroup) this.solidGroup.scale.setScalar(scaleFactor);
 
   this.render();
 }
 
+/**
+ *
+ * @param frameIndex
+ */
 export function updateRecordStates(frameIndex) {
   const currrentActions = this.recordConfig.actions.filter(
     i => (i.start <= frameIndex && frameIndex <= i.end) || frameIndex === i.at
@@ -238,8 +251,9 @@ export function updateRecordStates(frameIndex) {
             helperFunc.create4DRotationMat(...rotAng)
           );
         } else {
-          this.recordStates.rots[action.index] =
-            helperFunc.create4DRotationMat(...rotAng);
+          this.recordStates.rots[action.index] = helperFunc.create4DRotationMat(
+            ...rotAng
+          );
         }
         break;
       }
@@ -274,8 +288,7 @@ export function updateRecordStates(frameIndex) {
         this.recordStates.faceScale += action.faceScaleOfs * interps[prog];
         break;
       case 'setFaceOpacity':
-        this.recordStates.faceOpacity +=
-          action.faceOpacityOfs * interps[prog];
+        this.recordStates.faceOpacity += action.faceOpacityOfs * interps[prog];
         if (
           this.recordStates.faceOpacity < 0 ||
           this.recordStates.faceOpacity > 1
@@ -303,9 +316,7 @@ export function updateRecordStates(frameIndex) {
       case 'setScaleFactor':
         this.recordStates.scaleFactor += action.scaleFactorOfs * interps[prog];
         if (this.recordStates.scaleFactor <= 0)
-          throw new Error(
-            `actions[${action.index}] 错误地导致缩放因子非正。`
-          );
+          throw new Error(`actions[${action.index}] 错误地导致缩放因子非正。`);
         break;
     }
   }

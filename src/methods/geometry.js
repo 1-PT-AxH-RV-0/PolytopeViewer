@@ -1,15 +1,25 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
-import * as type from '../type.js';
 
+/**
+ *
+ * @param edges
+ * @param root0
+ * @param root0.cylinderMaterial
+ * @param root0.sphereMaterial
+ * @param root0.cylinderColor
+ * @param root0.sphereColor
+ * @param root0.faceCenter
+ * @param root0.faceNormal
+ */
 export function createWireframeAndVertices(
   edges,
   {
     cylinderMaterial,
     sphereMaterial,
-    cylinderColor = 0xB0C4DE,
-    sphereColor = 0xF2C3A7,
+    cylinderColor = 0xb0c4de,
+    sphereColor = 0xf2c3a7,
     faceCenter = new THREE.Vector3(0, 0, 0),
     faceNormal = new THREE.Vector3(0, 0, 0)
   } = {}
@@ -120,13 +130,22 @@ export function createWireframeAndVertices(
   return { wireframeGroup, verticesGroup };
 }
 
+/**
+ *
+ * @param edges
+ * @param root0
+ * @param root0.cylinderMaterial
+ * @param root0.sphereMaterial
+ * @param root0.cylinderColor
+ * @param root0.sphereColor
+ */
 export function create4DWireframeAndVertices(
   edges,
   {
     cylinderMaterial,
     sphereMaterial,
-    cylinderColor = 0xB0C4DE,
-    sphereColor = 0xF2C3A7
+    cylinderColor = 0xb0c4de,
+    sphereColor = 0xf2c3a7
   } = {}
 ) {
   let defaultCylinderMaterial =
@@ -231,11 +250,16 @@ export function create4DWireframeAndVertices(
   };
 }
 
+/**
+ *
+ * @param meshData
+ * @param material
+ */
 export function createSeparatedFacesGroup(meshData, material) {
   const facesGroup = new THREE.Group();
   const separatedWireframeGroup = new THREE.Group();
   const separatedVerticesGroup = new THREE.Group();
-  
+
   for (const originalFaceIndex in meshData.facesMap) {
     const originalFace = meshData.originalFaces[originalFaceIndex];
     const originalFaceCenter = meshData.originalFaceCenters[originalFaceIndex];
@@ -246,33 +270,72 @@ export function createSeparatedFacesGroup(meshData, material) {
     const indices = [];
 
     for (const faceIndex of meshData.facesMap[originalFaceIndex]) {
-      const face = meshData.faces[faceIndex]
+      const face = meshData.faces[faceIndex];
       for (const vertexIndex of face) {
         if (verticesMap.has(vertexIndex)) continue;
         const vertex = meshData.vertices[vertexIndex];
         verticesMap.set(vertexIndex, vertices.length / 3);
         vertices.push(vertex.x, vertex.y, vertex.z);
       }
-      indices.push(...face.map(idx => verticesMap.get(idx)))
+      indices.push(...face.map(idx => verticesMap.get(idx)));
     }
 
-    singleFaceGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vertices), 3));
+    singleFaceGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(vertices), 3)
+    );
     singleFaceGeometry.setIndex(indices);
     singleFaceGeometry.computeVertexNormals();
-    
-    const edges = helperFunc.getUniqueSortedPairs([originalFace]).map(edge =>
-      edge.map(index => meshData.vertices[index])
-    );
-    
-    const { wireframeGroup, verticesGroup } =  this.createWireframeAndVertices(
+
+    const edges = helperFunc
+      .getUniqueSortedPairs([originalFace])
+      .map(edge => edge.map(index => meshData.vertices[index]));
+
+    const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
       edges,
-      {faceCenter: new THREE.Vector3(originalFaceCenter.x, originalFaceCenter.y, originalFaceCenter.z), faceNormal: new THREE.Vector3(originalFaceNormal.x, originalFaceNormal.y, originalFaceNormal.z)}
+      {
+        faceCenter: new THREE.Vector3(
+          originalFaceCenter.x,
+          originalFaceCenter.y,
+          originalFaceCenter.z
+        ),
+        faceNormal: new THREE.Vector3(
+          originalFaceNormal.x,
+          originalFaceNormal.y,
+          originalFaceNormal.z
+        )
+      }
     );
 
-    facesGroup.add(new THREE.Mesh(singleFaceGeometry, shaderCompCallback.faceMaterial3D(material.clone(), this.rotUni, this.ofs3Uni, this.separationDistUni, this.faceScaleUni, {value: new THREE.Vector3(originalFaceCenter.x, originalFaceCenter.y, originalFaceCenter.z)}, {value: new THREE.Vector3(originalFaceNormal.x, originalFaceNormal.y, originalFaceNormal.z)})));
+    facesGroup.add(
+      new THREE.Mesh(
+        singleFaceGeometry,
+        shaderCompCallback.faceMaterial3D(
+          material.clone(),
+          this.rotUni,
+          this.ofs3Uni,
+          this.separationDistUni,
+          this.faceScaleUni,
+          {
+            value: new THREE.Vector3(
+              originalFaceCenter.x,
+              originalFaceCenter.y,
+              originalFaceCenter.z
+            )
+          },
+          {
+            value: new THREE.Vector3(
+              originalFaceNormal.x,
+              originalFaceNormal.y,
+              originalFaceNormal.z
+            )
+          }
+        )
+      )
+    );
     separatedWireframeGroup.add(wireframeGroup);
     separatedVerticesGroup.add(verticesGroup);
   }
-  
+
   return { facesGroup, separatedWireframeGroup, separatedVerticesGroup };
 }
