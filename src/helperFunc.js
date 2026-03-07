@@ -58,10 +58,14 @@ function computeNormal(points) {
   return { x: nx / length, y: ny / length, z: nz / length };
 }
 
+/**
+ *
+ * @param points
+ */
 function computeNormalOutward(points) {
   // 1. 先计算原始法线
   const normal = computeNormal(points);
-  
+
   // 2. 计算多边形中心（所有顶点的平均）
   const center = { x: 0, y: 0, z: 0 };
   for (const p of points) {
@@ -72,10 +76,10 @@ function computeNormalOutward(points) {
   center.x /= points.length;
   center.y /= points.length;
   center.z /= points.length;
-  
+
   // 3. 判断方向：法线是否指向外部？
   const dot = normal.x * center.x + normal.y * center.y + normal.z * center.z;
-  
+
   // 4. 如果指向内部（点积为负），就翻转
   if (dot < 0) {
     return {
@@ -84,7 +88,7 @@ function computeNormalOutward(points) {
       z: -normal.z
     };
   }
-  
+
   return normal;
 }
 
@@ -270,30 +274,45 @@ function rotate4DPointsToXY(points) {
  */
 function compute4x4Determinant(m) {
   // 3x3 子式辅助函数
+  /**
+   *
+   * @param m3
+   */
   function det3x3(m3) {
-    return m3[0][0] * (m3[1][1]*m3[2][2] - m3[1][2]*m3[2][1])
-         - m3[0][1] * (m3[1][0]*m3[2][2] - m3[1][2]*m3[2][0])
-         + m3[0][2] * (m3[1][0]*m3[2][1] - m3[1][1]*m3[2][0]);
+    return (
+      m3[0][0] * (m3[1][1] * m3[2][2] - m3[1][2] * m3[2][1]) -
+      m3[0][1] * (m3[1][0] * m3[2][2] - m3[1][2] * m3[2][0]) +
+      m3[0][2] * (m3[1][0] * m3[2][1] - m3[1][1] * m3[2][0])
+    );
   }
 
   // 拉普拉斯展开第一行
-  return m[0][0] * det3x3([
-    [m[1][1], m[1][2], m[1][3]],
-    [m[2][1], m[2][2], m[2][3]],
-    [m[3][1], m[3][2], m[3][3]]
-  ]) - m[0][1] * det3x3([
-    [m[1][0], m[1][2], m[1][3]],
-    [m[2][0], m[2][2], m[2][3]],
-    [m[3][0], m[3][2], m[3][3]]
-  ]) + m[0][2] * det3x3([
-    [m[1][0], m[1][1], m[1][3]],
-    [m[2][0], m[2][1], m[2][3]],
-    [m[3][0], m[3][1], m[3][3]]
-  ]) - m[0][3] * det3x3([
-    [m[1][0], m[1][1], m[1][2]],
-    [m[2][0], m[2][1], m[2][2]],
-    [m[3][0], m[3][1], m[3][2]]
-  ]);
+  return (
+    m[0][0] *
+      det3x3([
+        [m[1][1], m[1][2], m[1][3]],
+        [m[2][1], m[2][2], m[2][3]],
+        [m[3][1], m[3][2], m[3][3]]
+      ]) -
+    m[0][1] *
+      det3x3([
+        [m[1][0], m[1][2], m[1][3]],
+        [m[2][0], m[2][2], m[2][3]],
+        [m[3][0], m[3][2], m[3][3]]
+      ]) +
+    m[0][2] *
+      det3x3([
+        [m[1][0], m[1][1], m[1][3]],
+        [m[2][0], m[2][1], m[2][3]],
+        [m[3][0], m[3][1], m[3][3]]
+      ]) -
+    m[0][3] *
+      det3x3([
+        [m[1][0], m[1][1], m[1][2]],
+        [m[2][0], m[2][1], m[2][2]],
+        [m[3][0], m[3][1], m[3][2]]
+      ])
+  );
 }
 
 /**
@@ -643,7 +662,8 @@ function validateRecordConfig(config, is4D) {
   }
 
   if (config.initialSeparationDist !== undefined) {
-    if (is4D) throw new Error('initialSeparationDist 字段的只在 3D 模式下可用。');
+    if (is4D)
+      throw new Error('initialSeparationDist 字段的只在 3D 模式下可用。');
     if (typeof config.initialSeparationDist !== 'number') {
       throw new Error('initialSeparationDist 字段必须是实数。');
     }
@@ -729,9 +749,12 @@ function validateRecordConfig(config, is4D) {
       */
     }
   }
-  
+
   if (config.initialScaleFactor !== undefined) {
-    if (typeof config.initialScaleFactor !== 'number' || config.initialScaleFactor <= 0) {
+    if (
+      typeof config.initialScaleFactor !== 'number' ||
+      config.initialScaleFactor <= 0
+    ) {
       throw new Error('initialScaleFactor 字段必须是正实数。');
     }
   }
@@ -1174,27 +1197,28 @@ function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
    * 规则：
    * - 过零区间：先平移到对称区间 [-M, M]，正负半轴分别用指数映射，再平移回去
    * - 不过零区间：先平移到 [0, L]（L = max-min），用指数映射，再平移回去
+   * @param p
    */
   function valueFromPercent(p) {
     const t = p / 100; // 0 ~ 1
     if (isCrossZero) {
-      const M = (max - min) / 2;      // 对称半宽
-      const mid = (min + max) / 2;    // 中心点
+      const M = (max - min) / 2; // 对称半宽
+      const mid = (min + max) / 2; // 中心点
       if (t <= 0.5) {
         // 负半轴：u 从 1 到 0
         const u = 1 - 2 * t;
-        const v = -M * (Math.pow(base, u) - 1) / (base - 1);
+        const v = (-M * (Math.pow(base, u) - 1)) / (base - 1);
         return v + mid;
       } else {
         // 正半轴：u 从 0 到 1
         const u = 2 * t - 1;
-        const v = M * (Math.pow(base, u) - 1) / (base - 1);
+        const v = (M * (Math.pow(base, u) - 1)) / (base - 1);
         return v + mid;
       }
     } else {
       // 不过零区间：平移至 [0, L]
       const L = max - min;
-      const v = L * (Math.pow(base, t) - 1) / (base - 1);
+      const v = (L * (Math.pow(base, t) - 1)) / (base - 1);
       return min + v;
     }
   }
@@ -1224,30 +1248,34 @@ function createInterpolation(timingFn) {
    */
   return function interpolation(steps) {
     const result = [];
-    
+
     for (let i = 0; i < steps; i++) {
       // 当前点和下一个点的进度
       const t1 = i / steps;
       const t2 = (i + 1) / steps;
-      
+
       // 计算函数值
       const val1 = timingFn(t1);
       const val2 = timingFn(t2);
-      
+
       // 两点差值
       result.push(val2 - val1);
     }
-    
+
     return result;
   };
 }
 
+/**
+ *
+ * @param color
+ */
 function colorStrToInt(color) {
   const colorNum = parseInt(color, 16);
   const rgb = colorNum >>> 8;
   const a = (colorNum & 0xff) / 255;
-  
-  return {rgb, a};
+
+  return { rgb, a };
 }
 
 export {

@@ -5,17 +5,10 @@ import 'nouislider/dist/nouislider.css';
 import * as THREE from 'three';
 // eslint-disable-next-line no-unused-vars
 import { Button, Tab, Tooltip, Modal } from 'bootstrap';
-import YAML from 'js-yaml';
-import noUiSlider from 'nouislider';
 import WebMWriter from 'webm-writer';
 // 导入辅助模块
 import createAxes from './axesCreater.js';
-import shaderCompCallback from './shaderCompCallback.js';
-import infFamilies from './infFamilies.js';
 import * as helperFunc from './helperFunc.js';
-import { parseOFF } from './offProcessor.js';
-import { parse4OFF } from './offProcessor4D.js';
-import * as type from './type.js';
 
 // 导入拆分的各个方法模块
 import * as initMethods from './methods/init.js';
@@ -154,46 +147,49 @@ class PolytopeRendererApp {
       flatShading: true,
       side: THREE.DoubleSide,
       emissiveIntensity: 1
-    })
+    });
     this.editor = null;
     this.errorModalBs = null;
-    this.sphereRadiusRatio = 3;        // 球与圆柱的半径比
-    
+    this.sphereRadiusRatio = 3; // 球与圆柱的半径比
+
     // 插值函数映射
     const timingFunctions = {
       // 线性
       linear: t => t,
-      
+
       // 二次方
       quadraticEaseIn: t => t * t,
       quadraticEaseOut: t => t * (2 - t),
-      quadraticEaseInOut: t => t < 0.5 ? 2 * t * t : 1 - Math.pow(2 * (1 - t), 2) / 2,
-      
+      quadraticEaseInOut: t =>
+        t < 0.5 ? 2 * t * t : 1 - Math.pow(2 * (1 - t), 2) / 2,
+
       // 三次方
       cubicEaseIn: t => t * t * t,
       cubicEaseOut: t => 1 - Math.pow(1 - t, 3),
-      cubicEaseInOut: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
-      
+      cubicEaseInOut: t =>
+        t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+
       // 正弦
       sineEaseIn: t => 1 - Math.cos((t * Math.PI) / 2),
       sineEaseOut: t => Math.sin((t * Math.PI) / 2),
       sineEaseInOut: t => (1 - Math.cos(Math.PI * t)) / 2,
-      
+
       // 指数
-      expoEaseIn: t => t === 0 ? 0 : Math.pow(2, 10 * (t - 1)),
-      expoEaseOut: t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+      expoEaseIn: t => (t === 0 ? 0 : Math.pow(2, 10 * (t - 1))),
+      expoEaseOut: t => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t))
     };
     this.interpFuncMap = new Map(
-      Object.entries(timingFunctions).map(([key, fn]) => 
-        [key, helperFunc.createInterpolation(fn)]
-      )
+      Object.entries(timingFunctions).map(([key, fn]) => [
+        key,
+        helperFunc.createInterpolation(fn)
+      ])
     );
-    
+
     // 渲染循环
-    this.renderRequested = false;      // 是否有活跃的 requestAnimationFrame
-    this.interactionTimer = null;      // 延迟停止渲染的定时器
-    this.userInteracting = false;      // 鼠标或触摸按下状态
-    this.wheelTimer = null;            // 滚轮停止检测定时器
+    this.renderRequested = false; // 是否有活跃的 requestAnimationFrame
+    this.interactionTimer = null; // 延迟停止渲染的定时器
+    this.userInteracting = false; // 鼠标或触摸按下状态
+    this.wheelTimer = null; // 滚轮停止检测定时器
 
     this.init();
   }

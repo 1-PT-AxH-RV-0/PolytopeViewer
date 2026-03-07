@@ -1,23 +1,29 @@
 import * as THREE from 'three';
-import YAML from 'js-yaml';
 import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
+/**
+ *
+ * @param faces
+ * @param colorInt
+ */
 function changeFaceColor(faces, colorInt) {
   if (faces instanceof THREE.Group) {
-    faces.children.forEach(f => changeFaceColor(f, colorInt))
+    faces.children.forEach(f => changeFaceColor(f, colorInt));
   } else if (faces instanceof THREE.Mesh) {
-    faces.material.color.set(colorInt.rgb)
-    faces.material.transparent = colorInt.a !== 1
-    faces.material.opacity = colorInt.a
+    faces.material.color.set(colorInt.rgb);
+    faces.material.transparent = colorInt.a !== 1;
+    faces.material.opacity = colorInt.a;
   }
 }
 
+/**
+ *
+ * @param highlightConfig
+ */
 export function highlightCells(highlightConfig) {
   this.highlightedPartGroup.clear();
-  for (const [color, cellsSelectorConfig] of Object.entries(
-    highlightConfig
-  )) {
+  for (const [color, cellsSelectorConfig] of Object.entries(highlightConfig)) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
     helperFunc.validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
@@ -67,9 +73,7 @@ export function highlightCells(highlightConfig) {
       for (const [i, range] of cellsSelectorConfig.ranges.entries()) {
         const [start, end] = range;
         if (!this.cells[start]) {
-          throw new Error(
-            `ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`
-          );
+          throw new Error(`ranges[${i}] 的起始索引 ${start} 对应的胞不存在。`);
         }
         if (!this.cells[end - 1]) {
           throw new Error(`ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
@@ -201,16 +205,18 @@ export function highlightCells(highlightConfig) {
       new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
     );
   }
-  
+
   this.requestSingleRender();
 }
 
+/**
+ *
+ * @param highlightConfig
+ */
 export function highlightFaces(highlightConfig) {
   this.highlightedPartGroup.clear();
-  changeFaceColor(this.facesGroup, {rgb: 0, a: 0});
-  for (const [color, facesSelectorConfig] of Object.entries(
-    highlightConfig
-  )) {
+  changeFaceColor(this.facesGroup, { rgb: 0, a: 0 });
+  for (const [color, facesSelectorConfig] of Object.entries(highlightConfig)) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
 
@@ -246,6 +252,6 @@ export function highlightFaces(highlightConfig) {
       changeFaceColor(face, colorInt);
     }
   }
-  
+
   this.requestSingleRender();
 }

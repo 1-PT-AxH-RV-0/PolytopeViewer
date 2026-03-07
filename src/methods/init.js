@@ -6,10 +6,12 @@ import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
 import YAML from 'js-yaml';
-import createAxes from '../axesCreater.js';
 import * as helperFunc from '../helperFunc.js';
 import env from '../../assets/env.hdr';
 
+/**
+ *
+ */
 export function _initializeDomElements() {
   /* eslint-disable */
   this.canvas = document.getElementById('polytopeRenderer');
@@ -67,6 +69,9 @@ export function _initializeDomElements() {
   );
 }
 
+/**
+ *
+ */
 export function _initializeSliders() {
   noUiSlider.create(this.scaleFactorSlider, {
     range: helperFunc.generateLogarithmicRange(0.1, 120, 10),
@@ -124,6 +129,9 @@ export function _initializeSliders() {
   });
 }
 
+/**
+ *
+ */
 export function _initializeRenderer() {
   const dpr = window.devicePixelRatio || 1;
 
@@ -158,24 +166,36 @@ export function _initializeRenderer() {
   });
 }
 
+/**
+ *
+ */
 export function _initializeScene() {
   this.scene = new THREE.Scene();
   this.scene.background = new THREE.Color(0x111111);
 }
 
+/**
+ *
+ */
 export function _initializeEnv() {
   const loader = new RGBELoader();
-  loader.load(env, (texture) => {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      this.scene.environment = texture;
+  loader.load(env, texture => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    this.scene.environment = texture;
   });
 }
 
+/**
+ *
+ */
 export function _initializeCameras() {
   this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
   this.camera.position.set(0, 0, 120);
 }
 
+/**
+ *
+ */
 export function _initializeControls() {
   this.controls = new OrbitControls(this.camera, this.renderer.domElement);
   this.controls.enableDamping = true;
@@ -187,6 +207,9 @@ export function _initializeControls() {
   this.controls.maxZoom = 175.0;
 }
 
+/**
+ *
+ */
 export function _initializeEditor() {
   this.editor = new EditorView({
     doc: '3F7DBDFF: all',

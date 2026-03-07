@@ -3,9 +3,12 @@ import Nanobar from 'nanobar';
 import * as helperFunc from '../helperFunc.js';
 import { parseOFF } from '../offProcessor.js';
 import { parse4OFF } from '../offProcessor4D.js';
-import * as type from '../type.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
+/**
+ *
+ * @param path
+ */
 export async function importOff(path) {
   try {
     const data = await import(`../../assets/models/${path}`);
@@ -16,6 +19,11 @@ export async function importOff(path) {
   }
 }
 
+/**
+ *
+ * @param meshData
+ * @param is4D
+ */
 export function processMeshData(meshData, is4D = false) {
   const bar = new Nanobar({ target: this.progCon });
   const controller = new AbortController();
@@ -69,6 +77,11 @@ export function processMeshData(meshData, is4D = false) {
   };
 }
 
+/**
+ *
+ * @param data
+ * @param material
+ */
 export async function loadMeshFromData(data, material) {
   if (this.loadMeshPromise) this.loadMeshPromise.abort();
   const mesh = data instanceof Object ? data : parseOFF(data);
@@ -103,6 +116,11 @@ export async function loadMeshFromData(data, material) {
   this.updateProperties();
 }
 
+/**
+ *
+ * @param data
+ * @param material
+ */
 export async function loadMeshFrom4Data(data, material) {
   if (this.loadMeshPromise) this.loadMeshPromise.abort();
   const mesh = data instanceof Object ? data : parse4OFF(data);
@@ -119,12 +137,8 @@ export async function loadMeshFrom4Data(data, material) {
     .replace(' ', '');
   this.infoDis.innerText = info;
 
-  const {
-    solidGroup,
-    facesGroup,
-    wireframeGroup,
-    verticesGroup
-  } = this.load4DMesh(processedMesh, material);
+  const { solidGroup, facesGroup, wireframeGroup, verticesGroup } =
+    this.load4DMesh(processedMesh, material);
 
   this.solidGroup = solidGroup;
   this.facesGroup = facesGroup;
@@ -136,6 +150,12 @@ export async function loadMeshFrom4Data(data, material) {
   this.updateRotation();
 }
 
+/**
+ *
+ * @param url
+ * @param material
+ * @param is4Off
+ */
 export async function loadMeshFromUrl(url, material, is4Off = false) {
   return new Promise(resolve => {
     fetch(url)
@@ -156,6 +176,11 @@ export async function loadMeshFromUrl(url, material, is4Off = false) {
   });
 }
 
+/**
+ *
+ * @param meshData
+ * @param material
+ */
 export function loadMesh(meshData, material) {
   this.is4D = false;
   this.cells = [];
@@ -179,7 +204,8 @@ export function loadMesh(meshData, material) {
   const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
     meshData.edges
   );
-  const { facesGroup, separatedWireframeGroup, separatedVerticesGroup} = this.createSeparatedFacesGroup(meshData, material);
+  const { facesGroup, separatedWireframeGroup, separatedVerticesGroup } =
+    this.createSeparatedFacesGroup(meshData, material);
 
   container.add(wireframeGroup);
   container.add(verticesGroup);
@@ -201,6 +227,11 @@ export function loadMesh(meshData, material) {
   };
 }
 
+/**
+ *
+ * @param meshData
+ * @param material
+ */
 export function load4DMesh(meshData, material) {
   this.is4D = true;
   this.cells = meshData.cells;
@@ -242,10 +273,7 @@ export function load4DMesh(meshData, material) {
     vertices4D[i * 4 + 2] = v.z;
     vertices4D[i * 4 + 3] = v.w;
   });
-  geometry.setAttribute(
-    'position4D',
-    new THREE.BufferAttribute(vertices4D, 4)
-  );
+  geometry.setAttribute('position4D', new THREE.BufferAttribute(vertices4D, 4));
 
   const indices = [];
   meshData.faces.forEach(face => indices.push(...face));

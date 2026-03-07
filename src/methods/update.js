@@ -1,13 +1,16 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
 
+/**
+ *
+ */
 export function updateProperties() {
   helperFunc.changeMaterialProperty(
     this.facesGroup,
     'visible',
     this.faceVisibleSwitcher.checked
   );
-  this.updateWireframeAndVerticesVisibilities()
+  this.updateWireframeAndVerticesVisibilities();
   helperFunc.changeMaterialProperty(
     this.axesGroup,
     'visible',
@@ -28,62 +31,87 @@ export function updateProperties() {
   this.cylinderRadiusUni.value =
     this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
   this.sphereRadiusUni.value =
-    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor *
+    (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+      this.scaleFactor) *
     this.sphereRadiusRatio;
   this.separationDistUni.value =
     this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
-  this.faceScaleUni.value =
-    this.faceScaleSlider.noUiSlider.get(true);
+  this.faceScaleUni.value = this.faceScaleSlider.noUiSlider.get(true);
   this.isOrthoUni.value = !this.schleSwitcher.checked;
   this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
   this.ofs3Uni.value = new THREE.Vector3();
-  
+
   this.requestSingleRender();
 }
 
+/**
+ *
+ */
 export function updateProjectionDistance() {
   this.projDistUni.value = this.projectionDistanceSlider.noUiSlider.get(true);
   this.requestSingleRender();
 }
 
+/**
+ *
+ */
 export function updateWireframeAndVerticesVisibilities() {
   helperFunc.changeMaterialProperty(
     this.wireframeGroup,
     'visible',
-     this.wireframeVisibleSwitcher.checked && (this.is4D || (this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1))
-  )
+    this.wireframeVisibleSwitcher.checked &&
+      (this.is4D ||
+        (this.separationDistSlider.noUiSlider.get(true) === 0 &&
+          this.faceScaleSlider.noUiSlider.get(true) === 1))
+  );
   helperFunc.changeMaterialProperty(
     this.verticesGroup,
     'visible',
-    this.verticesVisibleSwitcher.checked && (this.is4D || (this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1))
-  )
+    this.verticesVisibleSwitcher.checked &&
+      (this.is4D ||
+        (this.separationDistSlider.noUiSlider.get(true) === 0 &&
+          this.faceScaleSlider.noUiSlider.get(true) === 1))
+  );
   helperFunc.changeMaterialProperty(
     this.separatedWireframeGroup,
     'visible',
-    !this.is4D && this.wireframeVisibleSwitcher.checked && (this.separationDistSlider.noUiSlider.get(true) !== 0 || this.faceScaleSlider.noUiSlider.get(true) !== 1)
-  )
+    !this.is4D &&
+      this.wireframeVisibleSwitcher.checked &&
+      (this.separationDistSlider.noUiSlider.get(true) !== 0 ||
+        this.faceScaleSlider.noUiSlider.get(true) !== 1)
+  );
   helperFunc.changeMaterialProperty(
     this.separatedVerticesGroup,
     'visible',
-    !this.is4D && this.verticesVisibleSwitcher.checked && (this.separationDistSlider.noUiSlider.get(true) !== 0 || this.faceScaleSlider.noUiSlider.get(true) !== 1)
-  )
-  
+    !this.is4D &&
+      this.verticesVisibleSwitcher.checked &&
+      (this.separationDistSlider.noUiSlider.get(true) !== 0 ||
+        this.faceScaleSlider.noUiSlider.get(true) !== 1)
+  );
+
   this.requestSingleRender();
 }
 
+/**
+ *
+ */
 export function updateSeparationDist() {
   this.separationDistUni.value =
-    this.separationDistSlider.noUiSlider.get(true) /
-    this.scaleFactor;
-  this.updateWireframeAndVerticesVisibilities()
+    this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
+  this.updateWireframeAndVerticesVisibilities();
 }
 
+/**
+ *
+ */
 export function updateFaceScale() {
-  this.faceScaleUni.value =
-    this.faceScaleSlider.noUiSlider.get(true);
-  this.updateWireframeAndVerticesVisibilities()
+  this.faceScaleUni.value = this.faceScaleSlider.noUiSlider.get(true);
+  this.updateWireframeAndVerticesVisibilities();
 }
 
+/**
+ *
+ */
 export function updateRotation() {
   const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
   this.rotAngles = rotations;
@@ -91,6 +119,11 @@ export function updateRotation() {
   this.requestSingleRender();
 }
 
+/**
+ *
+ * @param scaleFactor
+ * @param updateSlider
+ */
 export function updateScaleFactor(scaleFactor, updateSlider = true) {
   this.scaleFactor = scaleFactor;
   if (updateSlider) this.scaleFactorSlider.noUiSlider.set(scaleFactor);
@@ -99,13 +132,18 @@ export function updateScaleFactor(scaleFactor, updateSlider = true) {
   this.cylinderRadiusUni.value =
     this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor;
   this.sphereRadiusUni.value =
-    this.wireframeAndVerticesDimSlider.noUiSlider.get(true) / this.scaleFactor *
+    (this.wireframeAndVerticesDimSlider.noUiSlider.get(true) /
+      this.scaleFactor) *
     this.sphereRadiusRatio;
   this.separationDistUni.value =
     this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
   this.requestSingleRender();
 }
 
+/**
+ *
+ * @param enable
+ */
 export function updateEnable(enable = true) {
   /**
    * 禁用或启用页面上所有的 UI 元素。
@@ -121,10 +159,7 @@ export function updateEnable(enable = true) {
         element.noUiSlider[enable ? 'enable' : 'disable']();
       } else if (element.tagName === 'A') {
         element.classList.toggle('disabled', !enable);
-      } else if (
-        element.tagName === 'INPUT' ||
-        element.tagName === 'BUTTON'
-      ) {
+      } else if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
         element.disabled = !enable;
       }
     });
@@ -154,6 +189,10 @@ export function updateEnable(enable = true) {
   this.startRecordBtn.disabled = this.isRecordingFlag;
 }
 
+/**
+ *
+ * @param isPersp
+ */
 export function toggleCamera(isPersp) {
   const oldCamera = this.camera.clone();
 
