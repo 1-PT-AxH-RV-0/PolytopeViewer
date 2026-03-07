@@ -149,6 +149,7 @@ export function updateEnable(enable = true) {
   this.rotationSliders[4].noUiSlider[enableStringBy4D]();
   this.rotationSliders[5].noUiSlider[enableStringBy4D]();
   this.separationDistSlider.noUiSlider[enableStringBy3D]();
+  this.faceScaleSlider.noUiSlider[enableStringBy3D]();
 
   this.startRecordBtn.disabled = this.isRecordingFlag;
 }
