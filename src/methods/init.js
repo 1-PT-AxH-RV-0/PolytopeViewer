@@ -189,7 +189,7 @@ export function _initializeControls() {
 
 export function _initializeEditor() {
   this.editor = new EditorView({
-    doc: '555555FF: all',
+    doc: '3F7DBDFF: all',
     extensions: [
       basicSetup,
       yaml(),
