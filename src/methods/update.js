@@ -50,12 +50,12 @@ export function updateWireframeAndVerticesVisibilities() {
   helperFunc.changeMaterialProperty(
     this.wireframeGroup,
     'visible',
-    this.is4D || (this.wireframeVisibleSwitcher.checked && this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1)
+     this.wireframeVisibleSwitcher.checked && (this.is4D || (this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1))
   )
   helperFunc.changeMaterialProperty(
     this.verticesGroup,
     'visible',
-    this.is4D || (this.verticesVisibleSwitcher.checked && this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1)
+    this.verticesVisibleSwitcher.checked && (this.is4D || (this.separationDistSlider.noUiSlider.get(true) === 0 && this.faceScaleSlider.noUiSlider.get(true) === 1))
   )
   helperFunc.changeMaterialProperty(
     this.separatedWireframeGroup,

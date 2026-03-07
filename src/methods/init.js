@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import noUiSlider from 'nouislider';
 import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
@@ -7,6 +8,7 @@ import { linter } from '@codemirror/lint';
 import YAML from 'js-yaml';
 import createAxes from '../axesCreater.js';
 import * as helperFunc from '../helperFunc.js';
+import env from '../../assets/env.hdr';
 
 export function _initializeDomElements() {
   /* eslint-disable */
@@ -161,37 +163,17 @@ export function _initializeScene() {
   this.scene.background = new THREE.Color(0x111111);
 }
 
+export function _initializeEnv() {
+  const loader = new RGBELoader();
+  loader.load(env, (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      this.scene.environment = texture;
+  });
+}
+
 export function _initializeCameras() {
   this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
   this.camera.position.set(0, 0, 120);
-}
-
-export function _initializeLights() {
-  // 环境光 - 基础照明
-  const ambientLight = new THREE.AmbientLight(0xffffff, 3.6);
-  this.scene.add(ambientLight);
-  
-  // 主光
-  const sunLight = new THREE.DirectionalLight(0xfff5d1, 10.8);
-  sunLight.position.set(3, 5, 4);
-  sunLight.castShadow = true;
-  sunLight.receiveShadow = true;
-  this.scene.add(sunLight);
-  
-  // 背光
-  const backLight = new THREE.DirectionalLight(0xccddff, 4.8);
-  backLight.position.set(-3, 2, -4);
-  this.scene.add(backLight);
-  
-  // 侧面补光
-  const fillLight = new THREE.DirectionalLight(0xffffff, 3.0);
-  fillLight.position.set(-2, 1, 2);
-  this.scene.add(fillLight);
-  
-  // 底部补光
-  const bottomLight = new THREE.DirectionalLight(0xffffff, 1.8);
-  bottomLight.position.set(0, -2, 0);
-  this.scene.add(bottomLight);
 }
 
 export function _initializeControls() {
