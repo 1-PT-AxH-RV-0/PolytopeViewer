@@ -58,6 +58,36 @@ function computeNormal(points) {
   return { x: nx / length, y: ny / length, z: nz / length };
 }
 
+function computeNormalOutward(points) {
+  // 1. 先计算原始法线
+  const normal = computeNormal(points);
+  
+  // 2. 计算多边形中心（所有顶点的平均）
+  const center = { x: 0, y: 0, z: 0 };
+  for (const p of points) {
+    center.x += p.x;
+    center.y += p.y;
+    center.z += p.z;
+  }
+  center.x /= points.length;
+  center.y /= points.length;
+  center.z /= points.length;
+  
+  // 3. 判断方向：法线是否指向外部？
+  const dot = normal.x * center.x + normal.y * center.y + normal.z * center.z;
+  
+  // 4. 如果指向内部（点积为负），就翻转
+  if (dot < 0) {
+    return {
+      x: -normal.x,
+      y: -normal.y,
+      z: -normal.z
+    };
+  }
+  
+  return normal;
+}
+
 /**
  * 按照给定的 theta 和 phi 角度旋转 3D 点。
  * @param {type.Point3D} p - 要旋转的点。
@@ -612,6 +642,20 @@ function validateRecordConfig(config, is4D) {
     }
   }
 
+  if (config.initialSeparationDist !== undefined) {
+    if (is4D) throw new Error('initialSeparationDist 字段的只在 3D 模式下可用。');
+    if (typeof config.initialSeparationDist !== 'number') {
+      throw new Error('initialSeparationDist 字段必须是实数。');
+    }
+  }
+
+  if (config.initialFaceScale !== undefined) {
+    if (is4D) throw new Error('initialFaceScale 字段的只在 3D 模式下可用。');
+    if (typeof config.initialFaceScale !== 'number') {
+      throw new Error('initialFaceScale 字段必须是实数。');
+    }
+  }
+
   if (config.initialFaceOpacity !== undefined) {
     if (
       typeof config.initialFaceOpacity !== 'number' ||
@@ -685,6 +729,12 @@ function validateRecordConfig(config, is4D) {
       */
     }
   }
+  
+  if (config.initialScaleFactor !== undefined) {
+    if (typeof config.initialScaleFactor !== 'number' || config.initialScaleFactor <= 0) {
+      throw new Error('initialScaleFactor 字段必须是正实数。');
+    }
+  }
 
   if (
     !Array.isArray(config.actions) ||
@@ -741,6 +791,20 @@ function validateRecordConfig(config, is4D) {
         if (typeof action.projDistOfs !== 'number')
           throw new Error(
             `actions[${index}] 操作的 projDistOfs 字段必须为实数。`
+          );
+        break;
+      case 'setSeparationDist':
+        if (is4D) throw new Error(`actions[${index}] 操作只在三维模式可用。`);
+        if (typeof action.sepDistOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 sepDistOfs 字段必须为实数。`
+          );
+        break;
+      case 'setFaceScale':
+        if (is4D) throw new Error(`actions[${index}] 操作只在三维模式可用。`);
+        if (typeof action.faceScaleOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 faceScaleOfs 字段必须为实数。`
           );
         break;
       case 'setFaceOpacity':
@@ -806,6 +870,12 @@ function validateRecordConfig(config, is4D) {
           */
         }
         break;
+      case 'setScaleFactor':
+        if (typeof action.scaleFactorOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 scaleFactorOfs 字段必须为实数。`
+          );
+        break;
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
     }
@@ -832,7 +902,7 @@ function validateRecordConfig(config, is4D) {
         ].includes(action.type)
       ) {
         throw new Error(
-          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setFaceOpacity。`
+          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale、setFaceOpacity、setScaleFactor。`
         );
       }
       if (
@@ -848,11 +918,10 @@ function validateRecordConfig(config, is4D) {
       }
       if (
         Object.hasOwnProperty.call(action, 'interp') &&
-        action.interp !== 'sin' &&
-        action.interp !== 'linear'
+        !this.interpFuncMap.has(action.interp)
       ) {
         throw new Error(
-          `actions[${index}] 的 interp 字段必须为 sin 或 linear。`
+          `actions[${index}] 的 interp 字段必须为以下之一：${[...this.interpFuncMap.keys()].join('、')}。`
         );
       }
     } else if (Object.hasOwnProperty.call(action, 'at')) {
@@ -1072,88 +1141,118 @@ function filterArray(sourceArray, excludeArray) {
 }
 
 /**
- * 生成 noUiSlider 对数刻度 range 对象
- * @param {number} min - 最小值(必须 >0)
- * @param {number} max - 最大值(必须 >min)
- * @param {number} base - 对数底数(默认 e)
- * @param {number} segments - 中间分段数(默认 32)
+ * 生成 noUiSlider 对数刻度 range 对象，支持负数范围（包含零）
+ * @param {number} min - 最小值
+ * @param {number} max - 最大值 (必须大于 min)
+ * @param {number} base - 指数底数，控制曲率，必须 >1 (默认 Math.E)
+ * @param {number} segments - 中间分段数，即内部点的个数 (默认 32)
  * @returns {object} noUiSlider 的 range 配置对象
  */
 function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
-  if (min <= 0 || max <= 0) {
-    throw new Error('最小值和最大值必须大于零。');
-  }
   if (max <= min) {
     throw new Error('最大值必须大于最小值。');
   }
   if (segments <= 0) {
     throw new Error('分段数必须大于零。');
   }
+  if (base <= 1) {
+    throw new Error('底数必须大于 1。');
+  }
 
-  // 计算对数
-  const logMin = Math.log(min) / Math.log(base);
-  const logMax = Math.log(max) / Math.log(base);
-  const logRange = logMax - logMin;
+  const isCrossZero = min < 0 && max > 0; // 是否跨越零
+  const range = { min, max };
 
-  const range = {
-    min: min,
-    max: max
-  };
+  // 生成均匀分布的百分比位置（包括两端）
+  const totalPoints = segments + 2; // 内部点 + 两端
+  const percentages = [];
+  for (let i = 0; i < totalPoints; i++) {
+    percentages.push((i / (totalPoints - 1)) * 100); // 0% 到 100%
+  }
 
-  // 生成中间点
-  for (let i = 1; i < segments; i++) {
-    // 计算对数位置
-    const logValue = logMin + (i / segments) * logRange;
-    // 转换回实际值
-    const value = Math.pow(base, logValue);
-    // 计算百分比位置
-    const percent = (i / segments) * 100;
-    // 保留三位小数百分比
-    const percentKey = percent.toFixed(3) + '%';
+  /**
+   * 将百分比 (0-100) 映射到实际值
+   * 规则：
+   * - 过零区间：先平移到对称区间 [-M, M]，正负半轴分别用指数映射，再平移回去
+   * - 不过零区间：先平移到 [0, L]（L = max-min），用指数映射，再平移回去
+   */
+  function valueFromPercent(p) {
+    const t = p / 100; // 0 ~ 1
+    if (isCrossZero) {
+      const M = (max - min) / 2;      // 对称半宽
+      const mid = (min + max) / 2;    // 中心点
+      if (t <= 0.5) {
+        // 负半轴：u 从 1 到 0
+        const u = 1 - 2 * t;
+        const v = -M * (Math.pow(base, u) - 1) / (base - 1);
+        return v + mid;
+      } else {
+        // 正半轴：u 从 0 到 1
+        const u = 2 * t - 1;
+        const v = M * (Math.pow(base, u) - 1) / (base - 1);
+        return v + mid;
+      }
+    } else {
+      // 不过零区间：平移至 [0, L]
+      const L = max - min;
+      const v = L * (Math.pow(base, t) - 1) / (base - 1);
+      return min + v;
+    }
+  }
 
-    range[percentKey] = value;
+  // 添加内部点（跳过 0% 和 100%，因为已用 min / max 表示）
+  for (let i = 1; i < percentages.length - 1; i++) {
+    const p = percentages[i];
+    const val = valueFromPercent(p);
+    // 使用足够精度的小数作为键，避免冲突
+    const key = p.toFixed(15) + '%';
+    range[key] = val;
   }
 
   return range;
 }
 
 /**
- * 正弦插值函数。
- * @param {number} steps - 步数
- * @returns {Array<number>} - 相邻采样点的差值数组。
+ * 将时间函数包装为插值函数生成器。
+ * @param {Function} timingFn - 时间函数，接受 t (0-1) 返回进度值 (0-1)
+ * @returns {Function} - 包装后的插值函数，接受 steps 返回差值数组
  */
-function sineInterpolation(steps) {
-  const result = [];
-
-  for (let i = 0; i < steps; i++) {
-    // 当前点的角度（从0到π）
-    const angle1 = (i / steps) * Math.PI;
-    // 下一个点的角度
-    const angle2 = ((i + 1) / steps) * Math.PI;
-
-    // 计算函数值：sin(x-π/2)/2 + 0.5
-    const val1 = Math.sin(angle1 - Math.PI / 2) / 2 + 0.5;
-    const val2 = Math.sin(angle2 - Math.PI / 2) / 2 + 0.5;
-
-    // 两点差值
-    result.push(val2 - val1);
-  }
-
-  return result;
+function createInterpolation(timingFn) {
+  /**
+   * 生成的插值函数。
+   * @param {number} steps - 步数
+   * @returns {Array<number>} - 相邻采样点的差值数组
+   */
+  return function interpolation(steps) {
+    const result = [];
+    
+    for (let i = 0; i < steps; i++) {
+      // 当前点和下一个点的进度
+      const t1 = i / steps;
+      const t2 = (i + 1) / steps;
+      
+      // 计算函数值
+      const val1 = timingFn(t1);
+      const val2 = timingFn(t2);
+      
+      // 两点差值
+      result.push(val2 - val1);
+    }
+    
+    return result;
+  };
 }
 
-/**
- * 线性插值函数。
- * @param {number} steps - 步数
- * @returns {Array<number>}  - 相邻采样点的差值数组。
- */
-function linearInterpolation(steps) {
-  const stepValue = 1 / steps;
-  return new Array(steps).fill(stepValue);
+function colorStrToInt(color) {
+  const colorNum = parseInt(color, 16);
+  const rgb = colorNum >>> 8;
+  const a = (colorNum & 0xff) / 255;
+  
+  return {rgb, a};
 }
 
 export {
   decomposeSelfIntersectingPolygon,
+  computeNormalOutward,
   inverseRotatePoint,
   rotateToXY,
   arePointsClose,
@@ -1175,6 +1274,6 @@ export {
   parseYamlFileFromInput,
   filterArray,
   generateLogarithmicRange,
-  sineInterpolation,
-  linearInterpolation
+  createInterpolation,
+  colorStrToInt
 };

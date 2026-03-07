@@ -57,6 +57,8 @@ class PolytopeRendererApp {
     this.faceOpacitySlider = null;
     this.wireframeAndVerticesDimSlider = null;
     this.projectionDistanceSlider = null;
+    this.separationDistSlider = null;
+    this.faceScaleSlider = null;
     this.fileInput = null;
     this.uploadOffBtn = null;
     this.infoDis = null;
@@ -102,6 +104,8 @@ class PolytopeRendererApp {
     this.facesGroup = null;
     this.wireframeGroup = null;
     this.verticesGroup = null;
+    this.separatedWireframeGroup = null;
+    this.separatedVerticesGroup = null;
 
     // Uniform 对象。
     this.rotAngles = [0, 0, 0, 0, 0, 0];
@@ -113,6 +117,8 @@ class PolytopeRendererApp {
     this.isOrthoUni = { value: 0 };
     this.cylinderRadiusUni = { value: 0.5 };
     this.sphereRadiusUni = { value: 1.5 };
+    this.separationDistUni = { value: 0 };
+    this.faceScaleUni = { value: 1.0 };
 
     // 渲染用变量。
     this.renderer = null;
@@ -147,16 +153,47 @@ class PolytopeRendererApp {
       flatShading: true,
       emissive: 0x112233,
       emissiveIntensity: 1.0,
+      side: THREE.DoubleSide
     })
     this.editor = null;
     this.errorModalBs = null;
-    this.sphereRadiusRatio = 3; // 球与圆柱的半径比
+    this.sphereRadiusRatio = 3;        // 球与圆柱的半径比
+    
+    // 插值函数映射
+    const timingFunctions = {
+      // 线性
+      linear: t => t,
+      
+      // 二次方
+      quadraticEaseIn: t => t * t,
+      quadraticEaseOut: t => t * (2 - t),
+      quadraticEaseInOut: t => t < 0.5 ? 2 * t * t : 1 - Math.pow(2 * (1 - t), 2) / 2,
+      
+      // 三次方
+      cubicEaseIn: t => t * t * t,
+      cubicEaseOut: t => 1 - Math.pow(1 - t, 3),
+      cubicEaseInOut: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      
+      // 正弦
+      sineEaseIn: t => 1 - Math.cos((t * Math.PI) / 2),
+      sineEaseOut: t => Math.sin((t * Math.PI) / 2),
+      sineEaseInOut: t => (1 - Math.cos(Math.PI * t)) / 2,
+      
+      // 指数
+      expoEaseIn: t => t === 0 ? 0 : Math.pow(2, 10 * (t - 1)),
+      expoEaseOut: t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+    };
+    this.interpFuncMap = new Map(
+      Object.entries(timingFunctions).map(([key, fn]) => 
+        [key, helperFunc.createInterpolation(fn)]
+      )
+    );
     
     // 渲染循环
-    this.renderRequested = false; // 是否有活跃的 requestAnimationFrame
-    this.interactionTimer = null; // 延迟停止渲染的定时器
-    this.userInteracting = false; // 鼠标或触摸按下状态
-    this.wheelTimer = null;       // 滚轮停止检测定时器
+    this.renderRequested = false;      // 是否有活跃的 requestAnimationFrame
+    this.interactionTimer = null;      // 延迟停止渲染的定时器
+    this.userInteracting = false;      // 鼠标或触摸按下状态
+    this.wheelTimer = null;            // 滚轮停止检测定时器
 
     this.init();
   }
@@ -218,7 +255,7 @@ class PolytopeRendererApp {
     ); */
 
     this.setupEventListeners();
-    this.startRenderLoop();
+    this._startLoop();
     this.requestSingleRender();
   }
 }

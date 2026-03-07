@@ -11,22 +11,8 @@ export function setupEventListeners() {
     )
     this.requestSingleRender();
   });
-  this.wireframeVisibleSwitcher.addEventListener('change', () => {
-    helperFunc.changeMaterialProperty(
-      this.wireframeGroup,
-      'visible',
-      this.wireframeVisibleSwitcher.checked
-    )
-    this.requestSingleRender();
-  });
-  this.verticesVisibleSwitcher.addEventListener('change', () => {
-    helperFunc.changeMaterialProperty(
-      this.verticesGroup,
-      'visible',
-      this.verticesVisibleSwitcher.checked
-    )
-    this.requestSingleRender();
-  });
+  this.wireframeVisibleSwitcher.addEventListener('change', this.updateWireframeAndVerticesVisibilities.bind(this));
+  this.verticesVisibleSwitcher.addEventListener('change', this.updateWireframeAndVerticesVisibilities.bind(this));
   this.axisVisibleSwitcher.addEventListener('change', () => {
     helperFunc.changeMaterialProperty(
       this.axesGroup,
@@ -65,6 +51,14 @@ export function setupEventListeners() {
   this.projectionDistanceSlider.noUiSlider.on(
     'update',
     this.updateProjectionDistance.bind(this)
+  );
+  this.separationDistSlider.noUiSlider.on(
+    'update',
+    this.updateSeparationDist.bind(this)
+  );
+  this.faceScaleSlider.noUiSlider.on(
+    'update',
+    this.updateFaceScale.bind(this)
   );
 
   this.rotationSliders.forEach((slider, i) => {
@@ -106,7 +100,6 @@ export function setupEventListeners() {
   this.highlightFacesBtn.addEventListener('click', () => {
     try {
       const highlightConfig = YAML.load(this.editor.state.doc.toString());
-      this.faceVisibleSwitcher.checked = false;
       this.updateProperties();
       this.highlightFaces(highlightConfig);
     } catch (e) {
@@ -323,6 +316,7 @@ export function _onInteractionEnd() {
   if (this.interactionTimer) clearTimeout(this.interactionTimer);
   this.interactionTimer = setTimeout(() => {
     this.interactionTimer = null;
+    // 检查是否还有活跃的交互
     if (!this.userInteracting && !this.wheelTimer) {
       this.isRenderingFlag = false;
     }

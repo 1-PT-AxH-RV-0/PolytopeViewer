@@ -2,6 +2,7 @@ import poly2tri from 'poly2tri';
 
 import {
   decomposeSelfIntersectingPolygon,
+  computeNormalOutward,
   inverseRotatePoint,
   rotateToXY,
   arePointsClose,
@@ -127,7 +128,17 @@ function processMeshData({ vertices, faces, edges }, progressCallback) {
     faces: processedFaces,
     edges,
     facesMap,
-    ngonsInFaces
+    ngonsInFaces,
+    originalFaces: faces,
+    originalFaceCenters: faces.map(face => 
+      face.map(idx => vertices[idx])
+        .reduce((acc, v) => ({ 
+          x: acc.x + v.x / face.length, 
+          y: acc.y + v.y / face.length, 
+          z: acc.z + v.z / face.length 
+        }), { x: 0, y: 0, z: 0 })
+    ),
+    originalFaceNormals: faces.map(face => computeNormalOutward(face.map(idx => vertices[idx])))
   };
 }
 

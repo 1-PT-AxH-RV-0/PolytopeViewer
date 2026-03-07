@@ -21,6 +21,8 @@ export function _initializeDomElements() {
   this.faceOpacitySlider = document.getElementById('faceOpacitySlider');
   this.wireframeAndVerticesDimSlider = document.getElementById('wireframeAndVerticesDimSlider');
   this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
+  this.separationDistSlider = document.getElementById('separationDistSlider');
+  this.faceScaleSlider = document.getElementById('faceScaleSlider');
   this.fileInput = document.getElementById('fileInput');
   this.uploadOffBtn = document.getElementById('uploadOff');
   this.infoDis = document.getElementById('info');
@@ -65,7 +67,7 @@ export function _initializeDomElements() {
 
 export function _initializeSliders() {
   noUiSlider.create(this.scaleFactorSlider, {
-    range: helperFunc.generateLogarithmicRange(0.1, 120),
+    range: helperFunc.generateLogarithmicRange(0.1, 120, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]
@@ -79,14 +81,28 @@ export function _initializeSliders() {
   });
 
   noUiSlider.create(this.wireframeAndVerticesDimSlider, {
-    range: helperFunc.generateLogarithmicRange(0.01, 3),
+    range: helperFunc.generateLogarithmicRange(0.01, 3, 10),
     start: 0.5,
     tooltips: true,
     connect: [true, false]
   });
 
   noUiSlider.create(this.projectionDistanceSlider, {
-    range: helperFunc.generateLogarithmicRange(0.01, 100),
+    range: helperFunc.generateLogarithmicRange(0.01, 100, 10),
+    start: 1,
+    tooltips: true,
+    connect: [true, false]
+  });
+
+  noUiSlider.create(this.separationDistSlider, {
+    range: { min: -100, max: 100 },
+    start: 0,
+    tooltips: true,
+    connect: [true, false]
+  });
+
+  noUiSlider.create(this.faceScaleSlider, {
+    range: helperFunc.generateLogarithmicRange(-20, 20, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]

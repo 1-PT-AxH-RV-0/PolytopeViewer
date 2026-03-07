@@ -45,7 +45,6 @@
 | highlightCells      | highlightConfig | object   | 胞高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
 |                     | hideFaces(可选) | boolean  | 是否自动隐藏面，默认 true                              | 必须为布尔值                                                             |
 | highlightFaces      | highlightConfig | object   | 面高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
-|                     | hideFaces(可选) | boolean  | 是否自动隐藏面，默认 true                              | 必须为布尔值                                                             |
 
 ## 注意事项
 
