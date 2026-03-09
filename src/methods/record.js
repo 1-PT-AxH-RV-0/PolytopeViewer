@@ -91,7 +91,7 @@ export async function startRecord() {
     framerate: 30,
     name: 'Animation',
     verbose: true,
-    quality: 75
+    quality: 100
   });
   this.capturer.start();
 
@@ -179,8 +179,8 @@ export function genFrame(frameIndex) {
   this.camera.position.set(0, 0, 120);
   this.camera.rotation.set(0, 0, 0);
   this.rotUni.value = rot;
-  this.ofsUni.value = ofs;
-  this.ofs3Uni.value = ofs3;
+  this.ofsUni.value = ofs.clone().divideScalar(scaleFactor);
+  this.ofs3Uni.value = ofs3.clone().divideScalar(scaleFactor);
   this.sphereRadiusUni.value =
     (verticesEdgesDim * this.sphereRadiusRatio) / scaleFactor;
   this.cylinderRadiusUni.value = verticesEdgesDim / scaleFactor;
