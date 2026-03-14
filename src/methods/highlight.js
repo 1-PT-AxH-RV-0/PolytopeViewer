@@ -3,9 +3,10 @@ import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
 /**
- *
- * @param faces
- * @param colorInt
+ * 修改面组中所有面的颜色。
+ * 递归遍历组中的所有网格并设置颜色和透明度。
+ * @param {THREE.Group | THREE.Mesh} faces - 面组或单个网格。
+ * @param {{rgb: number, a: number}} colorInt - 颜色对象，包含 RGB 值和 alpha 值。
  */
 function changeFaceColor(faces, colorInt) {
   if (faces instanceof THREE.Group) {
@@ -18,8 +19,11 @@ function changeFaceColor(faces, colorInt) {
 }
 
 /**
- *
- * @param highlightConfig
+ * 高亮四维多胞体的胞。
+ * 根据配置选择特定的胞并以指定颜色高亮显示。
+ * @this {PolytopeRendererApp}
+ * @param {Object<string, Object | 'all'>} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为胞选择器配置。
+ * @throws {Error} 当颜色码无效或胞索引不存在时抛出错误。
  */
 export function highlightCells(highlightConfig) {
   this.highlightedPartGroup.clear();
@@ -210,8 +214,11 @@ export function highlightCells(highlightConfig) {
 }
 
 /**
- *
- * @param highlightConfig
+ * 高亮三维多面体的面。
+ * 根据配置选择特定的面并以指定颜色高亮显示。
+ * @this {PolytopeRendererApp}
+ * @param {Object<string, Object | 'all'>} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为面选择器配置。
+ * @throws {Error} 当颜色码无效或面索引不存在时抛出错误。
  */
 export function highlightFaces(highlightConfig) {
   this.highlightedPartGroup.clear();
