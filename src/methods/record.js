@@ -4,7 +4,10 @@ import CCapture from 'ccapture.js/build/CCapture.min.js';
 import * as helperFunc from '../helperFunc.js';
 
 /**
- *
+ * 开始视频录制。
+ * 解析配置文件，初始化录制状态，并启动渲染循环。
+ * @this {PolytopeRendererApp}
+ * @returns {Promise<void>}
  */
 export async function startRecord() {
   try {
@@ -148,8 +151,10 @@ export async function startRecord() {
 }
 
 /**
- *
- * @param frameIndex
+ * 生成指定帧的画面。
+ * 根据录制状态更新场景并渲染一帧。
+ * @this {PolytopeRendererApp}
+ * @param {number} frameIndex - 当前帧索引。
  */
 export function genFrame(frameIndex) {
   this.updateRecordStates(frameIndex);
@@ -232,8 +237,10 @@ export function genFrame(frameIndex) {
 }
 
 /**
- *
- * @param frameIndex
+ * 更新录制状态。
+ * 根据当前帧索引处理所有动作并更新状态对象。
+ * @this {PolytopeRendererApp}
+ * @param {number} frameIndex - 当前帧索引。
  */
 export function updateRecordStates(frameIndex) {
   const currrentActions = this.recordConfig.actions.filter(

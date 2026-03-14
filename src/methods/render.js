@@ -1,5 +1,7 @@
 /**
- *
+ * 执行单次渲染。
+ * 更新控制器并渲染场景。
+ * @this {PolytopeRendererApp}
  */
 export function render() {
   this.controls.update();
@@ -7,8 +9,9 @@ export function render() {
 }
 
 /**
- * 内部循环函数，由 _startLoop 启动。
+ * 内部渲染循环函数。
  * 如果 isRenderingFlag 为 true 则持续渲染，否则停止请求新帧。
+ * @this {PolytopeRendererApp}
  */
 export function _renderLoop() {
   if (this.isRenderingFlag) {
@@ -20,7 +23,8 @@ export function _renderLoop() {
 }
 
 /**
- * 启动循环（如果尚未启动）
+ * 启动渲染循环（如果尚未启动）。
+ * @this {PolytopeRendererApp}
  */
 export function _startLoop() {
   if (!this.renderRequested) {
@@ -30,7 +34,9 @@ export function _startLoop() {
 }
 
 /**
- * 开启持续渲染模式
+ * 开启持续渲染模式。
+ * 用于需要连续更新的场景（如用户交互时）。
+ * @this {PolytopeRendererApp}
  */
 export function startRenderLoop() {
   if (this.isRenderingFlag) return;
@@ -39,14 +45,17 @@ export function startRenderLoop() {
 }
 
 /**
- * 关闭持续渲染模式
+ * 关闭持续渲染模式。
+ * @this {PolytopeRendererApp}
  */
 export function stopRenderLoop() {
   this.isRenderingFlag = false;
 }
 
 /**
- * 请求单次渲染（仅在非持续模式下执行）
+ * 请求单次渲染。
+ * 仅在非持续渲染模式下执行渲染。
+ * @this {PolytopeRendererApp}
  */
 export function requestSingleRender() {
   if (!this.isRenderingFlag) {

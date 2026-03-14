@@ -3,15 +3,18 @@ import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
 /**
- *
- * @param edges
- * @param root0
- * @param root0.cylinderMaterial
- * @param root0.sphereMaterial
- * @param root0.cylinderColor
- * @param root0.sphereColor
- * @param root0.faceCenter
- * @param root0.faceNormal
+ * 创建三维线框和顶点组。
+ * 使用圆柱体表示边，球体表示顶点。
+ * @this {PolytopeRendererApp}
+ * @param {Array<import('../type.js').Edge3D>} edges - 边数组，每条边包含两个端点。
+ * @param {Object} [options] - 配置选项。
+ * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
+ * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
+ * @param {number} [options.cylinderColor=0xb0c4de] - 圆柱体颜色。
+ * @param {number} [options.sphereColor=0xf2c3a7] - 球体颜色。
+ * @param {THREE.Vector3} [options.faceCenter] - 面中心位置（用于分离效果）。
+ * @param {THREE.Vector3} [options.faceNormal] - 面法向量（用于分离效果）。
+ * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 线框组和顶点组。
  */
 export function createWireframeAndVertices(
   edges,
@@ -131,13 +134,16 @@ export function createWireframeAndVertices(
 }
 
 /**
- *
- * @param edges
- * @param root0
- * @param root0.cylinderMaterial
- * @param root0.sphereMaterial
- * @param root0.cylinderColor
- * @param root0.sphereColor
+ * 创建四维线框和顶点组。
+ * 使用圆柱体表示边，球体表示顶点，支持四维投影。
+ * @this {PolytopeRendererApp}
+ * @param {Array<import('../type.js').Edge4D>} edges - 四维边数组。
+ * @param {Object} [options] - 配置选项。
+ * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
+ * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
+ * @param {number} [options.cylinderColor=0xb0c4de] - 圆柱体颜色。
+ * @param {number} [options.sphereColor=0xf2c3a7] - 球体颜色。
+ * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 线框组和顶点组。
  */
 export function create4DWireframeAndVertices(
   edges,
@@ -251,9 +257,12 @@ export function create4DWireframeAndVertices(
 }
 
 /**
- *
- * @param meshData
- * @param material
+ * 创建分离的面组。
+ * 为每个原始面创建独立的网格对象，支持分离距离和面缩放效果。
+ * @this {PolytopeRendererApp}
+ * @param {import('../type.js').Mesh3D} meshData - 处理后的网格数据。
+ * @param {THREE.Material} material - 材质对象。
+ * @returns {{facesGroup: THREE.Group, separatedWireframeGroup: THREE.Group, separatedVerticesGroup: THREE.Group}} 面组、分离线框组和分离顶点组。
  */
 export function createSeparatedFacesGroup(meshData, material) {
   const facesGroup = new THREE.Group();

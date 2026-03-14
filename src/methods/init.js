@@ -10,7 +10,9 @@ import * as helperFunc from '../helperFunc.js';
 import env from '../../assets/env.hdr';
 
 /**
- *
+ * 初始化 DOM 元素引用。
+ * 将页面上的各个 UI 元素绑定到实例属性上。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeDomElements() {
   /* eslint-disable */
@@ -70,7 +72,9 @@ export function _initializeDomElements() {
 }
 
 /**
- *
+ * 初始化所有滑块控件。
+ * 包括缩放、透明度、尺寸、投影距离、分离距离、面缩放和旋转滑块。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeSliders() {
   noUiSlider.create(this.scaleFactorSlider, {
@@ -130,7 +134,9 @@ export function _initializeSliders() {
 }
 
 /**
- *
+ * 初始化 WebGL 渲染器。
+ * 设置渲染器大小、设备像素比，并添加窗口大小变化事件监听器。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeRenderer() {
   const dpr = window.devicePixelRatio || 1;
@@ -167,7 +173,9 @@ export function _initializeRenderer() {
 }
 
 /**
- *
+ * 初始化 Three.js 场景。
+ * 创建场景对象并设置背景颜色。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeScene() {
   this.scene = new THREE.Scene();
@@ -175,7 +183,9 @@ export function _initializeScene() {
 }
 
 /**
- *
+ * 初始化环境贴图。
+ * 加载 HDR 环境贴图用于材质反射。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeEnv() {
   const loader = new RGBELoader();
@@ -186,7 +196,9 @@ export function _initializeEnv() {
 }
 
 /**
- *
+ * 初始化相机。
+ * 创建透视相机并设置初始位置。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeCameras() {
   this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
@@ -194,7 +206,9 @@ export function _initializeCameras() {
 }
 
 /**
- *
+ * 初始化轨道控制器。
+ * 配置阻尼效果、缩放范围等参数。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeControls() {
   this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -208,7 +222,9 @@ export function _initializeControls() {
 }
 
 /**
- *
+ * 初始化代码编辑器。
+ * 创建用于编辑 YAML 高亮配置的 CodeMirror 编辑器实例。
+ * @this {PolytopeRendererApp}
  */
 export function _initializeEditor() {
   this.editor = new EditorView({

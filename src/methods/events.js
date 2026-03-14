@@ -3,7 +3,9 @@ import * as helperFunc from '../helperFunc.js';
 import infFamilies from '../infFamilies.js';
 
 /**
- *
+ * 设置所有事件监听器。
+ * 包括 UI 控件变化、文件上传、模型选择、交互事件等。
+ * @this {PolytopeRendererApp}
  */
 export function setupEventListeners() {
   this.faceVisibleSwitcher.addEventListener('change', () => {
@@ -162,7 +164,9 @@ export function setupEventListeners() {
 }
 
 /**
- *
+ * 设置无限家族多面体/多胞体的生成按钮事件监听器。
+ * 包括正角柱、正反角柱、偏方面体、冠体和正双角柱的生成。
+ * @this {PolytopeRendererApp}
  */
 export function setupSolidInfFamiliesEventListeners() {
   const sGeNErrorHtml =
@@ -271,8 +275,10 @@ export function setupSolidInfFamiliesEventListeners() {
 }
 
 /**
- *
- * @param e
+ * 处理文件输入变化事件。
+ * 读取用户上传的 OFF 文件并加载到场景中。
+ * @this {PolytopeRendererApp}
+ * @param {Event} e - 文件输入变化事件。
  */
 export function handleFileInputChange(e) {
   const file = e.target.files[0];
