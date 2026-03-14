@@ -6,8 +6,9 @@ import { parse4OFF } from '../offProcessor4D.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 
 /**
- *
- * @param path
+ * 动态导入 OFF 文件。
+ * @param {string} path - OFF 文件相对于 assets/models 的路径。
+ * @returns {Promise<string>} OFF 文件内容。
  */
 export async function importOff(path) {
   try {
@@ -20,9 +21,12 @@ export async function importOff(path) {
 }
 
 /**
- *
- * @param meshData
- * @param is4D
+ * 使用 Web Worker 处理网格数据。
+ * 在后台线程中进行三角剖分等耗时操作，并显示进度条。
+ * @this {PolytopeRendererApp}
+ * @param {import('../type.js').NonTriMesh3D | import('../type.js').NonTriMesh4D} meshData - 网格数据。
+ * @param {boolean} [is4D=false] - 是否为四维网格。
+ * @returns {{promise: Promise, abort: Function}} 包含处理结果 Promise 和中止函数的对象。
  */
 export function processMeshData(meshData, is4D = false) {
   const bar = new Nanobar({ target: this.progCon });
@@ -78,9 +82,12 @@ export function processMeshData(meshData, is4D = false) {
 }
 
 /**
- *
- * @param data
- * @param material
+ * 从数据加载三维网格模型。
+ * 解析 OFF 数据，处理网格，并创建 Three.js 对象。
+ * @this {PolytopeRendererApp}
+ * @param {string | import('../type.js').NonTriMesh3D} data - OFF 字符串或网格数据对象。
+ * @param {THREE.Material} material - 材质对象。
+ * @returns {Promise<void>}
  */
 export async function loadMeshFromData(data, material) {
   if (this.loadMeshPromise) this.loadMeshPromise.abort();
@@ -117,9 +124,12 @@ export async function loadMeshFromData(data, material) {
 }
 
 /**
- *
- * @param data
- * @param material
+ * 从数据加载四维网格模型。
+ * 解析 4OFF 数据，处理网格，并创建 Three.js 对象。
+ * @this {PolytopeRendererApp}
+ * @param {string | import('../type.js').NonTriMesh4D} data - 4OFF 字符串或网格数据对象。
+ * @param {THREE.Material} material - 材质对象。
+ * @returns {Promise<void>}
  */
 export async function loadMeshFrom4Data(data, material) {
   if (this.loadMeshPromise) this.loadMeshPromise.abort();
@@ -151,10 +161,13 @@ export async function loadMeshFrom4Data(data, material) {
 }
 
 /**
- *
- * @param url
- * @param material
- * @param is4Off
+ * 从 URL 加载网格模型。
+ * 获取文件内容并调用相应的加载函数。
+ * @this {PolytopeRendererApp}
+ * @param {string} url - 文件 URL。
+ * @param {THREE.Material} material - 材质对象。
+ * @param {boolean} [is4Off=false] - 是否为 4OFF 文件。
+ * @returns {Promise<void>}
  */
 export async function loadMeshFromUrl(url, material, is4Off = false) {
   return new Promise(resolve => {
@@ -177,9 +190,12 @@ export async function loadMeshFromUrl(url, material, is4Off = false) {
 }
 
 /**
- *
- * @param meshData
- * @param material
+ * 加载三维网格到场景。
+ * 创建线框、顶点和面组，并添加到场景中。
+ * @this {PolytopeRendererApp}
+ * @param {import('../type.js').Mesh3D} meshData - 处理后的网格数据。
+ * @param {THREE.Material} material - 材质对象。
+ * @returns {{solidGroup: THREE.Object3D, facesGroup: THREE.Group, wireframeGroup: THREE.Group, verticesGroup: THREE.Group, separatedWireframeGroup: THREE.Group, separatedVerticesGroup: THREE.Group}}
  */
 export function loadMesh(meshData, material) {
   this.is4D = false;
@@ -228,9 +244,12 @@ export function loadMesh(meshData, material) {
 }
 
 /**
- *
- * @param meshData
- * @param material
+ * 加载四维网格到场景。
+ * 创建带有四维属性的网格对象，支持四维旋转和投影。
+ * @this {PolytopeRendererApp}
+ * @param {import('../type.js').Mesh4D} meshData - 处理后的四维网格数据。
+ * @param {THREE.Material} material - 材质对象。
+ * @returns {{solidGroup: THREE.Group, facesGroup: THREE.Mesh, wireframeGroup: THREE.Group, verticesGroup: THREE.Group}}
  */
 export function load4DMesh(meshData, material) {
   this.is4D = true;

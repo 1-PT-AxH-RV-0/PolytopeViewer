@@ -15,6 +15,9 @@
 | initialSchleProjEnable      | boolean           | 是否启用施菜格尔投影（4D）  | 必须为布尔值，只在 4D 模式下可用                                                      |
 | initialHighlightConfig      | object            | 初始胞高亮配置              | 必须符合 [高亮配置文件](HighlightConfigFormat.md) 格式，只在 4D 模式下可用            |
 | initialHighlightFacesConfig | object            | 初始面高亮配置              | 必须符合 [高亮配置文件](HighlightConfigFormat.md#面高亮配置) 格式，只在 3D 模式下可用 |
+| initialSeparationDist       | number            | 初始分离距离（3D）          | 必须为实数，只在 3D 模式下可用                                                        |
+| initialFaceScale            | number            | 初始面缩放（3D）            | 必须为实数，只在 3D 模式下可用                                                        |
+| initialScaleFactor          | number            | 初始缩放因子                | 必须为正实数                                                                          |
 | endExtraFrames              | number            | 末尾的额外帧数，默认 30(1s) | 必须为自然数                                                                          |
 
 ## 动作配置(actions)
@@ -24,7 +27,7 @@
 |-----------|-------------------|----------------------------------|------------------------------|
 | type      | string            | 动作类型                         | 必须是支持的类型之一         |
 | start/end | number            | 动作开始 / 结束帧（部分类型适用）| ≥0 的整数，且 end≥start      |
-| interp    | 'sin' \| 'linear' | 动作过渡插值函数（部分类型适用） | 正弦插值或线性插值，默认线性 |
+| interp    | string | 动作过渡插值函数（部分类型适用） | 可选值见下方说明，默认 linear |
 | at        | number            | 执行动作的帧（部分类型适用）     | ≥0 的整数                    |
 
 ### 动作类型说明
@@ -44,7 +47,27 @@
 | setSchleProjEnable  | enable          | boolean  | 是否启用施莱格尔投影（4D）                             | 必须为布尔值（仅 4D 模式可用）                                           |
 | highlightCells      | highlightConfig | object   | 胞高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
 |                     | hideFaces(可选) | boolean  | 是否自动隐藏面，默认 true                              | 必须为布尔值                                                             |
-| highlightFaces      | highlightConfig | object   | 面高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 4D 模式可用） |
+| highlightFaces      | highlightConfig | object   | 面高亮配置                                             | 必须符合 [高亮配置文件格式](HighlightConfigFormat.md) （仅 3D 模式可用） |
+| setSeparationDist   | sepDistOfs      | number   | 分离距离偏移量（3D）                                   | 必须为实数（仅 3D 模式可用）                                            |
+| setFaceScale        | faceScaleOfs    | number   | 面缩放偏移量（3D）                                     | 必须为实数（仅 3D 模式可用）                                            |
+| setScaleFactor      | scaleFactorOfs  | number   | 缩放因子偏移量                                         | 必须为实数                                                              |
+
+### 插值函数(interp)可选值
+
+| 值                   | 说明           |
+|----------------------|----------------|
+| linear               | 线性插值       |
+| quadraticEaseIn      | 二次方缓入     |
+| quadraticEaseOut     | 二次方缓出     |
+| quadraticEaseInOut   | 二次方缓入缓出 |
+| cubicEaseIn          | 三次方缓入     |
+| cubicEaseOut         | 三次方缓出     |
+| cubicEaseInOut       | 三次方缓入缓出 |
+| sineEaseIn           | 正弦缓入       |
+| sineEaseOut          | 正弦缓出       |
+| sineEaseInOut        | 正弦缓入缓出   |
+| expoEaseIn           | 指数缓入       |
+| expoEaseOut          | 指数缓出       |
 
 ## 注意事项
 
@@ -53,7 +76,7 @@
   - 要么只有 `at` 字段。
 
 2. 字段适用性:
-  - `start/end & interp` 适用于: rot、trans4、trans3、setVerticesEdgesDim、setProjDist 和 setFaceOpacity；
+  - `start/end & interp` 适用于: rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale、setFaceOpacity 和 setScaleFactor；
   - `at` 适用于: setVisibility、setCameraProjMethod、highlightCells、highlightFaces 和 setSchleProjEnable。
 
 3. 4D专用功能:
@@ -61,7 +84,11 @@
   - trans4、setProjDist、setSchleProjEnable, highlightCells 动作；
   - rot 动作的 plane 字段值 2, 4, 5。
 
-4. 额外提醒：
+4. 3D专用功能:
+  - initialSeparationDist、initialFaceScale；
+  - setSeparationDist、setFaceScale 动作。
+
+5. 额外提醒：
   - 在 4D 模式下，trans4 是平移物体的 4D 坐标，而 trans3 是平移物体的 3D 投影的坐标，这两者的效果是不一样的！！
   - 3D 和 4D 的旋转是分顺序的，即先绕 xz 平面旋转再绕 yw 平面旋转和先绕 yw 平面旋转再绕 xz 平面旋转相同的角度，效果（可能）是不一样的。此代码中的旋转顺序由书写顺序决定。
   - `endExtraFrames` 的效果是在视频最后继续录制，但是没有任何动作。（用于最后一个动作为瞬时动作时，避免因视频结束而没有看到效果）
