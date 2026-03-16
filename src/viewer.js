@@ -150,7 +150,7 @@ class PolytopeRendererApp {
     });
     this.editor = null;
     this.errorModalBs = null;
-    this.sphereRadiusRatio = 3; // 球与圆柱的半径比
+    this.sphereRadiusRatio = 2.5; // 球与圆柱的半径比
 
     // 插值函数映射
     const timingFunctions = {

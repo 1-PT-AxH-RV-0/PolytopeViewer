@@ -136,7 +136,7 @@ export function updateRotation() {
  * 设置模型的整体缩放，并同步更新相关的 uniform 值。
  * @this {PolytopeRendererApp}
  * @param {number} scaleFactor - 新的缩放因子。
- * @param {boolean} [updateSlider=true] - 是否同步更新滑块显示。
+ * @param {boolean} [updateSlider] - 是否同步更新滑块显示。
  */
 export function updateScaleFactor(scaleFactor, updateSlider = true) {
   this.scaleFactor = scaleFactor;
@@ -158,7 +158,7 @@ export function updateScaleFactor(scaleFactor, updateSlider = true) {
  * 更新 UI 元素的启用/禁用状态。
  * 根据当前模式（3D/4D）和录制状态控制各控件的可用性。
  * @this {PolytopeRendererApp}
- * @param {boolean} [enable=true] - 是否启用 UI 元素。
+ * @param {boolean} [enable] - 是否启用 UI 元素。
  */
 export function updateEnable(enable = true) {
   /**
