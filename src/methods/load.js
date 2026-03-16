@@ -25,7 +25,7 @@ export async function importOff(path) {
  * 在后台线程中进行三角剖分等耗时操作，并显示进度条。
  * @this {PolytopeRendererApp}
  * @param {import('../type.js').NonTriMesh3D | import('../type.js').NonTriMesh4D} meshData - 网格数据。
- * @param {boolean} [is4D=false] - 是否为四维网格。
+ * @param {boolean} [is4D] - 是否为四维网格。
  * @returns {{promise: Promise, abort: Function}} 包含处理结果 Promise 和中止函数的对象。
  */
 export function processMeshData(meshData, is4D = false) {
@@ -166,7 +166,7 @@ export async function loadMeshFrom4Data(data, material) {
  * @this {PolytopeRendererApp}
  * @param {string} url - 文件 URL。
  * @param {THREE.Material} material - 材质对象。
- * @param {boolean} [is4Off=false] - 是否为 4OFF 文件。
+ * @param {boolean} [is4Off] - 是否为 4OFF 文件。
  * @returns {Promise<void>}
  */
 export async function loadMeshFromUrl(url, material, is4Off = false) {

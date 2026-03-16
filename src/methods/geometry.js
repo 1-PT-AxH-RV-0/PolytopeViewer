@@ -7,11 +7,11 @@ import shaderCompCallback from '../shaderCompCallback.js';
  * 使用圆柱体表示边，球体表示顶点。
  * @this {PolytopeRendererApp}
  * @param {Array<import('../type.js').Edge3D>} edges - 边数组，每条边包含两个端点。
- * @param {Object} [options] - 配置选项。
+ * @param {object} [options] - 配置选项。
  * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
  * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
- * @param {number} [options.cylinderColor=0xb0c4de] - 圆柱体颜色。
- * @param {number} [options.sphereColor=0xf2c3a7] - 球体颜色。
+ * @param {number} [options.cylinderColor] - 圆柱体颜色。
+ * @param {number} [options.sphereColor] - 球体颜色。
  * @param {THREE.Vector3} [options.faceCenter] - 面中心位置（用于分离效果）。
  * @param {THREE.Vector3} [options.faceNormal] - 面法向量（用于分离效果）。
  * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 线框组和顶点组。
@@ -138,11 +138,11 @@ export function createWireframeAndVertices(
  * 使用圆柱体表示边，球体表示顶点，支持四维投影。
  * @this {PolytopeRendererApp}
  * @param {Array<import('../type.js').Edge4D>} edges - 四维边数组。
- * @param {Object} [options] - 配置选项。
+ * @param {object} [options] - 配置选项。
  * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
  * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
- * @param {number} [options.cylinderColor=0xb0c4de] - 圆柱体颜色。
- * @param {number} [options.sphereColor=0xf2c3a7] - 球体颜色。
+ * @param {number} [options.cylinderColor] - 圆柱体颜色。
+ * @param {number} [options.sphereColor] - 球体颜色。
  * @returns {{wireframeGroup: THREE.Group, verticesGroup: THREE.Group}} 线框组和顶点组。
  */
 export function create4DWireframeAndVertices(
