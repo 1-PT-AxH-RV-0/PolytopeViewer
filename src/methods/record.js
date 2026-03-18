@@ -55,6 +55,9 @@ export async function startRecord() {
     faceScale:
       this.recordConfig.initialFaceScale ??
       this.faceScaleSlider.noUiSlider.get(true),
+    edgeScale:
+      this.recordConfig.initialEdgeScale ??
+      this.edgeScaleSlider.noUiSlider.get(true),
     faceOpacity:
       this.recordConfig.initialFaceOpacity ??
       +this.faceOpacitySlider.noUiSlider.get(true),
@@ -171,6 +174,7 @@ export function genFrame(frameIndex) {
     schleProjEnable,
     separationDist,
     faceScale,
+    edgeScale,
     scaleFactor
   } = this.recordStates;
   const rot = helperFunc
@@ -192,6 +196,7 @@ export function genFrame(frameIndex) {
   this.projDistUni.value = projDist;
   this.separationDistUni.value = separationDist / scaleFactor;
   this.faceScaleUni.value = faceScale;
+  this.edgeScaleUni.value = edgeScale;
   this.isOrthoUni.value = !schleProjEnable;
   this.axesOffsetScaleUni.value = scaleFactor;
 
@@ -293,6 +298,9 @@ export function updateRecordStates(frameIndex) {
         break;
       case 'setFaceScale':
         this.recordStates.faceScale += action.faceScaleOfs * interps[prog];
+        break;
+      case 'setEdgeScale':
+        this.recordStates.edgeScale += action.edgeScaleOfs * interps[prog];
         break;
       case 'setFaceOpacity':
         this.recordStates.faceOpacity += action.faceOpacityOfs * interps[prog];

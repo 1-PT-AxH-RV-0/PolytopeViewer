@@ -112,6 +112,7 @@ class PolytopeRendererApp {
     this.sphereRadiusUni = { value: 1.5 };
     this.separationDistUni = { value: 0 };
     this.faceScaleUni = { value: 1.0 };
+    this.edgeScaleUni = { value: 1.0 };
 
     // 渲染用变量。
     this.renderer = null;
