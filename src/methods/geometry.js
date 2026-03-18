@@ -50,6 +50,7 @@ export function createWireframeAndVertices(
     this.ofs3Uni,
     this.separationDistUni,
     this.faceScaleUni,
+    this.edgeScaleUni,
     { value: faceCenter },
     { value: faceNormal }
   );
@@ -60,6 +61,7 @@ export function createWireframeAndVertices(
     this.ofs3Uni,
     this.separationDistUni,
     this.faceScaleUni,
+    this.edgeScaleUni,
     { value: faceCenter },
     { value: faceNormal }
   );
@@ -74,6 +76,7 @@ export function createWireframeAndVertices(
   );
   const v1Arr = new Float32Array(edges.length * 3);
   const v2Arr = new Float32Array(edges.length * 3);
+  const midArr = new Float32Array(edges.length * 3);
 
   const sphereGeometry = helperFunc.toBufferGeometry(
     new THREE.SphereGeometry(1, 16, 16)
@@ -83,30 +86,21 @@ export function createWireframeAndVertices(
     defaultSphereMaterial,
     edges.length * 2
   );
-  sphereInstances.count = 0;
   const posArr = [];
+  const midVerticesArr = [];
 
-  const uniquePoints = new Set();
   edges.forEach(([start, end], index) => {
-    const startKey = `${start.x},${start.y},${start.z}`;
-    const endKey = `${end.x},${end.y},${end.z}`;
-
     const startVec = new THREE.Vector3(start.x, start.y, start.z);
     const endVec = new THREE.Vector3(end.x, end.y, end.z);
+    const midpoint = startVec.clone().lerp(endVec, 0.5);
     v1Arr.set(startVec.toArray(), index * 3);
     v2Arr.set(endVec.toArray(), index * 3);
+    midArr.set(midpoint.toArray(), index * 3);
 
-    if (!uniquePoints.has(startKey)) {
-      posArr.push(...startVec.toArray());
-      sphereInstances.count++;
-      uniquePoints.add(startKey);
-    }
-
-    if (!uniquePoints.has(endKey)) {
-      posArr.push(...endVec.toArray());
-      sphereInstances.count++;
-      uniquePoints.add(endKey);
-    }
+    posArr.push(...startVec.toArray());
+    midVerticesArr.push(...midpoint.toArray());
+    posArr.push(...endVec.toArray());
+    midVerticesArr.push(...midpoint.toArray());
   });
 
   cylinderInstances.instanceMatrix.needsUpdate = true;
@@ -120,9 +114,17 @@ export function createWireframeAndVertices(
     'v2',
     new THREE.InstancedBufferAttribute(v2Arr, 3)
   );
+  cylinderGeometry.setAttribute(
+    'midpoint',
+    new THREE.InstancedBufferAttribute(midArr, 3)
+  );
   sphereGeometry.setAttribute(
     'pos',
     new THREE.InstancedBufferAttribute(new Float32Array(posArr), 3)
+  );
+  sphereGeometry.setAttribute(
+    'midpoint',
+    new THREE.InstancedBufferAttribute(new Float32Array(midVerticesArr), 3)
   );
 
   const wireframeGroup = new THREE.Group();

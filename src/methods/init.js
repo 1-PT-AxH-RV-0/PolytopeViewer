@@ -29,6 +29,7 @@ export function _initializeDomElements() {
   this.projectionDistanceSlider = document.getElementById('projectionDistanceSlider');
   this.separationDistSlider = document.getElementById('separationDistSlider');
   this.faceScaleSlider = document.getElementById('faceScaleSlider');
+  this.edgeScaleSlider = document.getElementById('edgeScaleSlider');
   this.fileInput = document.getElementById('fileInput');
   this.uploadOffBtn = document.getElementById('uploadOff');
   this.infoDis = document.getElementById('info');
@@ -114,6 +115,13 @@ export function _initializeSliders() {
 
   noUiSlider.create(this.faceScaleSlider, {
     range: helperFunc.generateLogarithmicRange(-20, 20, 10),
+    start: 1,
+    tooltips: true,
+    connect: [true, false]
+  });
+
+  noUiSlider.create(this.edgeScaleSlider, {
+    range: helperFunc.generateLogarithmicRange(1, 20, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]

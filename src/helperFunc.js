@@ -676,6 +676,13 @@ function validateRecordConfig(config, is4D) {
     }
   }
 
+  if (config.initialEdgeScale !== undefined) {
+    if (is4D) throw new Error('initialEdgeScale 字段的只在 3D 模式下可用。');
+    if (typeof config.initialEdgeScale !== 'number') {
+      throw new Error('initialEdgeScale 字段必须是实数。');
+    }
+  }
+
   if (config.initialFaceOpacity !== undefined) {
     if (
       typeof config.initialFaceOpacity !== 'number' ||
@@ -830,6 +837,13 @@ function validateRecordConfig(config, is4D) {
             `actions[${index}] 操作的 faceScaleOfs 字段必须为实数。`
           );
         break;
+      case 'setEdgeScale':
+        if (is4D) throw new Error(`actions[${index}] 操作只在三维模式可用。`);
+        if (typeof action.edgeScaleOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 edgeScaleOfs 字段必须为实数。`
+          );
+        break;
       case 'setFaceOpacity':
         if (typeof action.faceOpacityOfs !== 'number')
           throw new Error(
@@ -925,7 +939,7 @@ function validateRecordConfig(config, is4D) {
         ].includes(action.type)
       ) {
         throw new Error(
-          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale、setFaceOpacity、setScaleFactor。`
+          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale, setEdgeScale、setFaceOpacity、setScaleFactor。`
         );
       }
       if (

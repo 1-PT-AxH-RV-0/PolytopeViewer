@@ -68,6 +68,7 @@ export function setupEventListeners() {
     this.updateSeparationDist.bind(this)
   );
   this.faceScaleSlider.noUiSlider.on('update', this.updateFaceScale.bind(this));
+  this.edgeScaleSlider.noUiSlider.on('update', this.updateEdgeScale.bind(this));
 
   this.rotationSliders.forEach((slider, i) => {
     slider.noUiSlider.on('update', () => {

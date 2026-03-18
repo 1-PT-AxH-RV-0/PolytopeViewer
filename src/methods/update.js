@@ -39,6 +39,7 @@ export function updateProperties() {
   this.separationDistUni.value =
     this.separationDistSlider.noUiSlider.get(true) / this.scaleFactor;
   this.faceScaleUni.value = this.faceScaleSlider.noUiSlider.get(true);
+  this.edgeScaleUni.value = this.edgeScaleSlider.noUiSlider.get(true);
   this.isOrthoUni.value = !this.schleSwitcher.checked;
   this.ofsUni.value = new THREE.Vector4(0, 0, 0, 0);
   this.ofs3Uni.value = new THREE.Vector3();
@@ -117,6 +118,14 @@ export function updateSeparationDist() {
 export function updateFaceScale() {
   this.faceScaleUni.value = this.faceScaleSlider.noUiSlider.get(true);
   this.updateWireframeAndVerticesVisibilities();
+}
+
+/**
+ *
+ */
+export function updateEdgeScale() {
+  this.edgeScaleUni.value = this.edgeScaleSlider.noUiSlider.get(true);
+  this.requestSingleRender();
 }
 
 /**
@@ -201,6 +210,7 @@ export function updateEnable(enable = true) {
   this.rotationSliders[5].noUiSlider[enableStringBy4D]();
   this.separationDistSlider.noUiSlider[enableStringBy3D]();
   this.faceScaleSlider.noUiSlider[enableStringBy3D]();
+  this.edgeScaleSlider.noUiSlider[enableStringBy3D]();
 
   this.startRecordBtn.disabled = this.isRecordingFlag;
 }
