@@ -916,6 +916,12 @@ function validateRecordConfig(config, is4D) {
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
     }
+    
+    if (Object.hasOwnProperty.call(action, 'priority') && (typeof action.priority !== 'number' || !Number.isInteger(action.priority) || !isNaN(action.priority) || !isFinite(action.priority))) {
+      throw new Error(
+        `actions[${index}] 的 priority 不是整数。`
+      );
+    }
 
     if (
       Object.hasOwnProperty.call(action, 'start') &&
