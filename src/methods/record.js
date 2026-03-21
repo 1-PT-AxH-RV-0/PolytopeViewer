@@ -35,9 +35,7 @@ export async function startRecord() {
   this.updateEnable(false);
   this.recordStates = {
     rots: {
-      Infinity: this.recordConfig.initialRot
-        ? helperFunc.create4DRotationMat(...this.recordConfig.initialRot)
-        : this.rotUni.value
+      0: this.recordConfig.initialRot ?? [...this.rotAngles]
     },
     ofs: this.recordConfig.initialOfs
       ? new THREE.Vector4(...this.recordConfig.initialOfs)
@@ -88,7 +86,6 @@ export async function startRecord() {
         return i.end ?? i.at ?? -1;
       })
     ) + (this.recordConfig.endExtraFrames ?? 30);
-  this.rotAngles = [0, 0, 0, 0, 0, 0];
   this.rotUni.value = new THREE.Matrix4();
   this.controls.dispose();
 
@@ -179,6 +176,7 @@ export function genFrame(frameIndex) {
   } = this.recordStates;
   const rot = helperFunc
     .getSortedValuesDesc(rots)
+    .map(r => helperFunc.create4DRotationMat(...r))
     .reduce((accumulator, currentMatrix) => {
       const product = new THREE.Matrix4();
       product.multiplyMatrices(accumulator, currentMatrix);
@@ -256,17 +254,11 @@ export function updateRecordStates(frameIndex) {
     const interps = action.interps;
     switch (action.type) {
       case 'rot': {
-        const rotAng = [0, 0, 0, 0, 0, 0];
-        rotAng[action.plane] = action.angle * interps[prog];
-        if (this.recordStates.rots[action.index]) {
-          this.recordStates.rots[action.index].multiply(
-            helperFunc.create4DRotationMat(...rotAng)
-          );
-        } else {
-          this.recordStates.rots[action.index] = helperFunc.create4DRotationMat(
-            ...rotAng
-          );
+        if (!Object.hasOwnProperty.call(this.recordStates.rots, action.priority ?? 0)) {
+          this.recordStates.rots[action.priority ?? 0] = [0, 0, 0, 0, 0, 0];
         }
+        
+        this.recordStates.rots[action.priority ?? 0][action.plane] += action.angle * interps[prog]
         break;
       }
       case 'trans4':
