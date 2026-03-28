@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import noUiSlider from 'nouislider';
 import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
 import YAML from 'js-yaml';
 import * as helperFunc from '../helperFunc.js';
-import env from '../../assets/env.hdr';
+import env from '../../assets/env.exr';
 import * as types from '../type.js';
 
 /**
@@ -197,7 +197,7 @@ export function _initializeScene() {
  * @this {types.PolytopeRendererApp}
  */
 export function _initializeEnv() {
-  const loader = new RGBELoader();
+  const loader = new EXRLoader();
   loader.load(env, texture => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     this.scene.environment = texture;

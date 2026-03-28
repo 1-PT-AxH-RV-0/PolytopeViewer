@@ -4,6 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const WebpackBar = require('webpackbar');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const production = true;
 
@@ -11,8 +12,16 @@ module.exports = ({
   cache: {
     type: 'filesystem',
     buildDependencies: {
-      config: [__filename]
-    }
+      config: [__filename],
+    },
+    cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
+    name: 'cache'
+  },
+  performance: {
+    hints: 'warning',
+    maxAssetSize: 320 * 1024,
+    maxEntrypointSize: 320 * 1024,
+    assetFilter: (assetFilename) => !assetFilename.endsWith('.exr')
   },
   entry: {index: './src/viewer.js'},
   output: {
@@ -66,7 +75,7 @@ module.exports = ({
         }
       },
       {
-        test: /\.(off|hdr)$/i,
+        test: /\.(off|exr)$/i,
         type: 'asset',
         parser: {
           dataUrlCondition: {
@@ -113,6 +122,18 @@ module.exports = ({
   },
   plugins: [
     new WebpackBar(),
+    new CompressionPlugin({
+      test: /\.(off|css|js)$/,
+      algorithm: 'brotliCompress',  // 使用 Brotli
+      compressionOptions: {
+        params: {
+          [require('zlib').constants.BROTLI_PARAM_QUALITY]: 11  // Brotli 质量级别 0-11，11 最高
+        }
+      },
+      threshold: 10240,
+      minRatio: 0.8,
+      deleteOriginalAssets: true
+    }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css'
     }),
