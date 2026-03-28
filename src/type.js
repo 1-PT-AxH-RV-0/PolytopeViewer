@@ -49,7 +49,7 @@
  * @property {Array<[number, number, number]>} faces - 面索引数组，必须是三角形面。
  * @property {Array<[number, number]>} edges - 边索引数组。
  * @property {{[key: string]: string}} facesMap - 原始面索引与处理后的面索引的映射关系。
- * @property {Object<number, number[]>} ngonsInFaces - 按边数分组的面索引。
+ * @property {{[key: string]: number[]}} ngonsInFaces - 按边数分组的面索引。
  * @property {Array<Array<number>>} originalFaces - 原始面索引数组。
  * @property {Array<Point3D>} originalFaceCenters - 原始面的中心点。
  * @property {Array<Point3D>} originalFaceNormals - 原始面的法向量。
@@ -107,7 +107,13 @@
 
 /**
  * 高亮配置。
- * @typedef {Object<string, CellsSelectorConfig | FacesSelectorConfig | 'all'>} HighlightConfig
+ * @typedef {{[key: string]: CellsSelectorConfig | FacesSelectorConfig | 'all'}} HighlightConfig
+ */
+
+/**
+ * 应用程序主类（PolytopeRendererApp）类型。
+ * 实际定义在 viewer.js 中。
+ * @typedef {import('./viewer.js').PolytopeRendererApp} PolytopeRendererApp
  */
 
 export const Point3D = {};

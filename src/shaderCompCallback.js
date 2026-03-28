@@ -4,14 +4,14 @@ import shaderFuncs from './GLSLs.js';
 /**
  * 3D 空间球体材质：在顶点阶段简单地按 radius 缩放顶点。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform.
- * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
- * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
- * @param separationDistUni
- * @param faceScaleUni
- * @param edgeScaleUni
- * @param faceCenterUni
- * @param faceNormalUni
+ * @param {THREE.IUniform<number>} sphereRadiusUni - 球体半径 uniform。
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform。
+ * @param {THREE.IUniform<number>} separationDistUni - 分离距离 uniform。
+ * @param {THREE.IUniform<number>} faceScaleUni - 面缩放 uniform。
+ * @param {THREE.IUniform<number>} edgeScaleUni - 边缩放 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceCenterUni - 面中心 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceNormalUni - 面法线 uniform。
  * @returns {THREE.Material} - 新材质实例。
  */
 function sphereMaterial3D(
@@ -70,14 +70,14 @@ function sphereMaterial3D(
 /**
  * 3D 空间圆柱材质：在顶点阶段按 x, z 方向缩放至所需半径。
  * @param {THREE.Material} material - 原始材质。
- * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform.
- * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform.
- * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform.
- * @param separationDistUni
- * @param faceScaleUni
- * @param edgeScaleUni
- * @param faceCenterUni
- * @param faceNormalUni
+ * @param {THREE.IUniform<number>} cylinderRadiusUni - 圆柱半径 uniform。
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform。
+ * @param {THREE.IUniform<number>} separationDistUni - 分离距离 uniform。
+ * @param {THREE.IUniform<number>} faceScaleUni - 面缩放 uniform。
+ * @param {THREE.IUniform<number>} edgeScaleUni - 边缩放 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceCenterUni - 面中心 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceNormalUni - 面法线 uniform。
  * @returns {THREE.Material} - 新材质实例。
  */
 function cylinderMaterial3D(
@@ -151,14 +151,15 @@ function cylinderMaterial3D(
 }
 
 /**
- *
- * @param material
- * @param rotUni
- * @param ofs3Uni
- * @param separationDistUni
- * @param faceScaleUni
- * @param faceCenterUni
- * @param faceNormalUni
+ * 3D 面材质：支持面缩放和分离距离效果。
+ * @param {THREE.Material} material - 原始材质。
+ * @param {THREE.IUniform<THREE.Matrix4>} rotUni - 4D 旋转矩阵 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} ofs3Uni - 3D 位置偏移 uniform。
+ * @param {THREE.IUniform<number>} separationDistUni - 分离距离 uniform。
+ * @param {THREE.IUniform<number>} faceScaleUni - 面缩放 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceCenterUni - 面中心 uniform。
+ * @param {THREE.IUniform<THREE.Vector3>} faceNormalUni - 面法线 uniform。
+ * @returns {THREE.Material} - 新材质实例。
  */
 function faceMaterial3D(
   material,

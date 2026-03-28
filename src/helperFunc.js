@@ -34,7 +34,7 @@ function decomposeSelfIntersectingPolygon(originalPoints) {
 }
 
 /**
- * 计算 3D 点集所在平面的法向量。
+ * 计算 3D 点集的平面法向量（右手定则）。
  * @param {Array<type.Point3D>} points - 3D 点集。
  * @returns {type.Point3D} 单位法向量。
  */
@@ -59,8 +59,9 @@ function computeNormal(points) {
 }
 
 /**
- *
- * @param points
+ * 计算由三个点定义的三角形的法线，并确保法线指向外部。
+ * @param {Array<type.Point3D>} points - 三个顶点数组。
+ * @returns {type.Point3D} 计算得到的单位法线向量。
  */
 function computeNormalOutward(points) {
   // 1. 先计算原始法线
@@ -268,15 +269,16 @@ function rotate4DPointsToXY(points) {
 }
 
 /**
- * 计算 4x4 矩阵的行列式（行主序）
- * @param {type.RotationMatrix} m - 4x4 矩阵
- * @returns {number} 行列式值
+ * 计算 4x4 矩阵的行列式（行主序）。
+ * @param {type.RotationMatrix} m - 4x4 矩阵。
+ * @returns {number} 行列式值。
  */
 function compute4x4Determinant(m) {
   // 3x3 子式辅助函数
   /**
-   *
-   * @param m3
+   * 计算 3x3 矩阵的行列式。
+   * @param {number[][]} m3 - 3x3 矩阵。
+   * @returns {number} 行列式值。
    */
   function det3x3(m3) {
     return (
@@ -916,11 +918,15 @@ function validateRecordConfig(config, is4D) {
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
     }
-    
-    if (Object.hasOwnProperty.call(action, 'priority') && (typeof action.priority !== 'number' || !Number.isInteger(action.priority) || !isNaN(action.priority) || !isFinite(action.priority))) {
-      throw new Error(
-        `actions[${index}] 的 priority 不是整数。`
-      );
+
+    if (
+      Object.hasOwnProperty.call(action, 'priority') &&
+      (typeof action.priority !== 'number' ||
+        !Number.isInteger(action.priority) ||
+        !isNaN(action.priority) ||
+        !isFinite(action.priority))
+    ) {
+      throw new Error(`actions[${index}] 的 priority 不是整数。`);
     }
 
     if (
@@ -1213,11 +1219,12 @@ function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
   }
 
   /**
-   * 将百分比 (0-100) 映射到实际值
+   * 将百分比 (0-100) 映射到实际值。
    * 规则：
    * - 过零区间：先平移到对称区间 [-M, M]，正负半轴分别用指数映射，再平移回去
    * - 不过零区间：先平移到 [0, L]（L = max-min），用指数映射，再平移回去
-   * @param p
+   * @param {number} p - 百分比值 (0-100)。
+   * @returns {number} 映射后的实际值。
    */
   function valueFromPercent(p) {
     const t = p / 100; // 0 ~ 1
@@ -1287,8 +1294,9 @@ function createInterpolation(timingFn) {
 }
 
 /**
- *
- * @param color
+ * 将十六进制颜色字符串转换为 RGB 和 Alpha 分量。
+ * @param {string} color - 十六进制颜色字符串（如 'FF0000FF'）。
+ * @returns {{rgb: number, a: number}} 包含 RGB 值和 Alpha 值（0-1）的对象。
  */
 function colorStrToInt(color) {
   const colorNum = parseInt(color, 16);
