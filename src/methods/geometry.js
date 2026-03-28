@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
+import * as types from '../type.js';
 
 /**
  * 创建三维线框和顶点组。
  * 使用圆柱体表示边，球体表示顶点。
- * @this {PolytopeRendererApp}
- * @param {Array<import('../type.js').Edge3D>} edges - 边数组，每条边包含两个端点。
+ * @this {types.PolytopeRendererApp}
+ * @param {Array<types.Edge3D>} edges - 边数组，每条边包含两个端点。
  * @param {object} [options] - 配置选项。
  * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
  * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
@@ -138,8 +139,8 @@ export function createWireframeAndVertices(
 /**
  * 创建四维线框和顶点组。
  * 使用圆柱体表示边，球体表示顶点，支持四维投影。
- * @this {PolytopeRendererApp}
- * @param {Array<import('../type.js').Edge4D>} edges - 四维边数组。
+ * @this {types.PolytopeRendererApp}
+ * @param {Array<types.Edge4D>} edges - 四维边数组。
  * @param {object} [options] - 配置选项。
  * @param {THREE.Material} [options.cylinderMaterial] - 圆柱体材质。
  * @param {THREE.Material} [options.sphereMaterial] - 球体材质。
@@ -261,8 +262,8 @@ export function create4DWireframeAndVertices(
 /**
  * 创建分离的面组。
  * 为每个原始面创建独立的网格对象，支持分离距离和面缩放效果。
- * @this {PolytopeRendererApp}
- * @param {import('../type.js').Mesh3D} meshData - 处理后的网格数据。
+ * @this {types.PolytopeRendererApp}
+ * @param {types.Mesh3D} meshData - 处理后的网格数据。
  * @param {THREE.Material} material - 材质对象。
  * @returns {{facesGroup: THREE.Group, separatedWireframeGroup: THREE.Group, separatedVerticesGroup: THREE.Group}} 面组、分离线框组和分离顶点组。
  */
