@@ -141,7 +141,8 @@ module.exports = ({
       title: '多胞形预览器',
       template: './src/index.html',
       filename: 'index.html',
-      chunks: ['index']
+      chunks: ['index'],
+      favicon: './assets/Logo.png'
     })
   ],
   devtool: production ? false : 'cheap-module-source-map',
