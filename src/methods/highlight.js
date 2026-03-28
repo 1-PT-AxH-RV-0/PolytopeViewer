@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '../shaderCompCallback.js';
+import * as types from '../type.js';
 
 /**
  * 修改面组中所有面的颜色。
@@ -21,8 +22,8 @@ function changeFaceColor(faces, colorInt) {
 /**
  * 高亮四维多胞体的胞。
  * 根据配置选择特定的胞并以指定颜色高亮显示。
- * @this {PolytopeRendererApp}
- * @param {Object<string, object | 'all'>} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为胞选择器配置。
+ * @this {types.PolytopeRendererApp}
+ * @param {types.HighlightConfig} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为胞选择器配置。
  * @throws {Error} 当颜色码无效或胞索引不存在时抛出错误。
  */
 export function highlightCells(highlightConfig) {
@@ -216,8 +217,8 @@ export function highlightCells(highlightConfig) {
 /**
  * 高亮三维多面体的面。
  * 根据配置选择特定的面并以指定颜色高亮显示。
- * @this {PolytopeRendererApp}
- * @param {Object<string, object | 'all'>} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为面选择器配置。
+ * @this {types.PolytopeRendererApp}
+ * @param {types.HighlightConfig} highlightConfig - 高亮配置对象，键为 16 进制 RGBA 色码，值为面选择器配置。
  * @throws {Error} 当颜色码无效或面索引不存在时抛出错误。
  */
 export function highlightFaces(highlightConfig) {

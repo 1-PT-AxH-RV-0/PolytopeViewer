@@ -1,7 +1,9 @@
+import * as types from '../type.js';
+
 /**
  * 触发错误对话框。
  * 显示错误消息弹窗。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {string} msg - 错误消息内容（支持 HTML）。
  */
 export function triggerErrorDialog(msg) {

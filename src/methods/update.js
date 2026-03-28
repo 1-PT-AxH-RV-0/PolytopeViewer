@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
+import * as types from '../type.js';
 
 /**
  * 更新所有属性到当前 UI 状态。
  * 同步可见性、透明度、相机模式、尺寸等属性。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateProperties() {
   helperFunc.changeMaterialProperty(
@@ -50,7 +51,7 @@ export function updateProperties() {
 /**
  * 更新投影距离。
  * 从滑块读取新值并更新 uniform。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateProjectionDistance() {
   this.projDistUni.value = this.projectionDistanceSlider.noUiSlider.get(true);
@@ -60,7 +61,7 @@ export function updateProjectionDistance() {
 /**
  * 更新线框和顶点的可见性。
  * 根据分离距离和面缩放设置决定显示原始或分离版本。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateWireframeAndVerticesVisibilities() {
   helperFunc.changeMaterialProperty(
@@ -102,7 +103,7 @@ export function updateWireframeAndVerticesVisibilities() {
 /**
  * 更新分离距离。
  * 从滑块读取新值并更新 uniform，同时更新线框和顶点可见性。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateSeparationDist() {
   this.separationDistUni.value =
@@ -113,7 +114,7 @@ export function updateSeparationDist() {
 /**
  * 更新面缩放。
  * 从滑块读取新值并更新 uniform，同时更新线框和顶点可见性。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateFaceScale() {
   this.faceScaleUni.value = this.faceScaleSlider.noUiSlider.get(true);
@@ -121,7 +122,9 @@ export function updateFaceScale() {
 }
 
 /**
- *
+ * 更新边缩放。
+ * 从滑块读取新值并更新 uniform。
+ * @this {types.PolytopeRendererApp}
  */
 export function updateEdgeScale() {
   this.edgeScaleUni.value = this.edgeScaleSlider.noUiSlider.get(true);
@@ -131,7 +134,7 @@ export function updateEdgeScale() {
 /**
  * 更新旋转矩阵。
  * 从六个旋转滑块读取角度并计算四维旋转矩阵。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  */
 export function updateRotation() {
   const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
@@ -143,7 +146,7 @@ export function updateRotation() {
 /**
  * 更新缩放因子。
  * 设置模型的整体缩放，并同步更新相关的 uniform 值。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {number} scaleFactor - 新的缩放因子。
  * @param {boolean} [updateSlider] - 是否同步更新滑块显示。
  */
@@ -166,7 +169,7 @@ export function updateScaleFactor(scaleFactor, updateSlider = true) {
 /**
  * 更新 UI 元素的启用/禁用状态。
  * 根据当前模式（3D/4D）和录制状态控制各控件的可用性。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {boolean} [enable] - 是否启用 UI 元素。
  */
 export function updateEnable(enable = true) {
@@ -218,7 +221,7 @@ export function updateEnable(enable = true) {
 /**
  * 切换相机投影模式。
  * 在透视投影和正交投影之间切换。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {boolean} isPersp - true 为透视投影，false 为正交投影。
  */
 export function toggleCamera(isPersp) {

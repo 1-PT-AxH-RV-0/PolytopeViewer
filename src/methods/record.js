@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import YAML from 'js-yaml';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import * as helperFunc from '../helperFunc.js';
+import * as types from '../type.js';
 
 /**
  * 开始视频录制。
  * 解析配置文件，初始化录制状态，并启动渲染循环。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @returns {Promise<void>}
  */
 export async function startRecord() {
@@ -153,7 +154,7 @@ export async function startRecord() {
 /**
  * 生成指定帧的画面。
  * 根据录制状态更新场景并渲染一帧。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {number} frameIndex - 当前帧索引。
  */
 export function genFrame(frameIndex) {
@@ -242,7 +243,7 @@ export function genFrame(frameIndex) {
 /**
  * 更新录制状态。
  * 根据当前帧索引处理所有动作并更新状态对象。
- * @this {PolytopeRendererApp}
+ * @this {types.PolytopeRendererApp}
  * @param {number} frameIndex - 当前帧索引。
  */
 export function updateRecordStates(frameIndex) {
@@ -254,11 +255,17 @@ export function updateRecordStates(frameIndex) {
     const interps = action.interps;
     switch (action.type) {
       case 'rot': {
-        if (!Object.hasOwnProperty.call(this.recordStates.rots, action.priority ?? 0)) {
+        if (
+          !Object.hasOwnProperty.call(
+            this.recordStates.rots,
+            action.priority ?? 0
+          )
+        ) {
           this.recordStates.rots[action.priority ?? 0] = [0, 0, 0, 0, 0, 0];
         }
-        
-        this.recordStates.rots[action.priority ?? 0][action.plane] += action.angle * interps[prog]
+
+        this.recordStates.rots[action.priority ?? 0][action.plane] +=
+          action.angle * interps[prog];
         break;
       }
       case 'trans4':
