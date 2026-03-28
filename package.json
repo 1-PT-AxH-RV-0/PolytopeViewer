@@ -3,8 +3,10 @@
     "@babel/preset-env": "^7.26.9",
     "autoprefixer": "^10.4.21",
     "babel-loader": "^10.0.0",
+    "compression-webpack-plugin": "^12.0.0",
     "css-loader": "^7.1.2",
-    "css-minimizer-webpack-plugin": "^7.0.2",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "del": "^8.0.1",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-jsdoc": "^51.3.2",
@@ -13,7 +15,7 @@
     "html-webpack-plugin": "^5.6.3",
     "mini-css-extract-plugin": "^2.9.3",
     "postcss-loader": "^8.1.1",
-    "sass": "^1.90.0",
+    "sass": "^1.69.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
     "stylelint": "^16.23.1",
@@ -27,7 +29,8 @@
     "webpackbar": "^7.0.0"
   },
   "scripts": {
-    "format": "npx eslint --fix . && npx prettier --write \"**/*.html\" && npx prettier --write \"**/*.scss\" && stylelint \"**/*.scss\" --fix"
+    "format": "npx eslint --fix . && npx prettier --write \"**/*.html\" && npx prettier --write \"**/*.scss\" && stylelint \"**/*.scss\" --fix",
+    "server": "http-server ./dist --brotli -p 8271"
   },
   "dependencies": {
     "@codemirror/lang-yaml": "^6.1.2",
