@@ -3,6 +3,7 @@ import YAML from 'js-yaml';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
 import * as helperFunc from '../helperFunc.js';
 import * as types from '../type.js';
+import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
 
 /**
  * 开始视频录制。
@@ -79,6 +80,7 @@ export async function startRecord() {
       YAML.load(this.editor.state.doc.toString()),
     scaleFactor: this.recordConfig.initialScaleFactor ?? this.scaleFactor
   };
+  const size = this.recordConfig.size;
 
   const totalFrames =
     Math.max(
@@ -100,6 +102,22 @@ export async function startRecord() {
   this.capturer.start();
 
   let frameIndex = 0;
+  if (Object.hasOwnProperty.call(this.recordConfig, "ssaaUsed")) {
+    this.ssaaPass = new SSAARenderPass(this.scene, this.camera);
+    this.ssaaPass.sampleLevel = this.recordConfig.ssaaUsed;
+    this.composer.passes[0] = this.ssaaPass;
+  }
+  if (Object.hasOwnProperty.call(this.recordConfig, "bloomUsed") && !this.recordConfig.bloomUsed) {
+    this.bloomPass.strength = 0;
+    this.bloomPass.threshold = 1.0;
+  }
+  
+  if (size) {
+    this.renderer.setSize(size, size, false);
+    this.composer.setSize(size, size);
+    this.ssaaPass.setSize(size, size);
+    this.bloomPass.setSize(size, size);
+  }
 
   /**
    * 渲染终止后的动作。
@@ -119,7 +137,17 @@ export async function startRecord() {
     if (!this.is4D)
       this.highlightFaces(YAML.load(this.editor.state.doc.toString()));
     this._initializeControls();
-
+    this.composer.passes[0] = this.renderPass;
+    this.bloomPass.strength = 0.3;
+    this.bloomPass.threshold = 0.98;
+    
+    const dpr = window.devicePixelRatio || 1;
+    const maxSize = Math.min(
+      Math.min(window.innerWidth, window.innerHeight),
+      720
+    );
+    this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
+    
     this.isRenderingFlag = false;
     this.requestSingleRender();
 

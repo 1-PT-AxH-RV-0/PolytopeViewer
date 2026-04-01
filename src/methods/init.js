@@ -9,6 +9,10 @@ import YAML from 'js-yaml';
 import * as helperFunc from '../helperFunc.js';
 import env from '../../assets/env.exr';
 import * as types from '../type.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 /**
  * 初始化 DOM 元素引用。
@@ -143,42 +147,13 @@ export function _initializeSliders() {
 }
 
 /**
- * 初始化 WebGL 渲染器。
- * 设置渲染器大小、设备像素比，并添加窗口大小变化事件监听器。
+ * 初始化相机。
+ * 创建透视相机并设置初始位置。
  * @this {types.PolytopeRendererApp}
  */
-export function _initializeRenderer() {
-  const dpr = window.devicePixelRatio || 1;
-
-  this.renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    powerPreference: 'high-performance',
-    canvas: this.canvas
-  });
-
-  const maxSize = Math.min(
-    Math.min(window.innerWidth, window.innerHeight),
-    720
-  );
-  this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
-  this.canvas.style.width = `${maxSize}px`;
-  this.canvas.style.height = `${maxSize}px`;
-  this.progCon.style.left = `${maxSize / 2 + 8}px`;
-  this.progCon.style.top = `${maxSize / 2 + 8}px`;
-  if (this.nanobar) this.nanobar.style.width = `${maxSize * 0.7}px`;
-
-  window.addEventListener('resize', () => {
-    const newMaxSize = Math.min(
-      Math.min(window.innerWidth, window.innerHeight),
-      720
-    );
-    this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
-    this.canvas.style.width = `${newMaxSize}px`;
-    this.canvas.style.height = `${newMaxSize}px`;
-    this.progCon.style.left = `${newMaxSize / 2 + 8}px`;
-    this.progCon.style.top = `${newMaxSize / 2 + 8}px`;
-    if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
-  });
+export function _initializeCameras() {
+  this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
+  this.camera.position.set(0, 0, 120);
 }
 
 /**
@@ -205,13 +180,58 @@ export function _initializeEnv() {
 }
 
 /**
- * 初始化相机。
- * 创建透视相机并设置初始位置。
+ * 初始化 WebGL 渲染器。
+ * 设置渲染器大小、设备像素比，并添加窗口大小变化事件监听器。
  * @this {types.PolytopeRendererApp}
  */
-export function _initializeCameras() {
-  this.camera = new THREE.PerspectiveCamera(60, 1.0, 0.01, 500);
-  this.camera.position.set(0, 0, 120);
+export function _initializeRenderer() {
+  const dpr = window.devicePixelRatio || 1;
+
+  this.renderer = new THREE.WebGLRenderer({
+    powerPreference: 'high-performance',
+    canvas: this.canvas
+  });
+
+  const maxSize = Math.min(
+    Math.min(window.innerWidth, window.innerHeight),
+    720
+  );
+  this.canvas.style.width = `${maxSize}px`;
+  this.canvas.style.height = `${maxSize}px`;
+  this.progCon.style.left = `${maxSize / 2 + 8}px`;
+  this.progCon.style.top = `${maxSize / 2 + 8}px`;
+  if (this.nanobar) this.nanobar.style.width = `${maxSize * 0.7}px`;
+
+  this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
+  this.composer = new EffectComposer(this.renderer);
+  this.renderPass = new RenderPass(this.scene, this.camera);
+  this.ssaaPass = new SSAARenderPass(this.scene, this.camera);
+  this.bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(maxSize, maxSize),
+    0.3,
+    0.1,
+    0.98
+  );
+  this.composer.addPass(this.renderPass);
+  this.composer.addPass(this.bloomPass);
+  
+  window.addEventListener('resize', () => {
+    const newMaxSize = Math.min(
+      Math.min(window.innerWidth, window.innerHeight),
+      720
+    );
+    
+    this.canvas.style.width = `${newMaxSize}px`;
+    this.canvas.style.height = `${newMaxSize}px`;
+    this.progCon.style.left = `${newMaxSize / 2 + 8}px`;
+    this.progCon.style.top = `${newMaxSize / 2 + 8}px`;
+    if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
+    
+    this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
+    this.composer.setSize(newMaxSize, newMaxSize);
+    this.ssaaPass.setSize(newMaxSize, newMaxSize);
+    this.bloomPass.setSize(newMaxSize, newMaxSize);
+  });
 }
 
 /**

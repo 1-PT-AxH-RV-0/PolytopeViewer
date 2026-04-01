@@ -32,16 +32,16 @@ export function createWireframeAndVertices(
     cylinderMaterial ||
     new THREE.MeshStandardMaterial({
       color: cylinderColor,
-      metalness: 1.0,
-      roughness: 0.05
+      metalness: 0.95,
+      roughness: 0.1
     });
 
   let defaultSphereMaterial =
     sphereMaterial ||
     new THREE.MeshStandardMaterial({
       color: sphereColor,
-      metalness: 1.0,
-      roughness: 0.05
+      metalness: 0.95,
+      roughness: 0.1
     });
 
   defaultCylinderMaterial = shaderCompCallback.cylinderMaterial3D(
@@ -161,16 +161,16 @@ export function create4DWireframeAndVertices(
     cylinderMaterial ||
     new THREE.MeshStandardMaterial({
       color: cylinderColor,
-      metalness: 1.0,
-      roughness: 0.05
+      metalness: 0.95,
+      roughness: 0.1
     });
 
   let defaultSphereMaterial =
     sphereMaterial ||
     new THREE.MeshStandardMaterial({
       color: sphereColor,
-      metalness: 1.0,
-      roughness: 0.05
+      metalness: 0.95,
+      roughness: 0.1
     });
 
   defaultCylinderMaterial = shaderCompCallback.cylinderMaterial(

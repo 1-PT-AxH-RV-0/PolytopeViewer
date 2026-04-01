@@ -235,6 +235,10 @@ export function toggleCamera(isPersp) {
 
   this.camera.position.copy(oldCamera.position);
   this.camera.rotation.copy(oldCamera.rotation);
+  
+  this.ssaaPass.camera = this.camera;
+  this.renderPass.camera = this.camera;
+  
   this._initializeControls();
   this.requestSingleRender();
 }

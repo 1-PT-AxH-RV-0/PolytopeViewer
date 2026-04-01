@@ -604,6 +604,13 @@ function getSortedValuesDesc(obj) {
  * @throws {Error} 当任何字段验证失败时抛出错误，包含具体的错误信息。
  */
 function validateRecordConfig(config, is4D) {
+  if (Object.hasOwnProperty.call(config, "ssaaUsed") && (!Number.isInteger(config.ssaaUsed) || !config.ssaaUsed > 0)) {
+    throw new Error('ssaaUsed 字段必须是正整数。');
+  }
+  if (Object.hasOwnProperty.call(config, "bloomUsed") && typeof config.bloomUsed !== 'boolean') {
+    throw new Error('bloomUsed 字段必须是布尔值。');
+  }
+
   if (config.initialRot !== undefined) {
     if (
       !Array.isArray(config.initialRot) ||

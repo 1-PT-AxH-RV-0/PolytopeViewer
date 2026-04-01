@@ -19,6 +19,9 @@
 | initialFaceScale            | number            | 初始面缩放（3D）            | 必须为实数，只在 3D 模式下可用                                                        |
 | initialScaleFactor          | number            | 初始缩放因子                | 必须为正实数                                                                          |
 | endExtraFrames              | number            | 末尾的额外帧数，默认 30(1s) | 必须为自然数                                                                          |
+| size                        | number            | 生成的视频的长宽            | 必须为正整数                                                                          |
+| ssaaUsed                    | number            | 使用 SSAA，值为 SSAA 倍数   | 必须为正整数                                                                          |
+| bloomUsed                   | boolean           | 是否启用泛光                | 必须为布尔值                                                                          |
 
 ## 动作配置(actions)
 
