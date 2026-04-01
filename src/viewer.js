@@ -116,6 +116,10 @@ class PolytopeRendererApp {
 
     // 渲染用变量。
     this.renderer = null;
+    this.composer = null;
+    this.renderPass = null;
+    this.smaaPass = null;
+    this.bloomPass = null
     this.isRenderingFlag = false;
     this.scene = null;
     this.camera = null;
@@ -142,12 +146,10 @@ class PolytopeRendererApp {
     this.scaleFactor = 1;
     this.initialMaterial = new THREE.MeshStandardMaterial({
       color: 0x3f7dbd,
-      roughness: 0.2,
-      metalness: 0.1,
-      emissive: 0x000000,
+      roughness: 0.4,
+      metalness: 0.2,
       flatShading: true,
       side: THREE.DoubleSide,
-      emissiveIntensity: 1
     });
     this.editor = null;
     this.errorModalBs = null;
@@ -216,10 +218,10 @@ class PolytopeRendererApp {
   async init() {
     this._initializeDomElements();
     this._initializeSliders();
-    this._initializeRenderer();
+    this._initializeCameras();
     this._initializeScene();
     this._initializeEnv();
-    this._initializeCameras();
+    this._initializeRenderer();
     this._initializeControls();
     this._initializeEditor();
 

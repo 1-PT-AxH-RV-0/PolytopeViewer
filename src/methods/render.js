@@ -7,7 +7,7 @@ import * as types from '../type.js';
  */
 export function render() {
   this.controls.update();
-  this.renderer.render(this.scene, this.camera);
+  this.composer.render();
 }
 
 /**
