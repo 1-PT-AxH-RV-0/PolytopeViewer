@@ -214,6 +214,10 @@ export function updateEnable(enable = true) {
   this.separationDistSlider.noUiSlider[enableStringBy3D]();
   this.faceScaleSlider.noUiSlider[enableStringBy3D]();
   this.edgeScaleSlider.noUiSlider[enableStringBy3D]();
+  
+  if (this.faceVisibleSwitcher.checked && this.isSkew) this.faceVisibleSwitcher.checked = false;
+  if (!this.isSkew) this.faceVisibleSwitcher.checked = true;
+  this.faceVisibleSwitcher.disabled = this.isSkew;
 
   this.startRecordBtn.disabled = this.isRecordingFlag;
 }

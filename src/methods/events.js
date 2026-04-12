@@ -100,7 +100,7 @@ export function setupEventListeners() {
       this.updateProperties();
       this.highlightCells(highlightConfig);
     } catch (e) {
-      this.triggerErrorDialog(e.message);
+      this.triggerErrorDialog(e.stack);
       console.error(e);
     }
   });
@@ -110,7 +110,7 @@ export function setupEventListeners() {
       this.updateProperties();
       this.highlightFaces(highlightConfig);
     } catch (e) {
-      this.triggerErrorDialog(e.message);
+      this.triggerErrorDialog(e.stack);
       console.error(e);
     }
   });
@@ -239,7 +239,7 @@ export function setupSolidInfFamiliesEventListeners() {
         this.initialMaterial
       );
     } catch (e) {
-      this.triggerErrorDialog(e.message);
+      this.triggerErrorDialog(e.stack);
       console.error(e);
     }
   });
@@ -270,7 +270,7 @@ export function setupSolidInfFamiliesEventListeners() {
         this.initialMaterial
       );
     } catch (e) {
-      this.triggerErrorDialog(e.message);
+      this.triggerErrorDialog(e.stack);
       console.error(e);
     }
   });
@@ -307,7 +307,7 @@ export function handleFileInputChange(e) {
         await this.loadMeshFromData(data, this.initialMaterial);
       }
     } catch (e) {
-      this.triggerErrorDialog(e.message);
+      this.triggerErrorDialog(e.stack);
       console.error(e);
     } finally {
       e.target.value = '';

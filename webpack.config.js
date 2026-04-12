@@ -9,14 +9,14 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const production = true;
 
 module.exports = ({
-  cache: {
-    type: 'filesystem',
-    buildDependencies: {
-      config: [__filename],
-    },
-    cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
-    name: 'cache'
-  },
+  // cache: {
+    // type: 'filesystem',
+    // buildDependencies: {
+      // config: [__filename],
+    // },
+    // cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
+    // name: 'cache'
+  // },
   performance: {
     hints: 'warning',
     maxAssetSize: 320 * 1024,

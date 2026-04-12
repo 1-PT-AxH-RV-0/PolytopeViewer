@@ -143,6 +143,7 @@ class PolytopeRendererApp {
     // 其他变量。
     this.loadMeshPromise = null;
     this.is4D = false;
+    this.isSkew = false;
     this.scaleFactor = 1;
     this.initialMaterial = new THREE.MeshStandardMaterial({
       color: 0x3f7dbd,

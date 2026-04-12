@@ -1313,6 +1313,36 @@ function colorStrToInt(color) {
   return { rgb, a };
 }
 
+/**
+ * 判断三维点集是否共面
+ * @param {Array<type.Point3D>} points - 点集数组，每个元素为 {x, y, z} 对象
+ * @returns {boolean} - 共面返回 true，否则返回 false
+ */
+function arePointsCoplanar(points, epsilon = 1e-2) {
+    if (points.length < 4) return true;
+    
+    // 取前3点确定平面
+    const p0 = points[0], p1 = points[1], p2 = points[2];
+    
+    // 计算法向量 (p1-p0) × (p2-p0)
+    const v1 = { x: p1.x - p0.x, y: p1.y - p0.y, z: p1.z - p0.z };
+    const v2 = { x: p2.x - p0.x, y: p2.y - p0.y, z: p2.z - p0.z };
+    
+    const n = {
+        x: v1.y * v2.z - v1.z * v2.y,
+        y: v1.z * v2.x - v1.x * v2.z,
+        z: v1.x * v2.y - v1.y * v2.x
+    };
+    
+    // 检查所有点到平面的距离
+    for (let i = 3; i < points.length; i++) {
+        const v = { x: points[i].x - p0.x, y: points[i].y - p0.y, z: points[i].z - p0.z };
+        const dist = Math.abs(n.x * v.x + n.y * v.y + n.z * v.z);
+        if (dist > epsilon) return false;
+    }
+    return true;
+}
+
 export {
   decomposeSelfIntersectingPolygon,
   computeNormalOutward,
@@ -1338,5 +1368,6 @@ export {
   filterArray,
   generateLogarithmicRange,
   createInterpolation,
-  colorStrToInt
+  colorStrToInt,
+  arePointsCoplanar
 };

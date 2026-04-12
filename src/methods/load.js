@@ -36,6 +36,7 @@ export function processMeshData(meshData, is4D = false) {
     new URL('../processMeshData.worker.js', import.meta.url)
   );
   this.nanobar = bar.el;
+  this.isSkew = false;
   bar.el.style.position = 'static';
 
   const promise = new Promise((resolve, reject) => {
@@ -55,6 +56,7 @@ export function processMeshData(meshData, is4D = false) {
           bar.el.remove();
           this.loadMeshPromise = null;
           this.nanobar = null;
+          this.isSkew = data.isSkew;
           resolve(data);
           break;
         case 'error':
