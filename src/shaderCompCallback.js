@@ -254,8 +254,9 @@ function sphereMaterial(
       `
       #include <begin_vertex>
       // 将顶点按球体半径缩放，再加上中心点的 3D 投影
-      vec3 center3D = schlegelProjection(rotation4D * center4D + offset4D);
-      float radius_scale = max(length(center3D) / length(center4D), 0.1);
+      vec4 t_center4D = rotation4D * center4D + offset4D;
+      vec3 center3D = schlegelProjection(t_center4D);
+      float radius_scale = min(projectionDistance / (projectionDistance - t_center4D.w), 2.0);
       transformed = transformed * radius * radius_scale + center3D + offset3D;
       `
     );
@@ -315,9 +316,12 @@ function cylinderMaterial(
         '#include <defaultnormal_vertex>',
         `
         #include <defaultnormal_vertex>
+        // 计算变换后的坐标
+        vec4 tv1 = rotation4D * v1 + offset4D;
+        vec4 tv2 = rotation4D * v2 + offset4D;
         // 计算 4D 空间中圆柱两端点的投影
-        vec3 pv1 = schlegelProjection(rotation4D * v1 + offset4D);
-        vec3 pv2 = schlegelProjection(rotation4D * v2 + offset4D);
+        vec3 pv1 = schlegelProjection(tv1);
+        vec3 pv2 = schlegelProjection(tv2);
         
         // 计算法线
         mat3 cylinderNormalTransform = mat3(transpose(inverse(getCylinderTransform(pv1, pv2, 0.001))));
@@ -329,8 +333,8 @@ function cylinderMaterial(
         `
         #include <begin_vertex>
         // 计算两端的缩放
-        float v1_radius_scale = max(length(pv1) / length(v1), 0.1);
-        float v2_radius_scale = max(length(pv2) / length(v2), 0.1);
+        float v1_radius_scale = min(projectionDistance / (projectionDistance - tv1.w), 2.0);
+        float v2_radius_scale = min(projectionDistance / (projectionDistance - tv2.w), 2.0);
         // 判断顶点在哪头并选择正确的缩放
         mat4 cylinderTransformSimulation = getCylinderTransform(pv1, pv2, 0.001);
         vec3 transformed_simulation = (cylinderTransformSimulation * vec4(transformed, 1.0)).xyz;
