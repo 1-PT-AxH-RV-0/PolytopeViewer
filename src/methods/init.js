@@ -207,7 +207,7 @@ export function _initializeRenderer() {
   this.renderPass = new RenderPass(this.scene, this.camera);
   this.ssaaPass = new SSAARenderPass(this.scene, this.camera);
   this.bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(maxSize, maxSize),
+    new THREE.Vector2(maxSize * dpr, maxSize * dpr),
     0.3,
     0.1,
     0.98
@@ -228,9 +228,9 @@ export function _initializeRenderer() {
     if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
 
     this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
-    this.composer.setSize(newMaxSize, newMaxSize);
-    this.ssaaPass.setSize(newMaxSize, newMaxSize);
-    this.bloomPass.setSize(newMaxSize, newMaxSize);
+    this.composer.setSize(newMaxSize * dpr, newMaxSize * dpr);
+    this.ssaaPass.setSize(newMaxSize * dpr, newMaxSize * dpr);
+    this.bloomPass.setSize(newMaxSize * dpr, newMaxSize * dpr);
   });
 }
 

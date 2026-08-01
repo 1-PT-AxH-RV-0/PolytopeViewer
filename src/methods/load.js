@@ -6,6 +6,25 @@ import { parse4OFF } from '../offProcessor4D.js';
 import shaderCompCallback from '../shaderCompCallback.js';
 import * as types from '../type.js';
 
+
+/**
+ *
+ * @param root0
+ * @param root0.vertices
+ * @param root0.faces
+ * @param root0.edges
+ */
+function toOFF({ vertices, faces, edges }) {
+  const v = vertices.map(i => `${i.x} ${i.y} ${i.z}`).join('\n');
+  const f = faces.map(f => `${f.length} ${f.map(String).join(' ')}`).join('\n');
+  return `
+    OFF
+    ${vertices.length} ${faces.length} ${edges.length}
+    ${v}
+    ${f}
+    `;
+}
+
 /**
  * 动态导入 OFF 文件。
  * @param {string} path - OFF 文件相对于 assets/models 的路径。

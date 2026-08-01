@@ -1,7 +1,6 @@
 import isOdd from 'is-odd';
 import { chunk } from 'lodash';
-import { getUniqueSortedPairs } from './helperFunc.js';
-import { range } from './helperFunc.js';
+import { getUniqueSortedPairs, range } from './helperFunc.js';
 import * as type from './type.js';
 
 /**
@@ -27,24 +26,6 @@ function* polygonIndexIterator(n, s) {
     index += s;
     index %= n;
   }
-}
-
-/**
- *
- * @param root0
- * @param root0.vertices
- * @param root0.faces
- * @param root0.edges
- */
-function toOFF({ vertices, faces, edges }) {
-  const v = vertices.map(i => `${i.x} ${i.y} ${i.z}`).join('\n');
-  const f = faces.map(f => `${f.length} ${f.map(String).join(' ')}`).join('\n');
-  return `
-    OFF
-    ${vertices.length} ${faces.length} ${edges.length}
-    ${v}
-    ${f}
-    `;
 }
 
 /**
@@ -92,7 +73,7 @@ function prism(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  return toOFF({ vertices, faces, edges });
+  return { vertices, faces, edges, norms: {}, nonclosed: new Set() };
 }
 
 /**
@@ -165,7 +146,7 @@ function antiprism(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  res.data = toOFF({ vertices, faces, edges });
+  res.data = { vertices, faces, edges, norms: {}, nonclosed: new Set() };
 
   return res;
 }
@@ -222,7 +203,7 @@ function trapezohedron(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  return toOFF({ vertices, faces, edges });
+  return { vertices, faces, edges, norms: {}, nonclosed: new Set() };
 }
 
 /**
@@ -267,7 +248,7 @@ function stephanoid(n, a, b) {
     edge.map(index => vertices[index])
   );
 
-  return toOFF({ vertices, faces, edges });
+  return { vertices, faces, edges, norms: {}, nonclosed: new Set() };
 }
 
 /**
