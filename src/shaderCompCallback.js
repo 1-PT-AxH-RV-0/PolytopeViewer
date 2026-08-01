@@ -256,7 +256,10 @@ function sphereMaterial(
       // 将顶点按球体半径缩放，再加上中心点的 3D 投影
       vec4 t_center4D = rotation4D * center4D + offset4D;
       vec3 center3D = schlegelProjection(t_center4D);
-      float radius_scale = min(projectionDistance / (projectionDistance - t_center4D.w), 2.0);
+      float radius_scale = 1.0;
+      if (!isOrtho) {
+        radius_scale = min(projectionDistance / (projectionDistance - t_center4D.w), 2.0);
+      }
       transformed = transformed * radius * radius_scale + center3D + offset3D;
       `
     );
@@ -333,8 +336,12 @@ function cylinderMaterial(
         `
         #include <begin_vertex>
         // 计算两端的缩放
-        float v1_radius_scale = min(projectionDistance / (projectionDistance - tv1.w), 2.0);
-        float v2_radius_scale = min(projectionDistance / (projectionDistance - tv2.w), 2.0);
+        float v1_radius_scale = 1.0;
+        float v2_radius_scale = 1.0;
+        if (!isOrtho) {
+            v1_radius_scale = min(projectionDistance / (projectionDistance - tv1.w), 2.0);
+            v2_radius_scale = min(projectionDistance / (projectionDistance - tv2.w), 2.0);
+        }
         // 判断顶点在哪头并选择正确的缩放
         mat4 cylinderTransformSimulation = getCylinderTransform(pv1, pv2, 0.001);
         vec3 transformed_simulation = (cylinderTransformSimulation * vec4(transformed, 1.0)).xyz;
