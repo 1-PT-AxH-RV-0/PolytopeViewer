@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
-import shaderCompCallback from '../shaderCompCallback.js';
 import * as types from '../type.js';
 
 /**
@@ -28,37 +27,17 @@ function changeFaceColor(faces, colorInt) {
  */
 export function highlightCells(highlightConfig) {
   this.highlightedPartGroup.clear();
+  changeFaceColor(this.facesGroup, { rgb: 0, a: 0 });
+
   for (const [color, cellsSelectorConfig] of Object.entries(highlightConfig)) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
     helperFunc.validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
 
-    const highlightedPartGeo = this.facesGroup.geometry.clone();
-    const highlightedPartMaterial = shaderCompCallback.faceMaterial(
-      this.facesGroup.material,
-      this.rotUni,
-      this.ofsUni,
-      this.ofs3Uni,
-      this.projDistUni,
-      this.isOrthoUni
-    );
-    const colorNum = parseInt(color, 16);
-    const rgb = colorNum >>> 8;
-    const a = colorNum & 0xff;
-    highlightedPartMaterial.color.set(rgb);
-    highlightedPartMaterial.transparent = a === 255 ? false : true;
-    highlightedPartMaterial.opacity = a / 255;
-    highlightedPartMaterial.visible = true;
+    const colorInt = helperFunc.colorStrToInt(color);
 
     if (cellsSelectorConfig === 'all') {
-      const indices = [];
-      this.faces.forEach(face => indices.push(...face));
-      highlightedPartGeo.setIndex(indices);
-      highlightedPartGeo.computeVertexNormals();
-      this.highlightedPartGroup.add(
-        new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
-      );
-
+      changeFaceColor(this.facesGroup, colorInt);
       continue;
     }
     const highlightCellsIdx = [];
@@ -197,18 +176,12 @@ export function highlightCells(highlightConfig) {
       }
     }
 
-    const indices = [];
     for (const cellIdx of highlightCellsIdx) {
-      for (const faceIndex of this.cells[cellIdx].faceIndices) {
-        indices.push(...this.faces[faceIndex]);
+      for (const faceIndex of this.originalCells[cellIdx]) {
+        const face = this.facesGroup.children[faceIndex];
+        changeFaceColor(face, colorInt);
       }
     }
-
-    highlightedPartGeo.setIndex(indices);
-    highlightedPartGeo.computeVertexNormals();
-    this.highlightedPartGroup.add(
-      new THREE.Mesh(highlightedPartGeo, highlightedPartMaterial)
-    );
   }
 
   this.requestSingleRender();

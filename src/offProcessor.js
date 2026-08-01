@@ -39,18 +39,23 @@ function parseOFF(data) {
     const parts = lines[i + 2 + nVertices].trim().split(/\s+/);
     const count = parseInt(parts[0]);
     const face = parts.slice(1, count + 1).map(Number);
-    
+
     if (lines[i + 2 + nVertices].trim().split('#')[1]?.trim?.()) {
-      const norm = lines[i + 2 + nVertices].trim().split('#')[1].trim().split(/\s+/).map(parseFloat);
-      norms[i] = {x: norm[0], y: norm[1], z: norm[2]};
+      const norm = lines[i + 2 + nVertices]
+        .trim()
+        .split('#')[1]
+        .trim()
+        .split(/\s+/)
+        .map(parseFloat);
+      norms[i] = { x: norm[0], y: norm[1], z: norm[2] };
     }
     if (lines[i + 2 + nVertices].trim().split('#')[2]?.trim?.() === 'n') {
       face.push(...face.slice(1, -1).reverse());
-      if (face.length === 2) face.push(face[0])
-      nonclosed.add(i)
+      if (face.length === 2) face.push(face[0]);
+      nonclosed.add(i);
     }
-    
-    faces.push(face)
+
+    faces.push(face);
   }
 
   const edges = getUniqueSortedPairs(faces).map(edge =>
@@ -66,7 +71,10 @@ function parseOFF(data) {
  * @param {import('lodash').Function2<number, number, any>} progressCallback - 处理面时每隔 200ms 执行的回调。
  * @returns {type.Mesh3D} 处理后的网格数据。
  */
-function processMeshData({ vertices, faces, edges, norms, nonclosed }, progressCallback) {
+function processMeshData(
+  { vertices, faces, edges, norms, nonclosed },
+  progressCallback
+) {
   let isSkew = false;
   const processedVertices = [...vertices];
   const processedFaces = [];
@@ -84,7 +92,12 @@ function processMeshData({ vertices, faces, edges, norms, nonclosed }, progressC
      * @returns {Array<[number, number, number]>} - 三角剖分出来的三角形。
      */
     function triangulateFace(vertices3D) {
-      if (nonclosed.has(faceIndex) || vertices3D.length === 3 || !arePointsCoplanar(vertices3D)) return [face];
+      if (
+        nonclosed.has(faceIndex) ||
+        vertices3D.length === 3 ||
+        !arePointsCoplanar(vertices3D)
+      )
+        return [face];
       const { rotated, theta, phi, z } = rotateToXY(vertices3D);
       const contour = rotated.map(p => new poly2tri.Point(p.x, p.y));
 
@@ -130,7 +143,7 @@ function processMeshData({ vertices, faces, edges, norms, nonclosed }, progressC
     } else {
       ngonsInFaces[face.length] = [faceIndex];
     }
-    
+
     if (triangles[0].length > 3) isSkew = true;
 
     processedItems++;
@@ -161,12 +174,11 @@ function processMeshData({ vertices, faces, edges, norms, nonclosed }, progressC
       return center;
     }),
     originalFaceNormals: faces.map((face, i) => {
-        if (norms[i]) return norms[i];
-        return computeNormalOutward(face.map(idx => vertices[idx]))
+      if (norms[i]) return norms[i];
+      return computeNormalOutward(face.map(idx => vertices[idx]));
     }),
     isSkew
   };
 }
 
 export { processMeshData, parseOFF };
-

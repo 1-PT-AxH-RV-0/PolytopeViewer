@@ -62,6 +62,7 @@
  * @property {Array<[number, number, number]>} faces - 面索引数组，必须是三角形面。
  * @property {Array<[number, number]>} edges - 边索引数组。
  * @property {Array<Cell>} cells - 胞数组。
+ * @property {Array<Array<number>>} originalCells - 原始胞数组。
  * @property {{[key: string]: string}} facesMap - 原始面索引与处理后的面索引的映射关系。
  */
 

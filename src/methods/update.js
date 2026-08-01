@@ -214,8 +214,9 @@ export function updateEnable(enable = true) {
   this.separationDistSlider.noUiSlider[enableStringBy3D]();
   this.faceScaleSlider.noUiSlider[enableStringBy3D]();
   this.edgeScaleSlider.noUiSlider[enableStringBy3D]();
-  
-  if (this.faceVisibleSwitcher.checked && this.isSkew) this.faceVisibleSwitcher.checked = false;
+
+  if (this.faceVisibleSwitcher.checked && this.isSkew)
+    this.faceVisibleSwitcher.checked = false;
   if (!this.isSkew) this.faceVisibleSwitcher.checked = true;
   this.faceVisibleSwitcher.disabled = this.isSkew;
 
@@ -239,10 +240,10 @@ export function toggleCamera(isPersp) {
 
   this.camera.position.copy(oldCamera.position);
   this.camera.rotation.copy(oldCamera.rotation);
-  
+
   this.ssaaPass.camera = this.camera;
   this.renderPass.camera = this.camera;
-  
+
   this._initializeControls();
   this.requestSingleRender();
 }

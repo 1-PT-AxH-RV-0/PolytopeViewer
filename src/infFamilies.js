@@ -30,6 +30,24 @@ function* polygonIndexIterator(n, s) {
 }
 
 /**
+ *
+ * @param root0
+ * @param root0.vertices
+ * @param root0.faces
+ * @param root0.edges
+ */
+function toOFF({ vertices, faces, edges }) {
+  const v = vertices.map(i => `${i.x} ${i.y} ${i.z}`).join('\n');
+  const f = faces.map(f => `${f.length} ${f.map(String).join(' ')}`).join('\n');
+  return `
+    OFF
+    ${vertices.length} ${faces.length} ${edges.length}
+    ${v}
+    ${f}
+    `;
+}
+
+/**
  * 生成 n 角柱的网格数据。
  * @param {number} n - 多边形的边数。
  * @param {number} s - 多边形的步长。
@@ -74,7 +92,7 @@ function prism(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  return { vertices, faces, edges };
+  return toOFF({ vertices, faces, edges });
 }
 
 /**
@@ -147,7 +165,7 @@ function antiprism(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  res.data = { vertices, faces, edges };
+  res.data = toOFF({ vertices, faces, edges });
 
   return res;
 }
@@ -204,7 +222,7 @@ function trapezohedron(n, s = 1) {
     edge.map(index => vertices[index])
   );
 
-  return { vertices, faces, edges };
+  return toOFF({ vertices, faces, edges });
 }
 
 /**
@@ -249,7 +267,7 @@ function stephanoid(n, a, b) {
     edge.map(index => vertices[index])
   );
 
-  return { vertices, faces, edges };
+  return toOFF({ vertices, faces, edges });
 }
 
 /**

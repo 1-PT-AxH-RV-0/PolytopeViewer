@@ -271,6 +271,7 @@ export function createSeparatedFacesGroup(meshData, material) {
   const facesGroup = new THREE.Group();
   const separatedWireframeGroup = new THREE.Group();
   const separatedVerticesGroup = new THREE.Group();
+  facesGroup.frustumCulled = false;
 
   for (const originalFaceIndex in meshData.facesMap) {
     const originalFace = meshData.originalFaces[originalFaceIndex];
@@ -298,6 +299,11 @@ export function createSeparatedFacesGroup(meshData, material) {
     );
     singleFaceGeometry.setIndex(indices);
     singleFaceGeometry.computeVertexNormals();
+    singleFaceGeometry.frustumCulled = false;
+    singleFaceGeometry.boundingSphere = new THREE.Sphere(
+      new THREE.Vector3(),
+      9999999.0
+    );
 
     const edges = helperFunc
       .getUniqueSortedPairs([originalFace])

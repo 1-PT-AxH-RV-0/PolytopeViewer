@@ -57,9 +57,8 @@ function sphereMaterial3D(
       #include <begin_vertex>
       // 顶点按 radius 统一缩放
       transformed *= radius;
-      transformed += (rotation4D * vec4(pos + (pos - faceCenter) * (faceScale - 1.0) + (pos - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
+      transformed += (rotation4D * vec4((pos + sepDist * faceNormal) + (pos - faceCenter) * (faceScale - 1.0) + (pos - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
       transformed += offset3D;
-      transformed += sepDist * faceNormal;
       `
     );
   };
@@ -126,8 +125,10 @@ function cylinderMaterial3D(
         `
       #include <defaultnormal_vertex>
       // 计算旋转后坐标
-      vec3 pv1 = (rotation4D * vec4(v1 + (v1 - faceCenter) * (faceScale - 1.0) + (v1 - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
-      vec3 pv2 = (rotation4D * vec4(v2 + (v2 - faceCenter) * (faceScale - 1.0) + (v2 - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
+      vec3 tv1 = v1 + sepDist * faceNormal;
+      vec3 tv2 = v2 + sepDist * faceNormal;
+      vec3 pv1 = (rotation4D * vec4(tv1 + (v1 - faceCenter) * (faceScale - 1.0) + (v1 - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
+      vec3 pv2 = (rotation4D * vec4(tv2 + (v2 - faceCenter) * (faceScale - 1.0) + (v2 - midpoint) * (edgeScale - 1.0) * faceScale, 0)).xyz;
       // 计算圆柱矩阵
       mat4 cylinderTransform = getCylinderTransform(pv1, pv2, radius);
       mat3 cylinderNormalTransform = mat3(transpose(inverse(cylinderTransform)));
@@ -142,7 +143,6 @@ function cylinderMaterial3D(
       #include <begin_vertex>
       transformed = (cylinderTransform * vec4(transformed, 1)).xyz;
       transformed += offset3D;
-      transformed += sepDist * faceNormal;
       `
       );
   };
@@ -195,10 +195,8 @@ function faceMaterial3D(
       '#include <begin_vertex>',
       `
       #include <begin_vertex>
-      transformed += (transformed - faceCenter) * (faceScale - 1.0);
-      transformed = (rotation4D * vec4(transformed, 0)).xyz;
+      transformed = (rotation4D * vec4((transformed + sepDist * faceNormal) + (transformed - faceCenter) * (faceScale - 1.0), 0)).xyz;
       transformed += offset3D;
-      transformed += sepDist * faceNormal;
       `
     );
   };

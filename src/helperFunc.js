@@ -604,10 +604,16 @@ function getSortedValuesDesc(obj) {
  * @throws {Error} 当任何字段验证失败时抛出错误，包含具体的错误信息。
  */
 function validateRecordConfig(config, is4D) {
-  if (Object.hasOwnProperty.call(config, "ssaaUsed") && (!Number.isInteger(config.ssaaUsed) || !config.ssaaUsed > 0)) {
+  if (
+    Object.hasOwnProperty.call(config, 'ssaaUsed') &&
+    (!Number.isInteger(config.ssaaUsed) || !config.ssaaUsed > 0)
+  ) {
     throw new Error('ssaaUsed 字段必须是正整数。');
   }
-  if (Object.hasOwnProperty.call(config, "bloomUsed") && typeof config.bloomUsed !== 'boolean') {
+  if (
+    Object.hasOwnProperty.call(config, 'bloomUsed') &&
+    typeof config.bloomUsed !== 'boolean'
+  ) {
     throw new Error('bloomUsed 字段必须是布尔值。');
   }
 
@@ -775,6 +781,35 @@ function validateRecordConfig(config, is4D) {
     }
   }
 
+  if (config.initialCameraLookAt !== undefined) {
+    if (
+      !Array.isArray(config.initialCameraLookAt) ||
+      config.initialCameraLookAt.length !== 3 ||
+      config.initialCameraLookAt.some(v => typeof v !== 'number')
+    ) {
+      throw new Error('initialCameraLookAt 字段必须是包含 3 个实数的数组。');
+    }
+  }
+
+  if (config.initialCameraDistance !== undefined) {
+    if (
+      typeof config.initialCameraDistance !== 'number' ||
+      config.initialCameraDistance <= 0
+    ) {
+      throw new Error('initialCameraDistance 字段必须是正实数。');
+    }
+  }
+
+  if (config.initialCameraRotation !== undefined) {
+    if (
+      !Array.isArray(config.initialCameraRotation) ||
+      config.initialCameraRotation.length !== 3 ||
+      config.initialCameraRotation.some(v => typeof v !== 'number')
+    ) {
+      throw new Error('initialCameraRotation 字段必须是包含 3 个实数的数组。');
+    }
+  }
+
   if (
     !Array.isArray(config.actions) ||
     config.actions.some(i => !(i instanceof Object))
@@ -922,6 +957,35 @@ function validateRecordConfig(config, is4D) {
             `actions[${index}] 操作的 scaleFactorOfs 字段必须为实数。`
           );
         break;
+      case 'setCameraLookAt':
+        if (
+          action.lookAtOfs.length !== 3 ||
+          action.lookAtOfs.some(v => typeof v !== 'number')
+        )
+          throw new Error(
+            `actions[${index}] 操作的 lookAtOfs 字段必须为三个实数的数组。`
+          );
+        break;
+      case 'setCameraDistance':
+        if (typeof action.distanceOfs !== 'number')
+          throw new Error(
+            `actions[${index}] 操作的 distanceOfs 字段必须为实数。`
+          );
+        break;
+      case 'setCameraRotation':
+        if (typeof action.angle !== 'number')
+          throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
+        if (
+          !(
+            Number.isInteger(action.axis) &&
+            0 <= action.axis &&
+            action.axis <= 2
+          )
+        )
+          throw new Error(
+            `actions[${index}] 操作的 axis 字段必须为大于等于零小于三的整数（0表示x轴，1表示y轴，2表示z轴）。`
+          );
+        break;
       default:
         throw new Error(`actions[${index}] 操作的类型 ${action.type} 无效。`);
     }
@@ -929,9 +993,7 @@ function validateRecordConfig(config, is4D) {
     if (
       Object.hasOwnProperty.call(action, 'priority') &&
       (typeof action.priority !== 'number' ||
-        !Number.isInteger(action.priority) ||
-        !isNaN(action.priority) ||
-        !isFinite(action.priority))
+        !Number.isInteger(action.priority))
     ) {
       throw new Error(`actions[${index}] 的 priority 不是整数。`);
     }
@@ -958,7 +1020,7 @@ function validateRecordConfig(config, is4D) {
         ].includes(action.type)
       ) {
         throw new Error(
-          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale, setEdgeScale、setFaceOpacity、setScaleFactor。`
+          `actions[${index}] 的 start 和 end 字段值只适用于以下类型的操作：rot、trans4、trans3、setVerticesEdgesDim、setProjDist、setSeparationDist、setFaceScale, setEdgeScale、setFaceOpacity、setScaleFactor、setCameraLookAt、setCameraDistance、setCameraRotation。`
         );
       }
       if (
@@ -1316,31 +1378,40 @@ function colorStrToInt(color) {
 /**
  * 判断三维点集是否共面
  * @param {Array<type.Point3D>} points - 点集数组，每个元素为 {x, y, z} 对象
+ * @param epsilon
  * @returns {boolean} - 共面返回 true，否则返回 false
  */
 function arePointsCoplanar(points, epsilon = 1e-2) {
-    if (points.length < 4) return true;
-    
-    // 取前3点确定平面
-    const p0 = points[0], p1 = points[1], p2 = points[2];
-    
-    // 计算法向量 (p1-p0) × (p2-p0)
-    const v1 = { x: p1.x - p0.x, y: p1.y - p0.y, z: p1.z - p0.z };
-    const v2 = { x: p2.x - p0.x, y: p2.y - p0.y, z: p2.z - p0.z };
-    
-    const n = {
-        x: v1.y * v2.z - v1.z * v2.y,
-        y: v1.z * v2.x - v1.x * v2.z,
-        z: v1.x * v2.y - v1.y * v2.x
+  if (points.length < 4) return true;
+
+  // 取前3点确定平面
+  const p0 = points[0],
+    p1 = points[1],
+    p2 = points[2];
+
+  // 计算法向量 (p1-p0) × (p2-p0)
+  const v1 = { x: p1.x - p0.x, y: p1.y - p0.y, z: p1.z - p0.z };
+  const v2 = { x: p2.x - p0.x, y: p2.y - p0.y, z: p2.z - p0.z };
+
+  const n = {
+    x: v1.y * v2.z - v1.z * v2.y,
+    y: v1.z * v2.x - v1.x * v2.z,
+    z: v1.x * v2.y - v1.y * v2.x
+  };
+
+  // 检查所有点到平面的距离
+  for (let i = 3; i < points.length; i++) {
+    const v = {
+      x: points[i].x - p0.x,
+      y: points[i].y - p0.y,
+      z: points[i].z - p0.z
     };
-    
-    // 检查所有点到平面的距离
-    for (let i = 3; i < points.length; i++) {
-        const v = { x: points[i].x - p0.x, y: points[i].y - p0.y, z: points[i].z - p0.z };
-        const dist = Math.abs(n.x * v.x + n.y * v.y + n.z * v.z);
-        if (dist > epsilon) return false;
-    }
-    return true;
+    const dist =
+      Math.abs(n.x * v.x + n.y * v.y + n.z * v.z) /
+      Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+    if (dist > epsilon) return false;
+  }
+  return true;
 }
 
 export {

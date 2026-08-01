@@ -119,7 +119,7 @@ class PolytopeRendererApp {
     this.composer = null;
     this.renderPass = null;
     this.smaaPass = null;
-    this.bloomPass = null
+    this.bloomPass = null;
     this.isRenderingFlag = false;
     this.scene = null;
     this.camera = null;
@@ -133,6 +133,7 @@ class PolytopeRendererApp {
     this.stopRecordFlag = false;
 
     // 高亮用变量。
+    this.originalCells = [];
     this.cells = [];
     this.faces = [];
     this.facesMap = {};
@@ -150,7 +151,7 @@ class PolytopeRendererApp {
       roughness: 0.4,
       metalness: 0.2,
       flatShading: true,
-      side: THREE.DoubleSide,
+      side: THREE.DoubleSide
     });
     this.editor = null;
     this.errorModalBs = null;

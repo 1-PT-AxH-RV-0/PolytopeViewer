@@ -96,7 +96,6 @@ export function setupEventListeners() {
   this.highlightCellsBtn.addEventListener('click', () => {
     try {
       const highlightConfig = YAML.load(this.editor.state.doc.toString());
-      this.faceVisibleSwitcher.checked = false;
       this.updateProperties();
       this.highlightCells(highlightConfig);
     } catch (e) {

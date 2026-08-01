@@ -214,19 +214,19 @@ export function _initializeRenderer() {
   );
   this.composer.addPass(this.renderPass);
   this.composer.addPass(this.bloomPass);
-  
+
   window.addEventListener('resize', () => {
     const newMaxSize = Math.min(
       Math.min(window.innerWidth, window.innerHeight),
       720
     );
-    
+
     this.canvas.style.width = `${newMaxSize}px`;
     this.canvas.style.height = `${newMaxSize}px`;
     this.progCon.style.left = `${newMaxSize / 2 + 8}px`;
     this.progCon.style.top = `${newMaxSize / 2 + 8}px`;
     if (this.nanobar) this.nanobar.style.width = `${newMaxSize * 0.7}px`;
-    
+
     this.renderer.setSize(newMaxSize * dpr, newMaxSize * dpr, false);
     this.composer.setSize(newMaxSize, newMaxSize);
     this.ssaaPass.setSize(newMaxSize, newMaxSize);

@@ -144,7 +144,8 @@ function process4DMeshData(
     faces: processedFaces,
     edges,
     cells: processedCells,
-    facesMap
+    facesMap,
+    originalCells: cells
   };
 }
 

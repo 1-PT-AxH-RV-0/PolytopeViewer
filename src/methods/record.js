@@ -78,7 +78,14 @@ export async function startRecord() {
     highlightFacesConfig:
       this.recordConfig.initialHighlightFacesConfig ??
       YAML.load(this.editor.state.doc.toString()),
-    scaleFactor: this.recordConfig.initialScaleFactor ?? this.scaleFactor
+    scaleFactor: this.recordConfig.initialScaleFactor ?? this.scaleFactor,
+    cameraLookAt: this.recordConfig.initialCameraLookAt
+      ? new THREE.Vector3(...this.recordConfig.initialCameraLookAt)
+      : new THREE.Vector3(0, 0, 0),
+    cameraDistance: this.recordConfig.initialCameraDistance ?? 120,
+    cameraRotation: this.recordConfig.initialCameraRotation
+      ? [...this.recordConfig.initialCameraRotation]
+      : [0, 0, 0]
   };
   const size = this.recordConfig.size;
 
@@ -102,16 +109,19 @@ export async function startRecord() {
   this.capturer.start();
 
   let frameIndex = 0;
-  if (Object.hasOwnProperty.call(this.recordConfig, "ssaaUsed")) {
+  if (Object.hasOwnProperty.call(this.recordConfig, 'ssaaUsed')) {
     this.ssaaPass = new SSAARenderPass(this.scene, this.camera);
     this.ssaaPass.sampleLevel = this.recordConfig.ssaaUsed;
     this.composer.passes[0] = this.ssaaPass;
   }
-  if (Object.hasOwnProperty.call(this.recordConfig, "bloomUsed") && !this.recordConfig.bloomUsed) {
+  if (
+    Object.hasOwnProperty.call(this.recordConfig, 'bloomUsed') &&
+    !this.recordConfig.bloomUsed
+  ) {
     this.bloomPass.strength = 0;
     this.bloomPass.threshold = 1.0;
   }
-  
+
   if (size) {
     this.renderer.setSize(size, size, false);
     this.composer.setSize(size, size);
@@ -140,14 +150,14 @@ export async function startRecord() {
     this.composer.passes[0] = this.renderPass;
     this.bloomPass.strength = 0.3;
     this.bloomPass.threshold = 0.98;
-    
+
     const dpr = window.devicePixelRatio || 1;
     const maxSize = Math.min(
       Math.min(window.innerWidth, window.innerHeight),
       720
     );
     this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
-    
+
     this.isRenderingFlag = false;
     this.requestSingleRender();
 
@@ -201,19 +211,34 @@ export function genFrame(frameIndex) {
     separationDist,
     faceScale,
     edgeScale,
-    scaleFactor
+    scaleFactor,
+    cameraLookAt,
+    cameraDistance,
+    cameraRotation
   } = this.recordStates;
   const rot = helperFunc
     .getSortedValuesDesc(rots)
     .map(r => helperFunc.create4DRotationMat(...r))
     .reduce((accumulator, currentMatrix) => {
       const product = new THREE.Matrix4();
-      product.multiplyMatrices(accumulator, currentMatrix);
+      product.multiplyMatrices(currentMatrix, accumulator);
       return product;
     }, new THREE.Matrix4().identity());
 
-  this.camera.position.set(0, 0, 120);
-  this.camera.rotation.set(0, 0, 0);
+  this.camera.position.set(
+    cameraLookAt.x,
+    cameraLookAt.y,
+    cameraLookAt.z + cameraDistance
+  );
+  this.camera.rotation.set(
+    THREE.MathUtils.degToRad(cameraRotation[0] + 180),
+    THREE.MathUtils.degToRad(cameraRotation[1] + 180),
+    THREE.MathUtils.degToRad(cameraRotation[2])
+  );
+  this.camera.updateMatrixWorld();
+  const offset = new THREE.Vector3(0, 0, -cameraDistance);
+  offset.applyEuler(this.camera.rotation);
+  this.camera.position.copy(cameraLookAt).add(offset);
   this.rotUni.value = rot;
   this.ofsUni.value = ofs.clone().divideScalar(scaleFactor);
   this.ofs3Uni.value = ofs3.clone().divideScalar(scaleFactor);
@@ -239,22 +264,22 @@ export function genFrame(frameIndex) {
   helperFunc.changeMaterialProperty(
     this.wireframeGroup,
     'visible',
-    (visibilities.wireframe ?? true) && (separationDist ?? 0) === 0 && (faceScale ?? 1) === 1
+    (visibilities.wireframe ?? true) && ((separationDist ?? 0) === 0 && (faceScale ?? 1) === 1 || this.is4D)
   )
   helperFunc.changeMaterialProperty(
     this.verticesGroup,
     'visible',
-    (visibilities.vertices ?? true) && (separationDist ?? 0) === 0 && (faceScale ?? 1) === 1
+    (visibilities.vertices ?? true) && ((separationDist ?? 0) === 0 && (faceScale ?? 1) === 1 || this.is4D)
   )
   helperFunc.changeMaterialProperty(
     this.separatedWireframeGroup,
     'visible',
-    (visibilities.wireframe ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1)
+    (visibilities.wireframe ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1) && !this.is4D
   )
   helperFunc.changeMaterialProperty(
     this.separatedVerticesGroup,
     'visible',
-    (visibilities.vertices ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1)
+    (visibilities.vertices ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1) && !this.is4D
   )
   helperFunc.changeMaterialProperty(this.axesGroup, 'visible', visibilities.axes ?? true);
   /* eslint-enable */
@@ -349,7 +374,6 @@ export function updateRecordStates(frameIndex) {
         this.recordStates.schleProjEnable = action.enable;
         break;
       case 'highlightCells':
-        this.recordStates.visibilities.faces = !(action.hideFaces ?? true);
         this.recordStates.highlightConfig = action.highlightConfig;
         break;
       case 'highlightFaces':
@@ -359,6 +383,20 @@ export function updateRecordStates(frameIndex) {
         this.recordStates.scaleFactor += action.scaleFactorOfs * interps[prog];
         if (this.recordStates.scaleFactor <= 0)
           throw new Error(`actions[${action.index}] 错误地导致缩放因子非正。`);
+        break;
+      case 'setCameraLookAt':
+        this.recordStates.cameraLookAt.add(
+          new THREE.Vector3(...action.lookAtOfs).multiplyScalar(interps[prog])
+        );
+        break;
+      case 'setCameraDistance':
+        this.recordStates.cameraDistance += action.distanceOfs * interps[prog];
+        if (this.recordStates.cameraDistance <= 0)
+          throw new Error(`actions[${action.index}] 错误地导致相机距离非正。`);
+        break;
+      case 'setCameraRotation':
+        this.recordStates.cameraRotation[action.axis] +=
+          action.angle * interps[prog];
         break;
     }
   }

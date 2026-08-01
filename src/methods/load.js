@@ -257,6 +257,7 @@ export function loadMesh(meshData, material) {
 export function load4DMesh(meshData, material) {
   this.is4D = true;
   this.cells = meshData.cells;
+  this.originalCells = meshData.originalCells;
   this.faces = meshData.faces;
   this.facesMap = meshData.facesMap;
   this.ngonsInFaces = {};
@@ -274,45 +275,68 @@ export function load4DMesh(meshData, material) {
     helperFunc.disposeGroup(this.solidGroup);
     this.scene.remove(this.solidGroup);
   }
-  this.highlightedPartGroup.clear();
   this.updateEnable();
   const container = new THREE.Group();
-  const geometry = new THREE.BufferGeometry();
 
-  // position 属性在这里没有实际作用，但必须设置以防止着色器报错。
-  const vertices = new Float32Array(meshData.vertices.length * 3);
-  meshData.vertices.forEach((v, i) => {
-    vertices[i * 3] = v.x;
-    vertices[i * 3 + 1] = v.y;
-    vertices[i * 3 + 2] = v.z;
-  });
-  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+  // 创建分离的面组
+  const facesGroup = new THREE.Group();
+  facesGroup.frustumCulled = false;
 
-  const vertices4D = new Float32Array(meshData.vertices.length * 4);
-  meshData.vertices.forEach((v, i) => {
-    vertices4D[i * 4] = v.x;
-    vertices4D[i * 4 + 1] = v.y;
-    vertices4D[i * 4 + 2] = v.z;
-    vertices4D[i * 4 + 3] = v.w;
-  });
-  geometry.setAttribute('position4D', new THREE.BufferAttribute(vertices4D, 4));
+  for (const originalFaceIndex in meshData.facesMap) {
+    const singleFaceGeometry = new THREE.BufferGeometry();
+    const verticesMap = new Map();
+    const vertices3D = [];
+    const vertices4D = [];
+    const indices = [];
 
-  const indices = [];
-  meshData.faces.forEach(face => indices.push(...face));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
+    const faceIndices = helperFunc.range(
+      ...meshData.facesMap[originalFaceIndex]
+    );
+    console.log(faceIndices);
+    for (const faceIndex of faceIndices) {
+      const face = meshData.faces[faceIndex];
+      const localIndices = [];
+      for (const vertexIndex of face) {
+        if (!verticesMap.has(vertexIndex)) {
+          const v = meshData.vertices[vertexIndex];
+          verticesMap.set(vertexIndex, vertices3D.length / 3);
+          vertices3D.push(v.x, v.y, v.z);
+          vertices4D.push(v.x, v.y, v.z, v.w);
+        }
+        localIndices.push(verticesMap.get(vertexIndex));
+      }
+      indices.push(...localIndices);
+    }
 
-  material = shaderCompCallback.faceMaterial(
-    material,
-    this.rotUni,
-    this.ofsUni,
-    this.ofs3Uni,
-    this.projDistUni,
-    this.isOrthoUni
-  );
-  material.side = THREE.DoubleSide;
+    singleFaceGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(new Float32Array(vertices3D), 3)
+    );
+    singleFaceGeometry.setAttribute(
+      'position4D',
+      new THREE.BufferAttribute(new Float32Array(vertices4D), 4)
+    );
+    singleFaceGeometry.setIndex(indices);
+    singleFaceGeometry.computeVertexNormals();
 
-  const mesh = new THREE.Mesh(geometry, material);
+    const faceMaterial = shaderCompCallback.faceMaterial(
+      material.clone(),
+      this.rotUni,
+      this.ofsUni,
+      this.ofs3Uni,
+      this.projDistUni,
+      this.isOrthoUni
+    );
+    faceMaterial.side = THREE.DoubleSide;
+
+    singleFaceGeometry.frustumCulled = false;
+    singleFaceGeometry.boundingSphere = new THREE.Sphere(
+      new THREE.Vector3(),
+      9999999.0
+    );
+    facesGroup.add(new THREE.Mesh(singleFaceGeometry, faceMaterial));
+  }
+
   this.projectionDistanceSlider.noUiSlider.set(
     helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05
   );
@@ -324,7 +348,6 @@ export function load4DMesh(meshData, material) {
           if (!this.schleSwitcher.checked) return { x: p.x, y: p.y, z: p.z };
           const d = this.projectionDistanceSlider.noUiSlider.get(true);
           const s = d / (d + p.w);
-
           return { x: p.x * s, y: p.y * s, z: p.z * s };
         })
       )
@@ -334,7 +357,7 @@ export function load4DMesh(meshData, material) {
     meshData.edges
   );
 
-  container.add(mesh);
+  container.add(facesGroup);
   container.add(wireframeGroup);
   container.add(verticesGroup);
   container.scale.setScalar(this.scaleFactor);
@@ -344,7 +367,7 @@ export function load4DMesh(meshData, material) {
 
   return {
     solidGroup: container,
-    facesGroup: mesh,
+    facesGroup,
     wireframeGroup,
     verticesGroup
   };
