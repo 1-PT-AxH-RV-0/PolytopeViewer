@@ -166,7 +166,7 @@ export function setupEventListeners() {
 
 /**
  * 设置无限家族多面体/多胞体的生成按钮事件监听器。
- * 包括正角柱、正反角柱、偏方面体、冠体和正双角柱的生成。
+ * 包括均匀角柱、均匀反角柱、偏方面体、冠体和均匀双角柱的生成。
  * @this {types.PolytopeRendererApp}
  */
 export function setupSolidInfFamiliesEventListeners() {

@@ -90,7 +90,7 @@ function antiprism(n, s = 1) {
   const gcd = getGCD(n, s);
   const offset = n % 2 === 0 ? (Math.PI * 1) / n : 0;
 
-  // 正反角柱高度公式
+  // 均匀反角柱高度公式
   /*
   推导过程：
 
