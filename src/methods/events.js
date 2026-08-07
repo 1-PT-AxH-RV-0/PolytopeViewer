@@ -197,7 +197,7 @@ export function setupSolidInfFamiliesEventListeners() {
     const res = infFamilies.antiprism(n, s);
     if (res.neverRegular) {
       this.triggerErrorDialog(
-        '当 <math><mi>s</mi> <mo>&ge;</mo> <mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>3</mn></mfrac></math> 时，将无法得到正反角柱，将使用 1 作为高度。'
+        '当 <math><mi>s</mi> <mo>&ge;</mo> <mfrac><mrow><mn>2</mn><mi>n</mi></mrow><mn>3</mn></mfrac></math> 时，将无法得到均匀反角柱，将使用 1 作为高度。'
       );
     }
 
