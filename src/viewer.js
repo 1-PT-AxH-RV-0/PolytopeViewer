@@ -222,8 +222,8 @@ class PolytopeRendererApp {
     this._initializeSliders();
     this._initializeCameras();
     this._initializeScene();
-    this._initializeEnv();
     this._initializeRenderer();
+    this._initializeEnv();
     this._initializeControls();
     this._initializeEditor();
 

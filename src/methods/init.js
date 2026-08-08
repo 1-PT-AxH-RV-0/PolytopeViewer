@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+import { PMREMGenerator } from 'three';
 import noUiSlider from 'nouislider';
 import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
@@ -167,19 +168,6 @@ export function _initializeScene() {
 }
 
 /**
- * 初始化环境贴图。
- * 加载 HDR 环境贴图用于材质反射。
- * @this {types.PolytopeRendererApp}
- */
-export function _initializeEnv() {
-  const loader = new EXRLoader();
-  loader.load(env, texture => {
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-    this.scene.environment = texture;
-  });
-}
-
-/**
  * 初始化 WebGL 渲染器。
  * 设置渲染器大小、设备像素比，并添加窗口大小变化事件监听器。
  * @this {types.PolytopeRendererApp}
@@ -231,6 +219,25 @@ export function _initializeRenderer() {
     this.composer.setSize(newMaxSize * dpr, newMaxSize * dpr);
     this.ssaaPass.setSize(newMaxSize * dpr, newMaxSize * dpr);
     this.bloomPass.setSize(newMaxSize * dpr, newMaxSize * dpr);
+  });
+}
+
+/**
+ * 初始化环境贴图。
+ * 加载 HDR 环境贴图用于材质反射。
+ * @this {types.PolytopeRendererApp}
+ */
+export function _initializeEnv() {
+  const loader = new EXRLoader();
+  const pmremGenerator = new PMREMGenerator(this.renderer);
+  pmremGenerator.compileEquirectangularShader();
+
+  loader.load(env, texture => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+    this.scene.environment = envMap;
+    texture.dispose();
+    pmremGenerator.dispose();
   });
 }
 

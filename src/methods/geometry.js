@@ -33,7 +33,7 @@ export function createWireframeAndVertices(
     new THREE.MeshStandardMaterial({
       color: cylinderColor,
       metalness: 0.95,
-      roughness: 0.1
+      roughness: 0.25
     });
 
   let defaultSphereMaterial =
@@ -41,7 +41,7 @@ export function createWireframeAndVertices(
     new THREE.MeshStandardMaterial({
       color: sphereColor,
       metalness: 0.95,
-      roughness: 0.1
+      roughness: 0.25
     });
 
   defaultCylinderMaterial = shaderCompCallback.cylinderMaterial3D(
@@ -68,7 +68,7 @@ export function createWireframeAndVertices(
   );
 
   const cylinderGeometry = helperFunc.toBufferGeometry(
-    new THREE.CylinderGeometry(1, 1, 1, 16)
+    new THREE.CylinderGeometry(1, 1, 1, 8)
   );
   const cylinderInstances = new THREE.InstancedMesh(
     cylinderGeometry,
@@ -80,7 +80,7 @@ export function createWireframeAndVertices(
   const midArr = new Float32Array(edges.length * 3);
 
   const sphereGeometry = helperFunc.toBufferGeometry(
-    new THREE.SphereGeometry(1, 16, 16)
+    new THREE.SphereGeometry(1, 8, 8)
   );
   const sphereInstances = new THREE.InstancedMesh(
     sphereGeometry,
@@ -162,7 +162,7 @@ export function create4DWireframeAndVertices(
     new THREE.MeshStandardMaterial({
       color: cylinderColor,
       metalness: 0.95,
-      roughness: 0.1
+      roughness: 0.25
     });
 
   let defaultSphereMaterial =
@@ -170,7 +170,7 @@ export function create4DWireframeAndVertices(
     new THREE.MeshStandardMaterial({
       color: sphereColor,
       metalness: 0.95,
-      roughness: 0.1
+      roughness: 0.25
     });
 
   defaultCylinderMaterial = shaderCompCallback.cylinderMaterial(
@@ -219,7 +219,7 @@ export function create4DWireframeAndVertices(
   });
 
   const cylinderGeometry = helperFunc.toBufferGeometry(
-    new THREE.CylinderGeometry(1, 1, 1, 16)
+    new THREE.CylinderGeometry(1, 1, 1, 8)
   );
   cylinderGeometry.setAttribute(
     'v1',
@@ -237,7 +237,7 @@ export function create4DWireframeAndVertices(
   wireframeGroup.add(instancedCylinderMesh);
 
   const sphereGeometry = helperFunc.toBufferGeometry(
-    new THREE.SphereGeometry(1, 16, 16)
+    new THREE.SphereGeometry(1, 8, 8)
   );
   sphereGeometry.setAttribute(
     'center4D',
