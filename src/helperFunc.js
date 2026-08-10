@@ -822,13 +822,11 @@ function validateRecordConfig(config, is4D) {
       case 'rot':
         if (typeof action.angle !== 'number')
           throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
-        if (
-          !(
-            Number.isInteger(action.plane) &&
-            0 <= action.plane &&
-            action.plane <= 5
-          )
-        )
+        if (!(
+          Number.isInteger(action.plane) &&
+          0 <= action.plane &&
+          action.plane <= 5
+        ))
           throw new Error(
             `actions[${index}] 操作的 plane 字段必须为大于等于零小于六的整数。`
           );
@@ -975,13 +973,11 @@ function validateRecordConfig(config, is4D) {
       case 'setCameraRotation':
         if (typeof action.angle !== 'number')
           throw new Error(`actions[${index}] 操作的 angle 字段必须为实数。`);
-        if (
-          !(
-            Number.isInteger(action.axis) &&
-            0 <= action.axis &&
-            action.axis <= 2
-          )
-        )
+        if (!(
+          Number.isInteger(action.axis) &&
+          0 <= action.axis &&
+          action.axis <= 2
+        ))
           throw new Error(
             `actions[${index}] 操作的 axis 字段必须为大于等于零小于三的整数（0表示x轴，1表示y轴，2表示z轴）。`
           );
@@ -1378,7 +1374,7 @@ function colorStrToInt(color) {
 /**
  * 判断三维点集是否共面
  * @param {Array<type.Point3D>} points - 点集数组，每个元素为 {x, y, z} 对象
- * @param epsilon
+ * @param {number} epsilon - 距离阈值
  * @returns {boolean} - 共面返回 true，否则返回 false
  */
 function arePointsCoplanar(points, epsilon = 1e-2) {

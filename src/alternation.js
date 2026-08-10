@@ -1,4 +1,10 @@
 // ======================== 拓扑工具 ========================
+/**
+ * 从面列表构建顶点邻接关系。
+ * @param {number[][]} faces - 面数组，每个面是顶点索引的数组
+ * @param {number} numVertices - 顶点总数
+ * @returns {Map<number, Set<number>>} 邻接表，键为顶点索引，值为相邻顶点索引的集合
+ */
 function buildAdjacencyFromFaces(faces, numVertices) {
   const adj = new Map();
   for (let i = 0; i < numVertices; i++) {
@@ -16,6 +22,12 @@ function buildAdjacencyFromFaces(faces, numVertices) {
   return adj;
 }
 
+/**
+ * 检查图是否为二分图。
+ * @param {Map<number, Set<number>>} adj - 邻接表
+ * @param {number} numVertices - 顶点总数
+ * @returns {{ isBipartite: boolean, color: number[] }} 包含是否为二分图以及各顶点颜色标记（0 或 1）的对象
+ */
 function checkBipartite(adj, numVertices) {
   const color = new Array(numVertices).fill(-1);
   for (let start = 0; start < numVertices; start++) {
@@ -38,6 +50,11 @@ function checkBipartite(adj, numVertices) {
   return { isBipartite: true, color };
 }
 
+/**
+ * 返回面的规范表示形式（选择字典序最小的循环排列）。
+ * @param {number[]} face - 顶点索引数组，表示一个面
+ * @returns {string} 面的规范字符串表示，各顶点以逗号分隔
+ */
 function canonicalFace(face) {
   if (face.length === 0) return '';
   const minVal = Math.min(...face);
@@ -61,6 +78,12 @@ function canonicalFace(face) {
   return candidates.sort()[0];
 }
 
+/**
+ * 从相邻顶点的链表结构中提取环。
+ * @param {number[]} neighbors - 相邻顶点索引数组
+ * @param {Map<number, Set<number>>} linkAdj - 链状邻接关系
+ * @returns {number[]|null} 提取出的环（顶点索引数组），若无法提取则返回 null
+ */
 function extractCycleFromLink(neighbors, linkAdj) {
   if (neighbors.length < 3) return null;
 
@@ -90,6 +113,13 @@ function extractCycleFromLink(neighbors, linkAdj) {
 }
 
 // ======================== 三维交替 ========================
+/**
+ * 对三维多面体进行交替（alternation）操作，保留指定颜色的顶点。
+ * @param {number[][]} vertices - 顶点坐标数组
+ * @param {number[][]} faces - 面数组，每个面是顶点索引的数组
+ * @param {number[]} color - 各顶点的颜色标记（0 表示保留，1 表示移除）
+ * @returns {{ vertices: number[][], faces: number[][] }} 交替后的新顶点和面
+ */
 function alternation3DWithColor(vertices, faces, color) {
   const n = vertices.length;
   const keep = [];
@@ -100,7 +130,9 @@ function alternation3DWithColor(vertices, faces, color) {
   }
 
   const newIdx = {};
-  keep.forEach((old, i) => { newIdx[old] = i; });
+  keep.forEach((old, i) => {
+    newIdx[old] = i;
+  });
   const newVerts = keep.map(i => vertices[i]);
 
   const vert2faces = {};
@@ -160,7 +192,15 @@ function alternation3DWithColor(vertices, faces, color) {
 }
 
 // ======================== 四维交替 ========================
-export function alternate4D({vertices, faces, cells}) {
+/**
+ * 对四维多胞体进行交替（alternation）操作。
+ * @param {object} root0 - 输入多胞体
+ * @param {number[][]} root0.vertices - 顶点坐标数组
+ * @param {number[][]} root0.faces - 面数组，每个面是顶点索引的数组
+ * @param {number[][]} root0.cells - 胞（cell）数组，每个胞是其包含的面索引数组
+ * @returns {{ vertices: number[][], faces: number[][], cells: number[][] }} 交替后的新多胞体（顶点、面、胞）
+ */
+export function alternate4D({ vertices, faces, cells }) {
   const numVerts = vertices.length;
   const adj = buildAdjacencyFromFaces(faces, numVerts);
   const { isBipartite, color } = checkBipartite(adj, numVerts);
@@ -175,7 +215,9 @@ export function alternate4D({vertices, faces, cells}) {
   }
 
   const globalNewIdx = {};
-  keep.forEach((old, i) => { globalNewIdx[old] = i; });
+  keep.forEach((old, i) => {
+    globalNewIdx[old] = i;
+  });
   const newVerts = keep.map(i => vertices[i]);
 
   const vert2cells = {};
@@ -204,7 +246,9 @@ export function alternate4D({vertices, faces, cells}) {
     }
     const localVerts = [...localVertsSet].sort((a, b) => a - b);
     const globalToLocal = {};
-    localVerts.forEach((v, i) => { globalToLocal[v] = i; });
+    localVerts.forEach((v, i) => {
+      globalToLocal[v] = i;
+    });
 
     const localFaces = cellFaces.map(fi =>
       faces[fi].map(v => globalToLocal[v])
@@ -218,7 +262,7 @@ export function alternate4D({vertices, faces, cells}) {
         localFaces,
         localColor
       );
-    } catch (e) {
+    } catch {
       continue;
     }
 

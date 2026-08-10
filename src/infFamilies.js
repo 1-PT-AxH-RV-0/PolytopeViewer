@@ -389,12 +389,12 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
  * @throws {Error} - 当为原双角柱为复合双角柱时抛出。
  */
 function duoantiprism(m, n, s1 = 1, s2 = 1) {
-    const origDuoprism = duoprism(m * 2, n * 2, s1, s2);
-    const { vertices, faces, cells } = alternate4D(origDuoprism);
-    const edges = getUniqueSortedPairs(faces).map(edge =>
-      edge.map(index => vertices[index])
-    );
-    return { vertices, faces, edges, cells };
+  const origDuoprism = duoprism(m * 2, n * 2, s1, s2);
+  const { vertices, faces, cells } = alternate4D(origDuoprism);
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
+  );
+  return { vertices, faces, edges, cells };
 }
 
 export default {

@@ -90,7 +90,7 @@ class PolytopeRendererApp {
     this.genDuoprismBtn = null;
     this.duoprismMInput = null;
     this.duoprismNInput = null;
-    
+
     this.genDuoantiprismBtn = null;
     this.duoantiprismMInput = null;
     this.duoantiprismNInput = null;
