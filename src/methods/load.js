@@ -33,7 +33,7 @@ export function processMeshData(meshData, is4D = false) {
   const bar = new Nanobar({ target: this.progCon });
   const controller = new AbortController();
   const worker = new Worker(
-    new URL('../processMeshData.worker.js', import.meta.url)
+    new URL('@/offProcessors/processMeshData.worker.js', import.meta.url)
   );
   this.nanobar = bar.el;
   this.isSkew = false;
