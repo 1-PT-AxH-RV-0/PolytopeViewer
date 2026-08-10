@@ -316,105 +316,105 @@ const offCatalog = {
     },
     {
       id: 'bitruncatedRegularConvex',
-      label: '过截角凸正多胞体',
+      label: '二截角凸正多胞体',
       items: [
-        { name: '过截角五胞体', path: 'BitruncatedRegularConvex/Bitruncated_pentachoron.off' },
-        { name: '过截角超立方体', path: 'BitruncatedRegularConvex/Bitruncated_tesseract.off' },
-        { name: '过截角二十四胞体', path: 'BitruncatedRegularConvex/Bitruncated_icositetrachoron.off' },
-        { name: '过截角一百二十胞体', path: 'BitruncatedRegularConvex/Bitruncated_hecatonicosachoron.off' }
+        { name: '二截角五胞体', path: 'BitruncatedRegularConvex/Bitruncated_pentachoron.off' },
+        { name: '二截角超立方体', path: 'BitruncatedRegularConvex/Bitruncated_tesseract.off' },
+        { name: '二截角二十四胞体', path: 'BitruncatedRegularConvex/Bitruncated_icositetrachoron.off' },
+        { name: '二截角一百二十胞体', path: 'BitruncatedRegularConvex/Bitruncated_hecatonicosachoron.off' }
       ]
     },
     {
       id: 'bitruncatedSchläfliHess',
-      label: '过截角施莱夫利–赫斯多胞体',
+      label: '二截角施莱夫利–赫斯多胞体',
       items: [
-        { name: '过截角巨一百二十胞体', path: 'BitruncatedSchläfliHess/Dahi(btga120).off' },
-        { name: '过截角巨大星形一百二十胞体', path: 'BitruncatedSchläfliHess/Gixhi(btgags120).off' },
-        { name: '过截角刻面六百胞体', path: 'BitruncatedSchläfliHess/Shihi(btf600).off' }
+        { name: '二截角巨一百二十胞体', path: 'BitruncatedSchläfliHess/Dahi(btga120).off' },
+        { name: '二截角巨大星形一百二十胞体', path: 'BitruncatedSchläfliHess/Gixhi(btgags120).off' },
+        { name: '二截角刻面六百胞体', path: 'BitruncatedSchläfliHess/Shihi(btf600).off' }
       ]
     },
     {
       id: 'cantellatedRegularConvex',
-      label: '小斜方截半凸正多胞体',
+      label: '小斜方凸正多胞体',
       items: [
-        { name: '小斜方截半五胞体', path: 'CantellatedRegularConvex/Cantellated_pentachoron.off' },
-        { name: '小斜方截半超立方体', path: 'CantellatedRegularConvex/Cantellated_tesseract.off' },
-        { name: '小斜方截半二十四胞体', path: 'CantellatedRegularConvex/Cantellated_icositetrachoron.off' },
-        { name: '小斜方截半一百二十胞体', path: 'CantellatedRegularConvex/Cantellated_hecatonicosachoron.off' },
-        { name: '小斜方截半六百胞体', path: 'CantellatedRegularConvex/Cantellated_hexacosichoron.off' }
+        { name: '小斜方五胞体', path: 'CantellatedRegularConvex/Cantellated_pentachoron.off' },
+        { name: '小斜方超立方体', path: 'CantellatedRegularConvex/Cantellated_tesseract.off' },
+        { name: '小斜方二十四胞体', path: 'CantellatedRegularConvex/Cantellated_icositetrachoron.off' },
+        { name: '小斜方一百二十胞体', path: 'CantellatedRegularConvex/Cantellated_hecatonicosachoron.off' },
+        { name: '小斜方六百胞体', path: 'CantellatedRegularConvex/Cantellated_hexacosichoron.off' }
       ]
     },
     {
       id: 'cantellatedSchläfliHess',
-      label: '小斜方截半施莱夫利–赫斯多胞体',
+      label: '小斜方施莱夫利–赫斯多胞体',
       items: [
-        { name: '小斜方截半大一百二十胞体', path: 'CantellatedSchläfliHess/Sirghi.off' },
-        { name: '小斜方截半巨一百二十胞体', path: 'CantellatedSchläfliHess/Sraghi.off' },
-        { name: '小斜方截半巨大一百二十胞体', path: 'CantellatedSchläfliHess/Sirgaghi.off' },
-        { name: '小斜方截半小星形一百二十胞体', path: 'CantellatedSchläfliHess/Sirsashi.off' },
-        { name: '小斜方截半巨星形一百二十胞体', path: 'CantellatedSchläfliHess/Sirgashi.off' },
-        { name: '小斜方截半刻面六百胞体', path: 'CantellatedSchläfliHess/Sirfix.off' },
-        { name: '小斜方截半巨六百胞体', path: 'CantellatedSchläfliHess/Sirgax.off' }
+        { name: '小斜方大一百二十胞体', path: 'CantellatedSchläfliHess/Sirghi.off' },
+        { name: '小斜方巨一百二十胞体', path: 'CantellatedSchläfliHess/Sraghi.off' },
+        { name: '小斜方巨大一百二十胞体', path: 'CantellatedSchläfliHess/Sirgaghi.off' },
+        { name: '小斜方小星形一百二十胞体', path: 'CantellatedSchläfliHess/Sirsashi.off' },
+        { name: '小斜方巨星形一百二十胞体', path: 'CantellatedSchläfliHess/Sirgashi.off' },
+        { name: '小斜方刻面六百胞体', path: 'CantellatedSchläfliHess/Sirfix.off' },
+        { name: '小斜方巨六百胞体', path: 'CantellatedSchläfliHess/Sirgax.off' }
       ]
     },
     {
       id: 'cantitruncatedRegularConvex',
-      label: '大斜方截半凸正多胞体',
+      label: '大斜方凸正多胞体',
       items: [
-        { name: '大斜方截半五胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_pentachoron.off' },
-        { name: '大斜方截半超立方体', path: 'CantitruncatedRegularConvex/Cantitruncated_tesseract.off' },
-        { name: '大斜方截半二十四胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_icositetrachoron.off' },
-        { name: '大斜方截半一百二十胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_hecatonicosachoron.off' },
-        { name: '大斜方截半六百胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_hexacosichoron.off' }
+        { name: '大斜方五胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_pentachoron.off' },
+        { name: '大斜方超立方体', path: 'CantitruncatedRegularConvex/Cantitruncated_tesseract.off' },
+        { name: '大斜方二十四胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_icositetrachoron.off' },
+        { name: '大斜方一百二十胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_hecatonicosachoron.off' },
+        { name: '大斜方六百胞体', path: 'CantitruncatedRegularConvex/Cantitruncated_hexacosichoron.off' }
       ]
     },
     {
       id: 'cantitruncatedSchläfliHess',
-      label: '大斜方截半施莱夫利–赫斯多胞体',
+      label: '大斜方施莱夫利–赫斯多胞体',
       items: [
-        { name: '大斜方截半巨一百二十胞体', path: 'CantitruncatedSchläfliHess/Graghi.off' },
-        { name: '大斜方截半刻面六百胞体', path: 'CantitruncatedSchläfliHess/Girfix.off' },
-        { name: '大斜方截半巨六百胞体', path: 'CantitruncatedSchläfliHess/Graggix.off' }
+        { name: '大斜方巨一百二十胞体', path: 'CantitruncatedSchläfliHess/Graghi.off' },
+        { name: '大斜方刻面六百胞体', path: 'CantitruncatedSchläfliHess/Girfix.off' },
+        { name: '大斜方巨六百胞体', path: 'CantitruncatedSchläfliHess/Graggix.off' }
       ]
     },
     {
       id: 'runcinatedRegularConvex',
-      label: '扩充凸正多胞体',
+      label: '小角柱二截角凸正多胞体',
       items: [
-        { name: '扩充五胞体', path: 'RuncinatedRegularConvex/Runcinated_pentachoron.off' },
-        { name: '扩充超立方体', path: 'RuncinatedRegularConvex/Runcinated_tesseract.off' },
-        { name: '扩充二十四胞体', path: 'RuncinatedRegularConvex/Runcinated_icositetrachoron.off' },
-        { name: '扩充一百二十胞体', path: 'RuncinatedRegularConvex/Runcinated_hecatonicosachoron.off' }
+        { name: '小角柱二截角五胞体', path: 'RuncinatedRegularConvex/Runcinated_pentachoron.off' },
+        { name: '小角柱二截角超立方体', path: 'RuncinatedRegularConvex/Runcinated_tesseract.off' },
+        { name: '小角柱二截角二十四胞体', path: 'RuncinatedRegularConvex/Runcinated_icositetrachoron.off' },
+        { name: '小角柱二截角一百二十胞体', path: 'RuncinatedRegularConvex/Runcinated_hecatonicosachoron.off' }
       ]
     },
     {
       id: 'runcinatedSchläfliHess',
-      label: '扩充施莱夫利–赫斯多胞体',
+      label: '小角柱二截角施莱夫利–赫斯多胞体',
       items: [
-        { name: '扩充巨大星形一百二十胞体', path: 'RuncinatedSchläfliHess/Runcinated_great_grand_stellated_hecatonicosachoron.off' },
-        { name: '扩充刻面六百胞体', path: 'RuncinatedSchläfliHess/Runcinated_facted_hexacosichoron.off' }
+        { name: '小角柱二截角巨大星形一百二十胞体', path: 'RuncinatedSchläfliHess/Runcinated_great_grand_stellated_hecatonicosachoron.off' },
+        { name: '小角柱二截角刻面六百胞体', path: 'RuncinatedSchläfliHess/Runcinated_facted_hexacosichoron.off' }
       ]
     },
     {
       id: 'runcitruncatedRegularConvex',
-      label: '扩充截角凸正多胞体',
+      label: '小角柱截角凸正多胞体',
       items: [
-        { name: '扩充截角五胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_pentachoron.off' },
-        { name: '扩充截角超立方体', path: 'RuncitruncatedRegularConvex/Runcitruncated_tesseract.off' },
-        { name: '扩充截角十六胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hexadecachoron.off' },
-        { name: '扩充截角二十四胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_icositetrachoron.off' },
-        { name: '扩充截角一百二十胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hecatonicosachoron.off' },
-        { name: '扩充截角六百胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hexacosichoron.off' }
+        { name: '小角柱截角五胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_pentachoron.off' },
+        { name: '小角柱截角超立方体', path: 'RuncitruncatedRegularConvex/Runcitruncated_tesseract.off' },
+        { name: '小角柱截角十六胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hexadecachoron.off' },
+        { name: '小角柱截角二十四胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_icositetrachoron.off' },
+        { name: '小角柱截角一百二十胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hecatonicosachoron.off' },
+        { name: '小角柱截角六百胞体', path: 'RuncitruncatedRegularConvex/Runcitruncated_hexacosichoron.off' }
       ]
     },
     {
       id: 'omnitruncatedRegularConvex',
-      label: '全截凸正多胞体',
+      label: '大角柱二截角凸正多胞体',
       items: [
-        { name: '全截五胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_pentachoron.off' },
-        { name: '全截超立方体', path: 'OmnitruncatedRegularConvex/Omnitruncated_tesseract.off' },
-        { name: '全截二十四胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_icositetrachoron.off' },
-        { name: '全截一百二十胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_hecatonicosachoron.off' }
+        { name: '大角柱二截角五胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_pentachoron.off' },
+        { name: '大角柱二截角超立方体', path: 'OmnitruncatedRegularConvex/Omnitruncated_tesseract.off' },
+        { name: '大角柱二截角二十四胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_icositetrachoron.off' },
+        { name: '大角柱二截角一百二十胞体', path: 'OmnitruncatedRegularConvex/Omnitruncated_hecatonicosachoron.off' }
       ]
     }
   ]
