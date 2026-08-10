@@ -1,5 +1,5 @@
-import { processMeshData } from './offProcessor.js';
-import { process4DMeshData } from './offProcessor4D.js';
+import { processMeshData } from '@/offProcessors/offProcessor.js';
+import { process4DMeshData } from '@/offProcessors/offProcessor4D.js';
 
 self.addEventListener('message', event => {
   const { meshData, is4D } = event.data;

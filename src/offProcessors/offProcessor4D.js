@@ -1,13 +1,13 @@
 import {
-  decomposeSelfIntersectingPolygon,
-  getUniqueSortedPairs,
-  rotate4DPointsToXY,
   apply4DInverseRotation,
   are4DPointsClose,
-  range
-} from './helperFunc.js';
+  decomposeSelfIntersectingPolygon,
+  getUniqueSortedPairs,
+  range,
+  rotate4DPointsToXY
+} from '@/helperFunc.js';
+import * as type from '@/type.js';
 import * as poly2tri from 'poly2tri';
-import * as type from './type.js';
 
 /**
  * 解析 4OFF 格式的四维网格数据。
@@ -149,4 +149,5 @@ function process4DMeshData(
   };
 }
 
-export { process4DMeshData, parse4OFF };
+export {parse4OFF, process4DMeshData};
+

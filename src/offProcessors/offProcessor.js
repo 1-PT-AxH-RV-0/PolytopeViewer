@@ -9,8 +9,8 @@ import {
   getUniqueSortedPairs,
   range,
   arePointsCoplanar
-} from './helperFunc.js';
-import * as type from './type.js';
+} from '@/helperFunc.js';
+import * as type from '@/type.js';
 
 /**
  * 解析 OFF 格式的 3D 模型数据。
