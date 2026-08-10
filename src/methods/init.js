@@ -71,6 +71,10 @@ export function _initializeDomElements() {
   this.genDuoprismBtn = document.getElementById('genDuoprism');
   this.duoprismMInput = document.getElementById('duoprismM');
   this.duoprismNInput = document.getElementById('duoprismN');
+  
+  this.genDuoantiprismBtn = document.getElementById('genDuoantiprism');
+  this.duoantiprismMInput = document.getElementById('duoantiprismM');
+  this.duoantiprismNInput = document.getElementById('duoantiprismN');
   /* eslint-enable */
 
   this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
