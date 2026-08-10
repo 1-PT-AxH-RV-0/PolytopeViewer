@@ -16,28 +16,48 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
 ## 文件结构
 
 - `src/`：项目源代码目录。
-  - `index.js`: 入口 js.
-  - `offProcessor.js`：解析 OFF 的工具。
-  - `offProcessor4D.js`：解析 4OFF 的工具。
-  - `processMeshData.worker.js`：用 WebWorker 处理网格数据。
-  - `axesCreater.js`：创建坐标轴。
-  - `infFamilies.js`：无限家族的网格数据生成函数。
-  - `helperFunc.js`：一些辅助函数。
-  - `GLSLs.js`：在 GLSL 中的辅助函数。
-  - `shaderCompCallback.js`：为 Three.js 的内置材质注入四维或其他功能。
-  - `type.js`：类型定义。
-  - `viewer.js`：主要功能。
-  - `style.css`：样式。
   - `index.html`：主页。
+  - `viewer.js`：主类，核心功能。
+  - `axesCreater.js`：创建坐标轴。
+  - `offCatalog.js`：预设多胞体数据目录。
+  - `type.js`：类型定义。
+  - `styles/`: 样式
+    - `style.scss`：全局样式。
+    - `neededBootstrap.scss`：Bootstrap 按需引入。
+  - `math/`：数学计算模块。
+    - `geo3D.js`：3D 几何计算（法向量、点旋转、共面判断等）。
+    - `geo4D.js`：4D 几何计算（4D 旋转矩阵、点变换、Gram-Schmidt 正交化等）。
+    - `interp.js`：插值与缓动函数生成器。
+  - `utils/`：通用工具模块。
+    - `decompPolygon.js`：自相交多边形分解。
+    - `general.js`：通用工具函数（range、边对提取、排序、颜色转换等）。
+    - `threeHelpers.js`：Three.js 辅助函数（材质修改、资源释放、几何体转换）。
+    - `validation.js`：配置校验。
+    - `yamlParser.js`：YAML 文件解析。
+  - `methods/`：挂载到主类原型上的方法。
+    - `error.js`：错误处理。
+    - `events.js`：事件处理。
+    - `geometry.js`：几何相关方法。
+    - `highlight.js`：高亮相关方法。
+    - `init.js`：初始化方法。
+    - `load.js`：加载方法。
+    - `record.js`：录制方法。
+    - `render.js`：渲染方法。
+    - `update.js`：更新方法。
+  - `offProcessors/`：OFF 文件处理模块。
+    - `offProcessor.js`：解析 OFF 格式。
+    - `offProcessor4D.js`：解析 4OFF 格式。
+    - `processMeshData.worker.js`：WebWorker 网格数据处理。
+  - `shader/`：着色器模块。
+    - `GLSLs.js`：GLSL 辅助函数。
+    - `shaderCompCallback.js`：为 Three.js 内置材质注入四维等功能。
+  - `infFamilies/`：无限家族模块。
+    - `infFamilies.js`：无限家族网格数据生成。
+    - `alternation.js`：多胞体的交替操作（用于生成双反角柱）。
 - `assets/`：静态资源目录。
   - `fonts/`: 字体目录。
     - `Sarasa_Mono_SC_Bold.typeface.json`：等距更纱黑体，用于绘制坐标轴标签，故仅有 X、Y、Z、W 四个字符的字形。
-  - `models/`：立体模型目录。
-- `dist/`：编译结果目录。
-  - `index.html`：主页。
-  - `js/`：js 代码目录。
-  - `assets/`：静态资源目录。
-
+  - `models/`：OFF 立体模型目录。
 
 ## 使用说明
 
@@ -82,12 +102,13 @@ PolytopeViewer 是一个基于 Three.js 的交互式三维和四维多胞形预�
 
 ## 注意事项
 
-1. 目前仅支持三维和四维 OFF 文件，二维、五维及更高维度文件不受支持，未来也不会考虑支持。五维不支持是因为GLSL实现任意维向量困难。
+1. 目前仅支持三维和四维 OFF 文件，二维、五维及更高维度文件不受支持，未来也不会考虑支持。因为 GLSL 实现任意维向量困难。
 2. 导出视频（录制）为测试功能，后续会完善。
 3. 所有配置文件均为 YAML 格式。
 
 ## 构建方法
 
-`npm run format` 格式化代码；
-`npm run server` 启动服务器；
+`pnpm format` 格式化代码；
+`pnpm server` 启动服务器；
 `webpack` 构建项目；
+
