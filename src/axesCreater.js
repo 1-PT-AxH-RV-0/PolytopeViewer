@@ -3,7 +3,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 import shaderCompCallback from '@/shader/shaderCompCallback.js';
-import { toBufferGeometry } from './helperFunc.js';
+import { toBufferGeometry } from '@/utils/threeHelpers.js';
 import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json';
 
 const axisLength = 100;

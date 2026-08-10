@@ -7,13 +7,71 @@ import { EditorView, basicSetup } from 'codemirror';
 import { yaml } from '@codemirror/lang-yaml';
 import { linter } from '@codemirror/lint';
 import YAML from 'js-yaml';
-import * as helperFunc from '../helperFunc.js';
 import env from '../../assets/env.exr';
 import * as types from '../type.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+
+/**
+ * 生成 noUiSlider 对数刻度 range 对象，支持负数范围（包含零）。
+ * @param {number} min - 最小值。
+ * @param {number} max - 最大值 (必须大于 min)。
+ * @param {number} base - 指数底数，控制曲率，必须 >1 (默认 Math.E)。
+ * @param {number} segments - 中间分段数，即内部点的个数 (默认 32)。
+ * @returns {object} noUiSlider 的 range 配置对象。
+ */
+function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
+  if (max <= min) {
+    throw new Error('最大值必须大于最小值。');
+  }
+  if (segments <= 0) {
+    throw new Error('分段数必须大于零。');
+  }
+  if (base <= 1) {
+    throw new Error('底数必须大于 1。');
+  }
+
+  const isCrossZero = min < 0 && max > 0;
+  const range = { min, max };
+
+  const totalPoints = segments + 2;
+  const percentages = [];
+  for (let i = 0; i < totalPoints; i++) {
+    percentages.push((i / (totalPoints - 1)) * 100);
+  }
+
+  function valueFromPercent(p) {
+    const t = p / 100;
+    if (isCrossZero) {
+      const M = (max - min) / 2;
+      const mid = (min + max) / 2;
+      if (t <= 0.5) {
+        const u = 1 - 2 * t;
+        const v = (-M * (Math.pow(base, u) - 1)) / (base - 1);
+        return v + mid;
+      } else {
+        const u = 2 * t - 1;
+        const v = (M * (Math.pow(base, u) - 1)) / (base - 1);
+        return v + mid;
+      }
+    } else {
+      const L = max - min;
+      const v = (L * (Math.pow(base, t) - 1)) / (base - 1);
+      return min + v;
+    }
+  }
+
+  for (let i = 1; i < percentages.length - 1; i++) {
+    const p = percentages[i];
+    const val = valueFromPercent(p);
+    const key = p.toFixed(15) + '%';
+    range[key] = val;
+  }
+
+  return range;
+}
 
 /**
  * 初始化 DOM 元素引用。
@@ -89,7 +147,7 @@ export function _initializeDomElements() {
  */
 export function _initializeSliders() {
   noUiSlider.create(this.scaleFactorSlider, {
-    range: helperFunc.generateLogarithmicRange(0.1, 120, 10),
+    range: generateLogarithmicRange(0.1, 120, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]
@@ -103,14 +161,14 @@ export function _initializeSliders() {
   });
 
   noUiSlider.create(this.wireframeAndVerticesDimSlider, {
-    range: helperFunc.generateLogarithmicRange(0.01, 3, 10),
+    range: generateLogarithmicRange(0.01, 3, 10),
     start: 0.5,
     tooltips: true,
     connect: [true, false]
   });
 
   noUiSlider.create(this.projectionDistanceSlider, {
-    range: helperFunc.generateLogarithmicRange(0.01, 100, 10),
+    range: generateLogarithmicRange(0.01, 100, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]
@@ -124,14 +182,14 @@ export function _initializeSliders() {
   });
 
   noUiSlider.create(this.faceScaleSlider, {
-    range: helperFunc.generateLogarithmicRange(-20, 20, 10),
+    range: generateLogarithmicRange(-20, 20, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]
   });
 
   noUiSlider.create(this.edgeScaleSlider, {
-    range: helperFunc.generateLogarithmicRange(1, 20, 10),
+    range: generateLogarithmicRange(1, 20, 10),
     start: 1,
     tooltips: true,
     connect: [true, false]

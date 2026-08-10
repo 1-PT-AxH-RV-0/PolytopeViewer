@@ -8,7 +8,7 @@ import { Button, Tab, Tooltip, Modal } from 'bootstrap';
 import WebMWriter from 'webm-writer';
 // 导入辅助模块
 import createAxes from './axesCreater.js';
-import * as helperFunc from './helperFunc.js';
+import { createInterpolation } from '@/math/interp.js';
 
 // 导入拆分的各个方法模块
 import * as initMethods from './methods/init.js';
@@ -190,7 +190,7 @@ class PolytopeRendererApp {
     this.interpFuncMap = new Map(
       Object.entries(timingFunctions).map(([key, fn]) => [
         key,
-        helperFunc.createInterpolation(fn)
+        createInterpolation(fn)
       ])
     );
 

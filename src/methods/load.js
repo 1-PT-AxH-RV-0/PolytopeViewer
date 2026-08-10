@@ -1,10 +1,14 @@
 import Nanobar from 'nanobar';
 import * as THREE from 'three';
-import * as helperFunc from '@/helperFunc.js';
 import { parseOFF } from '@/offProcessors/offProcessor.js';
 import { parse4OFF } from '@/offProcessors/offProcessor4D.js';
 import shaderCompCallback from '@/shader/shaderCompCallback.js';
-import * as types from '../type.js';
+import * as types from '@/type.js';
+
+import { disposeGroup } from '@/utils/threeHelpers.js';
+import { getFarthestPointDist } from '@/math/geo3D.js';
+import { getFarthest4DPointDist } from '@/math/geo4D.js';
+import { range } from '@/utils/general.js';
 
 /**
  * 动态导入 OFF 文件。
@@ -211,14 +215,12 @@ export function loadMesh(meshData, material) {
   this.ngonsInFaces = meshData.ngonsInFaces;
 
   if (this.solidGroup) {
-    helperFunc.disposeGroup(this.solidGroup);
+    disposeGroup(this.solidGroup);
     this.scene.remove(this.solidGroup);
   }
   this.updateEnable();
   const container = new THREE.Object3D();
-  this.updateScaleFactor(
-    40 / helperFunc.getFarthestPointDist(meshData.vertices)
-  );
+  this.updateScaleFactor(40 / getFarthestPointDist(meshData.vertices));
 
   const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
     meshData.edges
@@ -272,7 +274,7 @@ export function load4DMesh(meshData, material) {
   });
 
   if (this.solidGroup) {
-    helperFunc.disposeGroup(this.solidGroup);
+    disposeGroup(this.solidGroup);
     this.scene.remove(this.solidGroup);
   }
   this.updateEnable();
@@ -289,9 +291,7 @@ export function load4DMesh(meshData, material) {
     const vertices4D = [];
     const indices = [];
 
-    const faceIndices = helperFunc.range(
-      ...meshData.facesMap[originalFaceIndex]
-    );
+    const faceIndices = range(...meshData.facesMap[originalFaceIndex]);
     console.log(faceIndices);
     for (const faceIndex of faceIndices) {
       const face = meshData.faces[faceIndex];
@@ -338,12 +338,12 @@ export function load4DMesh(meshData, material) {
   }
 
   this.projectionDistanceSlider.noUiSlider.set(
-    helperFunc.getFarthest4DPointDist(meshData.vertices) * 1.05
+    getFarthest4DPointDist(meshData.vertices) * 1.05
   );
   this.updateProjectionDistance();
   this.updateScaleFactor(
     40 /
-      helperFunc.getFarthestPointDist(
+      getFarthestPointDist(
         meshData.vertices.map(p => {
           if (!this.schleSwitcher.checked) return { x: p.x, y: p.y, z: p.z };
           const d = this.projectionDistanceSlider.noUiSlider.get(true);

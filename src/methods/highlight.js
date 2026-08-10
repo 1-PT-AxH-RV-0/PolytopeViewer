@@ -1,6 +1,12 @@
 import * as THREE from 'three';
-import * as helperFunc from '../helperFunc.js';
-import * as types from '../type.js';
+import * as types from '@/type.js';
+
+import { validateCellsSelectorConfig } from '@/utils/validation.js';
+import {
+  colorStrToInt,
+  range as genRange,
+  filterArray
+} from '@/utils/general.js';
 
 /**
  * 修改面组中所有面的颜色。
@@ -32,9 +38,9 @@ export function highlightCells(highlightConfig) {
   for (const [color, cellsSelectorConfig] of Object.entries(highlightConfig)) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
-    helperFunc.validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
+    validateCellsSelectorConfig(cellsSelectorConfig, color + '.');
 
-    const colorInt = helperFunc.colorStrToInt(color);
+    const colorInt = colorStrToInt(color);
 
     if (cellsSelectorConfig === 'all') {
       changeFaceColor(this.facesGroup, colorInt);
@@ -62,7 +68,7 @@ export function highlightCells(highlightConfig) {
         if (!this.cells[end - 1]) {
           throw new Error(`ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`);
         }
-        highlightCellsIdx.push(...helperFunc.range(start, end - 1));
+        highlightCellsIdx.push(...genRange(start, end - 1));
       }
     }
 
@@ -93,7 +99,7 @@ export function highlightCells(highlightConfig) {
                 `nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
               );
             }
-            cells.push(...this.nHedraInCells[nFaces].slice(...range));
+            cells.push(...this.nHedraInCells[nFaces].slice(...genRange));
           }
           highlightCellsIdx.push(...cells);
         }
@@ -112,7 +118,7 @@ export function highlightCells(highlightConfig) {
             );
           }
         }
-        helperFunc.filterArray(highlightCellsIdx, exclude.indices);
+        filterArray(highlightCellsIdx, exclude.indices);
       }
 
       if (Object.hasOwnProperty.call(exclude, 'ranges')) {
@@ -128,10 +134,7 @@ export function highlightCells(highlightConfig) {
               `exclude.ranges[${i}] 的结束索引 ${end} 对应的胞不存在。`
             );
           }
-          helperFunc.filterArray(
-            highlightCellsIdx,
-            helperFunc.range(start, end - 1)
-          );
+          filterArray(highlightCellsIdx, genRange(start, end - 1));
         }
       }
 
@@ -144,10 +147,7 @@ export function highlightCells(highlightConfig) {
                 `exclude.nHedra[${i}] 指定的 ${nFaces} 面体胞不存在。`
               );
             }
-            helperFunc.filterArray(
-              highlightCellsIdx,
-              this.nHedraInCells[nFaces]
-            );
+            filterArray(highlightCellsIdx, this.nHedraInCells[nFaces]);
           } else if (item instanceof Object) {
             const { nFaces, ranges } = item;
             if (!this.nHedraInCells[nFaces]) {
@@ -168,9 +168,9 @@ export function highlightCells(highlightConfig) {
                   `exclude.nHedra[${i}].ranges[${j}] 的结束索引 ${end} 超出范围。`
                 );
               }
-              cells.push(...this.nHedraInCells[nFaces].slice(...range));
+              cells.push(...this.nHedraInCells[nFaces].slice(...genRange));
             }
-            helperFunc.filterArray(highlightCellsIdx, cells);
+            filterArray(highlightCellsIdx, cells);
           }
         }
       }
@@ -201,7 +201,7 @@ export function highlightFaces(highlightConfig) {
     if (!/^[0-9a-fA-F]{8}$/.test(color))
       throw new Error(`十六进制 RGBA 色码 ${color} 无效。`);
 
-    const colorInt = helperFunc.colorStrToInt(color);
+    const colorInt = colorStrToInt(color);
 
     if (facesSelectorConfig === 'all') {
       changeFaceColor(this.facesGroup, colorInt);

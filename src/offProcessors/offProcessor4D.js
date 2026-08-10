@@ -1,13 +1,13 @@
+import * as type from '@/type.js';
+import * as poly2tri from 'poly2tri';
+
+import { decomposeSelfIntersectingPolygon } from '@/utils/decompPolygon.js';
+import { getUniqueSortedPairs, range } from '@/utils/general.js';
 import {
   apply4DInverseRotation,
   are4DPointsClose,
-  decomposeSelfIntersectingPolygon,
-  getUniqueSortedPairs,
-  range,
   rotate4DPointsToXY
-} from '@/helperFunc.js';
-import * as type from '@/type.js';
-import * as poly2tri from 'poly2tri';
+} from '@/math/geo4D.js';
 
 /**
  * 解析 4OFF 格式的四维网格数据。
@@ -149,5 +149,4 @@ function process4DMeshData(
   };
 }
 
-export {parse4OFF, process4DMeshData};
-
+export { parse4OFF, process4DMeshData };

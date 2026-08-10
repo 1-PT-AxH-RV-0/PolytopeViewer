@@ -1,15 +1,14 @@
 import poly2tri from 'poly2tri';
 
+import { decomposeSelfIntersectingPolygon } from '@/utils/decompPolygon.js';
 import {
-  decomposeSelfIntersectingPolygon,
   computeNormalOutward,
   inverseRotatePoint,
   rotateToXY,
   arePointsClose,
-  getUniqueSortedPairs,
-  range,
   arePointsCoplanar
-} from '@/helperFunc.js';
+} from '@/math/geo3D.js';
+import { getUniqueSortedPairs, range } from '@/utils/general.js';
 import * as type from '@/type.js';
 
 /**

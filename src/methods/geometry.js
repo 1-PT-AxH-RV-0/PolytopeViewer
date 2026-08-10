@@ -1,7 +1,9 @@
 import * as THREE from 'three';
-import * as helperFunc from '../helperFunc.js';
 import shaderCompCallback from '@/shader/shaderCompCallback.js';
-import * as types from '../type.js';
+import * as types from '@/type.js';
+
+import { toBufferGeometry } from '@/utils/threeHelpers.js';
+import { getUniqueSortedPairs } from '@/utils/general.js';
 
 /**
  * 创建三维线框和顶点组。
@@ -67,7 +69,7 @@ export function createWireframeAndVertices(
     { value: faceNormal }
   );
 
-  const cylinderGeometry = helperFunc.toBufferGeometry(
+  const cylinderGeometry = toBufferGeometry(
     new THREE.CylinderGeometry(1, 1, 1, 8)
   );
   const cylinderInstances = new THREE.InstancedMesh(
@@ -79,9 +81,7 @@ export function createWireframeAndVertices(
   const v2Arr = new Float32Array(edges.length * 3);
   const midArr = new Float32Array(edges.length * 3);
 
-  const sphereGeometry = helperFunc.toBufferGeometry(
-    new THREE.SphereGeometry(1, 8, 8)
-  );
+  const sphereGeometry = toBufferGeometry(new THREE.SphereGeometry(1, 8, 8));
   const sphereInstances = new THREE.InstancedMesh(
     sphereGeometry,
     defaultSphereMaterial,
@@ -218,7 +218,7 @@ export function create4DWireframeAndVertices(
     }
   });
 
-  const cylinderGeometry = helperFunc.toBufferGeometry(
+  const cylinderGeometry = toBufferGeometry(
     new THREE.CylinderGeometry(1, 1, 1, 8)
   );
   cylinderGeometry.setAttribute(
@@ -236,9 +236,7 @@ export function create4DWireframeAndVertices(
   );
   wireframeGroup.add(instancedCylinderMesh);
 
-  const sphereGeometry = helperFunc.toBufferGeometry(
-    new THREE.SphereGeometry(1, 8, 8)
-  );
+  const sphereGeometry = toBufferGeometry(new THREE.SphereGeometry(1, 8, 8));
   sphereGeometry.setAttribute(
     'center4D',
     new THREE.InstancedBufferAttribute(
@@ -305,9 +303,9 @@ export function createSeparatedFacesGroup(meshData, material) {
       9999999.0
     );
 
-    const edges = helperFunc
-      .getUniqueSortedPairs([originalFace])
-      .map(edge => edge.map(index => meshData.vertices[index]));
+    const edges = getUniqueSortedPairs([originalFace]).map(edge =>
+      edge.map(index => meshData.vertices[index])
+    );
 
     const { wireframeGroup, verticesGroup } = this.createWireframeAndVertices(
       edges,

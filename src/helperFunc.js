@@ -5,7 +5,7 @@ import { set } from 'lodash';
 import * as poly2tri from 'poly2tri';
 import YAML from 'js-yaml';
 import * as polygonClipping from 'polygon-clipping';
-import * as type from './type.js';
+import * as type from '@/type.js';
 
 /**
  * 将自相交多边形分解为多个非自相交多边形。

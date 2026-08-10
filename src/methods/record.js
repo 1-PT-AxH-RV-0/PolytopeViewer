@@ -1,9 +1,14 @@
-import * as THREE from 'three';
-import YAML from 'js-yaml';
+import * as types from '@/type.js';
 import CCapture from 'ccapture.js/build/CCapture.min.js';
-import * as helperFunc from '../helperFunc.js';
-import * as types from '../type.js';
+import YAML from 'js-yaml';
+import * as THREE from 'three';
 import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
+
+import { create4DRotationMat } from '@/math/geo4D.js';
+import { getSortedValuesDesc } from '@/utils/general.js';
+import { changeMaterialProperty } from '@/utils/threeHelpers.js';
+import { validateRecordConfig } from '@/utils/validation.js';
+import { parseYamlFileFromInput } from '@/utils/yamlParser.js';
 
 /**
  * 开始视频录制。
@@ -13,10 +18,8 @@ import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
  */
 export async function startRecord() {
   try {
-    this.recordConfig = await helperFunc.parseYamlFileFromInput(
-      this.configFileInput
-    );
-    helperFunc.validateRecordConfig.call(this, this.recordConfig, this.is4D);
+    this.recordConfig = await parseYamlFileFromInput(this.configFileInput);
+    validateRecordConfig(this.recordConfig, this.is4D, this.interpFuncMap);
   } catch (e) {
     this.triggerErrorDialog(e.message);
     console.error(e);
@@ -216,9 +219,8 @@ export function genFrame(frameIndex) {
     cameraDistance,
     cameraRotation
   } = this.recordStates;
-  const rot = helperFunc
-    .getSortedValuesDesc(rots)
-    .map(r => helperFunc.create4DRotationMat(...r))
+  const rot = getSortedValuesDesc(rots)
+    .map(r => create4DRotationMat(...r))
     .reduce((accumulator, currentMatrix) => {
       const product = new THREE.Matrix4();
       product.multiplyMatrices(currentMatrix, accumulator);
@@ -252,36 +254,32 @@ export function genFrame(frameIndex) {
   this.isOrthoUni.value = !schleProjEnable;
   this.axesOffsetScaleUni.value = scaleFactor;
 
-  helperFunc.changeMaterialProperty(this.facesGroup, 'opacity', faceOpacity);
-  helperFunc.changeMaterialProperty(
-    this.facesGroup,
-    'transparent',
-    faceOpacity !== 1
-  );
+  changeMaterialProperty(this.facesGroup, 'opacity', faceOpacity);
+  changeMaterialProperty(this.facesGroup, 'transparent', faceOpacity !== 1);
 
   /* eslint-disable */
-  helperFunc.changeMaterialProperty(this.facesGroup, 'visible', visibilities.faces ?? true);
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(this.facesGroup, 'visible', visibilities.faces ?? true);
+  changeMaterialProperty(
     this.wireframeGroup,
     'visible',
     (visibilities.wireframe ?? true) && ((separationDist ?? 0) === 0 && (faceScale ?? 1) === 1 || this.is4D)
   )
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.verticesGroup,
     'visible',
     (visibilities.vertices ?? true) && ((separationDist ?? 0) === 0 && (faceScale ?? 1) === 1 || this.is4D)
   )
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.separatedWireframeGroup,
     'visible',
     (visibilities.wireframe ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1) && !this.is4D
   )
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.separatedVerticesGroup,
     'visible',
     (visibilities.vertices ?? true) && ((separationDist ?? 0) !== 0 || (faceScale ?? 1) !== 1) && !this.is4D
   )
-  helperFunc.changeMaterialProperty(this.axesGroup, 'visible', visibilities.axes ?? true);
+  changeMaterialProperty(this.axesGroup, 'visible', visibilities.axes ?? true);
   /* eslint-enable */
 
   this.toggleCamera(cameraIsPersp);

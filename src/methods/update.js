@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import * as helperFunc from '../helperFunc.js';
-import * as types from '../type.js';
+import * as types from '@/type.js';
+import { changeMaterialProperty } from '@/utils/threeHelpers.js';
+import { create4DRotationMat } from '@/math/geo4D.js';
 
 /**
  * 更新所有属性到当前 UI 状态。
@@ -8,23 +9,23 @@ import * as types from '../type.js';
  * @this {types.PolytopeRendererApp}
  */
 export function updateProperties() {
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.facesGroup,
     'visible',
     this.faceVisibleSwitcher.checked
   );
   this.updateWireframeAndVerticesVisibilities();
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.axesGroup,
     'visible',
     this.axisVisibleSwitcher.checked
   );
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.facesGroup,
     'opacity',
     +this.faceOpacitySlider.noUiSlider.get(true)
   );
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.facesGroup,
     'transparent',
     +this.faceOpacitySlider.noUiSlider.get(true) !== 1
@@ -64,7 +65,7 @@ export function updateProjectionDistance() {
  * @this {types.PolytopeRendererApp}
  */
 export function updateWireframeAndVerticesVisibilities() {
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.wireframeGroup,
     'visible',
     this.wireframeVisibleSwitcher.checked &&
@@ -72,7 +73,7 @@ export function updateWireframeAndVerticesVisibilities() {
         (this.separationDistSlider.noUiSlider.get(true) === 0 &&
           this.faceScaleSlider.noUiSlider.get(true) === 1))
   );
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.verticesGroup,
     'visible',
     this.verticesVisibleSwitcher.checked &&
@@ -80,7 +81,7 @@ export function updateWireframeAndVerticesVisibilities() {
         (this.separationDistSlider.noUiSlider.get(true) === 0 &&
           this.faceScaleSlider.noUiSlider.get(true) === 1))
   );
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.separatedWireframeGroup,
     'visible',
     !this.is4D &&
@@ -88,7 +89,7 @@ export function updateWireframeAndVerticesVisibilities() {
       (this.separationDistSlider.noUiSlider.get(true) !== 0 ||
         this.faceScaleSlider.noUiSlider.get(true) !== 1)
   );
-  helperFunc.changeMaterialProperty(
+  changeMaterialProperty(
     this.separatedVerticesGroup,
     'visible',
     !this.is4D &&
@@ -139,7 +140,7 @@ export function updateEdgeScale() {
 export function updateRotation() {
   const rotations = this.rotationSliders.map(i => i.noUiSlider.get(true));
   this.rotAngles = rotations;
-  this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
+  this.rotUni.value = create4DRotationMat(...this.rotAngles);
   this.requestSingleRender();
 }
 

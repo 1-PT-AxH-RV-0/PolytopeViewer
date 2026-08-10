@@ -1,7 +1,9 @@
 import YAML from 'js-yaml';
-import * as helperFunc from '@/helperFunc.js';
 import infFamilies from '@/infFamilies/infFamilies.js';
 import * as types from '@/type.js';
+
+import { changeMaterialProperty } from '@/utils/threeHelpers.js';
+import { create4DRotationMat } from '@/math/geo4D.js';
 
 /**
  * 设置所有事件监听器。
@@ -10,7 +12,7 @@ import * as types from '@/type.js';
  */
 export function setupEventListeners() {
   this.faceVisibleSwitcher.addEventListener('change', () => {
-    helperFunc.changeMaterialProperty(
+    changeMaterialProperty(
       this.facesGroup,
       'visible',
       this.faceVisibleSwitcher.checked
@@ -26,7 +28,7 @@ export function setupEventListeners() {
     this.updateWireframeAndVerticesVisibilities.bind(this)
   );
   this.axisVisibleSwitcher.addEventListener('change', () => {
-    helperFunc.changeMaterialProperty(
+    changeMaterialProperty(
       this.axesGroup,
       'visible',
       this.axisVisibleSwitcher.checked
@@ -37,12 +39,12 @@ export function setupEventListeners() {
     this.updateScaleFactor(this.scaleFactorSlider.noUiSlider.get(true), false)
   );
   this.faceOpacitySlider.noUiSlider.on('update', () => {
-    helperFunc.changeMaterialProperty(
+    changeMaterialProperty(
       this.facesGroup,
       'opacity',
       +this.faceOpacitySlider.noUiSlider.get(true)
     );
-    helperFunc.changeMaterialProperty(
+    changeMaterialProperty(
       this.facesGroup,
       'transparent',
       +this.faceOpacitySlider.noUiSlider.get(true) !== 1
@@ -74,7 +76,7 @@ export function setupEventListeners() {
   this.rotationSliders.forEach((slider, i) => {
     slider.noUiSlider.on('update', () => {
       this.rotAngles[i] = slider.noUiSlider.get(true);
-      this.rotUni.value = helperFunc.create4DRotationMat(...this.rotAngles);
+      this.rotUni.value = create4DRotationMat(...this.rotAngles);
       this.requestSingleRender();
     });
   });
