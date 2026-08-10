@@ -5,6 +5,7 @@ const WebpackBar = require('webpackbar');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const offCatalog = require('./src/offCatalog');
 
 const production = true;
 
@@ -140,6 +141,7 @@ module.exports = ({
     new HtmlWebpackPlugin({
       title: '多胞形预览器',
       template: './src/index.html',
+      templateParameters: { offCatalog },
       filename: 'index.html',
       chunks: ['index'],
       favicon: './assets/Logo.png'
