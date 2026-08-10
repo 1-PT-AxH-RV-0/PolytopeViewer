@@ -1,5 +1,5 @@
 // 导入样式。
-import './style.scss';
+import '@/styles/style.scss';
 import 'nouislider/dist/nouislider.css';
 // 导入全局库
 import * as THREE from 'three';
