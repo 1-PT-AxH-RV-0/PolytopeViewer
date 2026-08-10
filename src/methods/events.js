@@ -1,7 +1,7 @@
 import YAML from 'js-yaml';
-import * as helperFunc from '../helperFunc.js';
-import infFamilies from '../infFamilies.js';
-import * as types from '../type.js';
+import * as helperFunc from '@/helperFunc.js';
+import infFamilies from '@/infFamilies/infFamilies.js';
+import * as types from '@/type.js';
 
 /**
  * 设置所有事件监听器。

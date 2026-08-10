@@ -1,8 +1,8 @@
 import isOdd from 'is-odd';
 import { chunk } from 'lodash';
 import { alternate4D } from './alternation.js';
-import { getUniqueSortedPairs, range } from './helperFunc.js';
-import * as type from './type.js';
+import { getUniqueSortedPairs, range } from '@/helperFunc.js';
+import * as type from '@/type.js';
 
 /**
  * 最大公约数。
