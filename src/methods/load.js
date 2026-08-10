@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import * as helperFunc from '@/helperFunc.js';
 import { parseOFF } from '@/offProcessors/offProcessor.js';
 import { parse4OFF } from '@/offProcessors/offProcessor4D.js';
-import shaderCompCallback from '../shaderCompCallback.js';
+import shaderCompCallback from '@/shader/shaderCompCallback.js';
 import * as types from '../type.js';
 
 /**

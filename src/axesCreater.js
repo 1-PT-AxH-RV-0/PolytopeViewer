@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-import shaderCompCallback from './shaderCompCallback.js';
+import shaderCompCallback from '@/shader/shaderCompCallback.js';
 import { toBufferGeometry } from './helperFunc.js';
 import fontUrl from '../assets/fonts/Sarasa_Mono_SC_Bold.typeface.json';
 

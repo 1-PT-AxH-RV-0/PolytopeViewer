@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as helperFunc from '../helperFunc.js';
-import shaderCompCallback from '../shaderCompCallback.js';
+import shaderCompCallback from '@/shader/shaderCompCallback.js';
 import * as types from '../type.js';
 
 /**
