@@ -413,6 +413,13 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
     throw new Error('不支持复合双罩体。');
   }
 
+  // 计算使得得到均匀对偶双罩体且顶点或面心居中
+  const polygon_edge_length1 = 2 * Math.sin((Math.PI * s1) / m);
+  const polygon_edge_length2 = 2 * Math.sin((Math.PI * s2) / n);
+  const polygon2ScaleFactor =
+    (polygon_edge_length1 / polygon_edge_length2) *
+    (Math.cos((Math.PI * s2) / n) / Math.cos((Math.PI * s1) / m));
+
   const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
 
@@ -425,7 +432,12 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
   // 多边形 B 位于 (0,y,0,w)
   for (let j = 0; j < n; j++) {
     const theta = (2 * Math.PI * j) / n + offset2;
-    vertices.push({ x: 0, y: Math.cos(theta), z: 0, w: Math.sin(theta) });
+    vertices.push({
+      x: 0,
+      y: Math.cos(theta) * polygon2ScaleFactor,
+      z: 0,
+      w: Math.sin(theta) * polygon2ScaleFactor
+    });
   }
 
   // 两个多边形自身的边（顶点索引对）

@@ -1,47 +1,37 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const WebpackBar = require('webpackbar');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const CompressionPlugin = require('compression-webpack-plugin');
-const offCatalog = require('./src/offCatalog');
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
+import WebpackBar from 'webpackbar';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import CompressionPlugin from 'compression-webpack-plugin';
+import zlib from 'zlib';
+import { offCatalog } from './src/offCatalog.js';
 
 const production = true;
 
-module.exports = ({
-  // cache: {
-    // type: 'filesystem',
-    // buildDependencies: {
-      // config: [__filename],
-    // },
-    // cacheDirectory: path.resolve(__dirname, '.webpack_cache'),
-    // name: 'cache'
-  // },
+export default {
   performance: {
     hints: 'warning',
     maxAssetSize: 320 * 1024,
     maxEntrypointSize: 320 * 1024,
-    assetFilter: (assetFilename) => !assetFilename.endsWith('.exr')
+    assetFilter: assetFilename => !assetFilename.endsWith('.exr')
   },
-  entry: {index: './src/viewer.js'},
+  entry: { index: './src/viewer.js' },
   output: {
     filename: 'js/[name].[contenthash].js',
     chunkFilename: 'js/[name].[contenthash].chunk.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(import.meta.dirname, 'dist'),
     clean: true
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@assets': path.resolve(__dirname, 'assets')
+      '@': path.resolve(import.meta.dirname, 'src'),
+      '@assets': path.resolve(import.meta.dirname, 'assets')
     }
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin(),
-      new CssMinimizerPlugin()
-    ],
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
     splitChunks: {
       chunks: 'all',
       minSize: 4 * 1024,
@@ -67,11 +57,7 @@ module.exports = ({
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
-          presets: [
-            [
-              '@babel/preset-env'
-            ]
-          ]
+          presets: [['@babel/preset-env']]
         }
       },
       {
@@ -86,7 +72,7 @@ module.exports = ({
         type: 'asset',
         parser: {
           dataUrlCondition: {
-            maxSize: 4 * 1024,
+            maxSize: 4 * 1024
           }
         },
         generator: {
@@ -98,11 +84,7 @@ module.exports = ({
       },
       {
         test: /\.css$/i,
-        use: [
-          MiniCssExtractPlugin.loader,
-          'css-loader',
-          'postcss-loader'
-        ]
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader']
       },
       {
         test: /\.scss$/i,
@@ -131,10 +113,10 @@ module.exports = ({
     new WebpackBar(),
     new CompressionPlugin({
       test: /\.(off|css|js)$/,
-      algorithm: 'brotliCompress',  // 使用 Brotli
+      algorithm: 'brotliCompress',
       compressionOptions: {
         params: {
-          [require('zlib').constants.BROTLI_PARAM_QUALITY]: 11  // Brotli 质量级别 0-11，11 最高
+          [zlib.constants.BROTLI_PARAM_QUALITY]: 11
         }
       },
       threshold: 10240,
@@ -155,4 +137,4 @@ module.exports = ({
   ],
   devtool: production ? false : 'cheap-module-source-map',
   mode: production ? 'production' : 'development'
-});
+};
