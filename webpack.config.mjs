@@ -128,7 +128,7 @@ export default {
     }),
     new HtmlWebpackPlugin({
       title: '多胞形预览器',
-      template: './src/index.html',
+      template: './src/index.ejs',
       templateParameters: { offCatalog },
       filename: 'index.html',
       chunks: ['index'],
