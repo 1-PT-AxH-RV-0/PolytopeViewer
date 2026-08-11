@@ -270,9 +270,7 @@ export function validateRecordConfig(config, is4D, interpFuncMap) {
   if (config.initialHighlightFacesConfig !== undefined) {
     if (is4D)
       throw new Error('initialHighlightFacesConfig 字段的只在 3D 模式下可用。');
-    for (const [color] of Object.entries(
-      config.initialHighlightFacesConfig
-    )) {
+    for (const [color] of Object.entries(config.initialHighlightFacesConfig)) {
       if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
         throw new Error(
           `initialHighlightFacesConfig 的十六进制 RGBA 色码 ${color} 无效。`
@@ -442,9 +440,7 @@ export function validateRecordConfig(config, is4D, interpFuncMap) {
       case 'highlightFaces':
         if (is4D) throw new Error(`actions[${index}] 操作只在三维模式可用。`);
 
-        for (const [color] of Object.entries(
-          action.highlightConfig
-        )) {
+        for (const [color] of Object.entries(action.highlightConfig)) {
           if (!/^(0x)?[0-9a-fA-F]{8}$/.test(color))
             throw new Error(
               `actions[${index}].highlightConfig 的十六进制 RGBA 色码 ${color} 无效。`

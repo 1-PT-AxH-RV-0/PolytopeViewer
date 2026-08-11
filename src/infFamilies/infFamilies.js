@@ -412,7 +412,7 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
   if (gcd1 !== 1 || gcd2 !== 1) {
     throw new Error('不支持复合双罩体。');
   }
-  
+
   const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
 
@@ -435,7 +435,7 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
   }
   const edgesB = [];
   for (let j = 0; j < n; j++) {
-    edgesB.push([m + j, m + (j + s2) % n]);
+    edgesB.push([m + j, m + ((j + s2) % n)]);
   }
 
   // 用于根据 (边, 顶点) 查找面索引的 Map
@@ -443,14 +443,19 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
   const faceMap = new Map();
   const faces = [];
 
-  // 辅助函数：生成并记录面
+  /**
+   * 添加一个三角形面，若已存在则返回已有索引。
+   * 面由一条边和一个额外顶点定义，确保边顶点有序以保证键的一致性。
+   * @param {number} edgeA - 边的第一个顶点索引。
+   * @param {number} edgeB - 边的第二个顶点索引（会与 edgeA 排序）。
+   * @param {number} third - 与边相对的第三个顶点索引。
+   * @returns {number} 新添加的面的索引，或已存在面的索引。
+   */
   function addFace(edgeA, edgeB, third) {
     // 对 edge 的两个顶点排序，保证键的一致性
     const [a, b] = edgeA < edgeB ? [edgeA, edgeB] : [edgeB, edgeA];
     const key = `${a}_${b}_${third}`;
-    if (faceMap.has(key)) {
-      return faceMap.get(key); // 不应发生，但安全起见
-    }
+
     const idx = faces.length;
     faces.push([a, b, third]);
     faceMap.set(key, idx);
@@ -481,7 +486,12 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
       const f3 = faceMap.get(`${x < y ? x : y}_${x < y ? y : x}_${u}`); // 边 xy + 点 u
       const f4 = faceMap.get(`${x < y ? x : y}_${x < y ? y : x}_${v}`); // 边 xy + 点 v
       // 确保四个面都存在（理论上必然存在）
-      if (f1 === undefined || f2 === undefined || f3 === undefined || f4 === undefined) {
+      if (
+        f1 === undefined ||
+        f2 === undefined ||
+        f3 === undefined ||
+        f4 === undefined
+      ) {
         throw new Error('内部错误：找不到对应的面');
       }
       cells.push([f1, f2, f3, f4]);

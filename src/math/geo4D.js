@@ -11,7 +11,14 @@ import * as THREE from 'three';
  * @param {number} zw_deg - zw 旋转角度。
  * @returns {THREE.Matrix4} - 4D 旋转矩阵。
  */
-export function create4DRotationMat(xy_deg, xz_deg, xw_deg, yz_deg, yw_deg, zw_deg) {
+export function create4DRotationMat(
+  xy_deg,
+  xz_deg,
+  xw_deg,
+  yz_deg,
+  yw_deg,
+  zw_deg
+) {
   const xy = THREE.MathUtils.degToRad(xy_deg);
   const xz = THREE.MathUtils.degToRad(xz_deg);
   const xw = THREE.MathUtils.degToRad(xw_deg);
@@ -175,6 +182,11 @@ export function apply4DInverseRotation(rotatedPoint, rotationMatrix) {
  * @returns {number} 行列式值。
  */
 function compute4x4Determinant(m) {
+  /**
+   * 返回 3×3 矩阵的行列式
+   * @param {number[][]} m3 3×3 矩阵
+   * @returns {number} 行列式的值
+   */
   function det3x3(m3) {
     return (
       m3[0][0] * (m3[1][1] * m3[2][2] - m3[1][2] * m3[2][1]) -

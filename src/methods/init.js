@@ -42,6 +42,11 @@ function generateLogarithmicRange(min, max, base = Math.E, segments = 32) {
     percentages.push((i / (totalPoints - 1)) * 100);
   }
 
+  /**
+   * 生成某个百分百对应的值（对数刻度）
+   * @param {number} p 百分比
+   * @returns {number} 对应的对数值
+   */
   function valueFromPercent(p) {
     const t = p / 100;
     if (isCrossZero) {
