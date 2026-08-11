@@ -540,6 +540,13 @@ export const offCatalog = {
       ]
     },
     {
+      id: 'special4D',
+      label: '特殊多胞体',
+      items: [
+        { name: '大双反角柱（五边形—五角星交错双反角柱）', path: 'Special/Gudap.off' },
+      ]
+    },
+    {
       id: 'truncatedRegularConvex',
       label: '截角凸正多胞体',
       items: [
