@@ -95,6 +95,10 @@ class PolytopeRendererApp {
     this.duoantiprismMInput = null;
     this.duoantiprismNInput = null;
 
+    this.genDuotegumBtn = null;
+    this.duotegumMInput = null;
+    this.duotegumNInput = null;
+
     // 物体组变量
     this.axesGroup = null;
     this.solidGroup = null;

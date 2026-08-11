@@ -306,6 +306,37 @@ export function setupSolidInfFamiliesEventListeners() {
       console.error(e);
     }
   });
+
+  this.genDuotegumBtn.addEventListener('click', async () => {
+    const [m, s1] = this.duotegumMInput.value.split('/').map(i => +i);
+    const [n, s2] = this.duotegumNInput.value.split('/').map(i => +i);
+
+    if (s1 >= m) {
+      this.triggerErrorDialog(
+        '<math><msub><mi>s</mi><mn>1</mn></msub></math> 不能大于等于 <math><mi>m</mi></math>。'
+      );
+      console.error('s1 不能大于等于 m。');
+      return;
+    }
+
+    if (s2 >= n) {
+      this.triggerErrorDialog(
+        '<math><msub><mi>s</mi><mn>2</mn></msub></math> 不能大于等于 <math><mi>n</mi></math>。'
+      );
+      console.error('s2 不能大于等于 n。');
+      return;
+    }
+
+    try {
+      await this.loadMeshFrom4Data(
+        infFamilies.duotegum(m, n, s1, s2),
+        this.initialMaterial
+      );
+    } catch (e) {
+      this.triggerErrorDialog(e.stack);
+      console.error(e);
+    }
+  });
 }
 
 /**
