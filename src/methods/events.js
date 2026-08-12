@@ -337,6 +337,30 @@ export function setupSolidInfFamiliesEventListeners() {
       console.error(e);
     }
   });
+
+  this.genPqDigonalDisphenoidBtn.addEventListener('click', async () => {
+    const [p, q] = this.pqDigonalDisphenoidPQInput.value
+      .split('/')
+      .map(i => +i);
+
+    if (q >= p) {
+      this.triggerErrorDialog(
+        '<math><mi>q</mi></math> 不能大于等于 <math><mi>p</mi></math>。'
+      );
+      console.error('q 不能大于等于 p。');
+      return;
+    }
+
+    try {
+      await this.loadMeshFrom4Data(
+        infFamilies.pqDigonalDisphenoid(p, q),
+        this.initialMaterial
+      );
+    } catch (e) {
+      this.triggerErrorDialog(e.stack);
+      console.error(e);
+    }
+  });
 }
 
 /**

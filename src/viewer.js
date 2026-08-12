@@ -99,6 +99,9 @@ class PolytopeRendererApp {
     this.duotegumMInput = null;
     this.duotegumNInput = null;
 
+    this.genPqDigonalDisphenoidBtn = null;
+    this.pqDigonalDisphenoidPQInput = null;
+
     // 物体组变量
     this.axesGroup = null;
     this.solidGroup = null;

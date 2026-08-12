@@ -142,6 +142,9 @@ export function _initializeDomElements() {
   this.genDuotegumBtn = document.getElementById('genDuotegum');
   this.duotegumMInput = document.getElementById('duotegumM');
   this.duotegumNInput = document.getElementById('duotegumN');
+  
+  this.genPqDigonalDisphenoidBtn = document.getElementById('genPqDigonalDisphenoid');
+  this.pqDigonalDisphenoidPQInput = document.getElementById('pqDigonalDisphenoidPQ');
   /* eslint-enable */
 
   this.rotationSliders = ['XY', 'XZ', 'XW', 'YZ', 'YW', 'ZW'].map(i =>
