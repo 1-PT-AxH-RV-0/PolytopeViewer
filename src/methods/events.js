@@ -1,6 +1,7 @@
 import YAML from 'js-yaml';
 import infFamilies from '@/infFamilies/infFamilies.js';
 import * as types from '@/type.js';
+import isOdd from 'is-odd';
 
 import { changeMaterialProperty } from '@/utils/threeHelpers.js';
 import { create4DRotationMat } from '@/math/geo4D.js';
@@ -237,6 +238,44 @@ export function setupSolidInfFamiliesEventListeners() {
     try {
       await this.loadMeshFromData(
         infFamilies.stephanoid(n, a, b),
+        this.initialMaterial
+      );
+    } catch (e) {
+      this.triggerErrorDialog(e.stack);
+      console.error(e);
+    }
+  });
+
+  this.genCupolaBtn.addEventListener('click', async () => {
+    const [n, s] = this.cupolaNInput.value.split('/').map(i => +i);
+
+    if (s >= n) {
+      this.triggerErrorDialog(sGeNErrorHtml);
+      console.error(sGeNErrorText);
+      return;
+    }
+
+    if (n / (s ?? 1) <= 6 / 5 || n / (s ?? 1) >= 6) {
+      this.triggerErrorDialog(
+        '当 <math><mfrac><mi>n</mi><mi>s</mi></mfrac><mo>≤</mo><mfrac><mn>6</mn><mn>5</mn></mfrac><mspace width="1em"/><mtext>或</mtext><mspace width="1em"/><mfrac><mi>n</mi><mi>s</mi></mfrac><mo>≥</mo><mn>6</mn></math> 时，将无法得到面全正的台塔，将使用底面外接圆半径的 0.8 倍作为高度。'
+      );
+      console.error(
+        '当 n/s ≤ 6/5 或 n/s ≥ 6 时，将无法得到面全正的台塔，将使用底面外接圆半径的 0.8 倍作为高度。'
+      );
+    }
+
+    if (!isOdd(s ?? 1)) {
+      this.triggerErrorDialog(
+        '当 s 为偶数时时，将得到半台塔，没有底面且底面顶点数与顶面相同。'
+      );
+      console.error(
+        '当 s 为偶数时时，将得到半台塔，没有底面且底面顶点数与顶面相同。'
+      );
+    }
+
+    try {
+      await this.loadMeshFromData(
+        infFamilies.cupola(n, s),
         this.initialMaterial
       );
     } catch (e) {

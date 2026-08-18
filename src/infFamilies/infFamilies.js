@@ -37,7 +37,7 @@ function* polygonIndexIterator(n, s) {
  */
 function prism(n, s = 1) {
   const gcd = getGCD(n, s);
-  const offset = n % 2 === 0 ? (Math.PI * 1) / n : 0;
+  const offset = !isOdd(n) ? (Math.PI * 1) / n : 0;
   const height = 2 * Math.sin((Math.PI * s) / n);
 
   const vertices = [];
@@ -89,7 +89,7 @@ function antiprism(n, s = 1) {
     data: null
   };
   const gcd = getGCD(n, s);
-  const offset = n % 2 === 0 ? (Math.PI * 1) / n : 0;
+  const offset = !isOdd(n) ? (Math.PI * 1) / n : 0;
 
   // 均匀反角柱高度公式
   /*
@@ -253,6 +253,164 @@ function stephanoid(n, a, b) {
 }
 
 /**
+ * 生成 n 台塔的网格数据。
+ * @param {number} n - 多边形的边数。
+ * @param {number} d - 多边形的步长。
+ * @returns {type.NonTriMesh3D} 网格数据对象。
+ */
+function cupola(n, d = 1) {
+  if (getGCD(n, d) !== 1) throw new Error('不支持复合台塔。');
+
+  /**
+   * 生成星形多边形的迭代器。
+   * @param {number} start - 开始。
+   * @param {number} end - 结束。
+   * @param {number} step - 步长。
+   * @yields [number] - 索引。
+   */
+  function* starIndexGenerator(start, end, step) {
+    let current = start;
+
+    while (true) {
+      yield current;
+
+      current += step;
+      if (current > end) {
+        current -= end;
+      }
+
+      if (current === start) {
+        break;
+      }
+    }
+  }
+  const twistAngle = (Math.PI / (2 * n)) * d;
+
+  // 半径（边长 s=1）
+  const bottomRadius =
+    1 / Math.sqrt(2 * (1 - Math.cos((2 * Math.PI * d) / n - 2 * twistAngle)));
+  const topRadius = 1 / Math.sqrt(2 * (1 - Math.cos((2 * Math.PI * d) / n)));
+
+  // 高度公式（边长 s=1）
+  const ratio = n / d;
+  let height;
+
+  if (6 / 5 < ratio && ratio < 6) {
+    height = Math.sqrt(1 - 1 / (4 * Math.sin((Math.PI * d) / n) ** 2));
+  } else {
+    height = Math.max(topRadius, bottomRadius) * 0.8;
+  }
+
+  const rawVertices = [];
+  const rawFaces = [];
+  const bottomVertexIndices = [];
+
+  // 底面顶点（y=-height/2），为半台塔时生成两次顶点。
+  const bottomRepeatCount = isOdd(d) ? 1 : 2;
+
+  for (let repeat = 0; repeat < bottomRepeatCount; repeat += 1) {
+    for (const index of starIndexGenerator(1, 2 * n, d)) {
+      const theta = (2 * Math.PI * (index - 1)) / (2 * n) + twistAngle;
+
+      rawVertices.push({
+        x: bottomRadius * Math.cos(theta),
+        y: -height / 2,
+        z: bottomRadius * Math.sin(theta)
+      });
+
+      bottomVertexIndices.push(rawVertices.length - 1);
+    }
+  }
+
+  // 顶面顶点（y=height/2）
+  const topVertexIndices = [];
+
+  for (const index of starIndexGenerator(1, n, d)) {
+    const theta = (2 * Math.PI * (index - 1)) / n;
+
+    rawVertices.push({
+      x: topRadius * Math.cos(theta),
+      y: height / 2,
+      z: topRadius * Math.sin(theta)
+    });
+
+    topVertexIndices.push(rawVertices.length - 1);
+  }
+
+  // 底面（半台塔无底面，仅当 d 为奇数时添加）
+  if (isOdd(d)) {
+    rawFaces.push(bottomVertexIndices);
+  }
+
+  // 顶面
+  rawFaces.push(topVertexIndices);
+
+  // 三角形侧面
+  for (let i = 0; i < n; i += 1) {
+    const topVertex = topVertexIndices[i];
+
+    const bottomVertex1Index =
+      (2 * i - 1 + bottomVertexIndices.length) % bottomVertexIndices.length;
+
+    const bottomVertex1 = bottomVertexIndices[bottomVertex1Index];
+    const bottomVertex2 = bottomVertexIndices[2 * i];
+
+    rawFaces.push([topVertex, bottomVertex1, bottomVertex2]);
+  }
+
+  // 矩形侧面
+  for (let i = 0; i < n; i += 1) {
+    const topVertex1 = topVertexIndices[(i + 1) % n];
+    const topVertex2 = topVertexIndices[i];
+    const bottomVertex1 = bottomVertexIndices[2 * i];
+    const bottomVertex2 = bottomVertexIndices[2 * i + 1];
+
+    rawFaces.push([topVertex1, topVertex2, bottomVertex1, bottomVertex2]);
+  }
+
+  // ---- 顶点去重并更新面索引 ----
+  const coordinateToNewIndex = Object.create(null);
+  const uniqueVertices = [];
+
+  for (const index in rawVertices) {
+    const vertex = rawVertices[index];
+    const key = `${vertex.x},${vertex.y},${vertex.z}`;
+
+    if (!(key in coordinateToNewIndex)) {
+      coordinateToNewIndex[key] = uniqueVertices.length;
+      uniqueVertices.push(vertex);
+    }
+  }
+
+  const uniqueFaces = [];
+
+  for (const face of rawFaces) {
+    const newFace = [];
+
+    for (const rawIndex of face) {
+      const vertex = rawVertices[rawIndex];
+      const key = `${vertex.x},${vertex.y},${vertex.z}`;
+
+      newFace.push(coordinateToNewIndex[key]);
+    }
+
+    uniqueFaces.push(newFace);
+  }
+
+  const edges = getUniqueSortedPairs(uniqueFaces).map(edge =>
+    edge.map(index => uniqueVertices[index])
+  );
+
+  return {
+    vertices: uniqueVertices,
+    faces: uniqueFaces,
+    edges,
+    norms: {},
+    nonclosed: new Set()
+  };
+}
+
+/**
  * 生成 m 角 n 角双角柱的网格数据。
  * @param {number} m - 第一个多边形的边数。
  * @param {number} n - 第二个多边形的边数。
@@ -266,7 +424,7 @@ function duoprism(m, n, s1 = 1, s2 = 1) {
   const polygon_edge_length2 = 2 * Math.sin((Math.PI * s2) / n);
   const polygon2ScaleFactor = polygon_edge_length1 / polygon_edge_length2;
 
-  const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
+  const offset1 = !isOdd(m) ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
 
   const gcd1 = getGCD(m, s1);
@@ -420,7 +578,7 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
     (polygon_edge_length1 / polygon_edge_length2) *
     (Math.cos((Math.PI * s2) / n) / Math.cos((Math.PI * s1) / m));
 
-  const offset1 = m % 2 === 0 ? (Math.PI * 1) / m : 0;
+  const offset1 = !isOdd(m) ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
 
   const vertices = [];
@@ -640,6 +798,7 @@ export default {
   antiprism,
   trapezohedron,
   stephanoid,
+  cupola,
   duoprism,
   duoantiprism,
   duotegum,

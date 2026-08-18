@@ -87,6 +87,9 @@ class PolytopeRendererApp {
     this.stephanoidAInput = null;
     this.stephanoidBInput = null;
 
+    this.genCupolaBtn = null;
+    this.cupolaNInput = null;
+
     this.genDuoprismBtn = null;
     this.duoprismMInput = null;
     this.duoprismNInput = null;

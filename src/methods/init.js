@@ -130,6 +130,9 @@ export function _initializeDomElements() {
   this.stephanoidNInput = document.getElementById('stephanoidN');
   this.stephanoidAInput = document.getElementById('stephanoidA');
   this.stephanoidBInput = document.getElementById('stephanoidB');
+  
+  this.genCupolaBtn = document.getElementById('genCupola');
+  this.cupolaNInput = document.getElementById('cupolaN');
 
   this.genDuoprismBtn = document.getElementById('genDuoprism');
   this.duoprismMInput = document.getElementById('duoprismM');
