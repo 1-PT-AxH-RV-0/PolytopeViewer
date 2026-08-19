@@ -11,6 +11,12 @@ import { offCatalog } from './src/offCatalog.js';
 const production = true;
 
 export default {
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [import.meta.filename]
+    }
+  },
   performance: {
     hints: 'warning',
     maxAssetSize: 320 * 1024,
@@ -31,7 +37,7 @@ export default {
     }
   },
   optimization: {
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    minimizer: [new TerserPlugin({parallel: true}), new CssMinimizerPlugin()],
     splitChunks: {
       chunks: 'all',
       minSize: 4 * 1024,
@@ -116,7 +122,7 @@ export default {
       algorithm: 'brotliCompress',
       compressionOptions: {
         params: {
-          [zlib.constants.BROTLI_PARAM_QUALITY]: 11
+          [zlib.constants.BROTLI_PARAM_QUALITY]: 5
         }
       },
       threshold: 10240,
