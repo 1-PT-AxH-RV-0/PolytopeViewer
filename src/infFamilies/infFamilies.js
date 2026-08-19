@@ -1,6 +1,7 @@
 import isOdd from 'is-odd';
 import { chunk } from 'lodash';
 import { alternate4D } from './alternation.js';
+import { equalPoint } from './midFormula.js';
 import { getUniqueSortedPairs, range } from '@/utils/general.js';
 import * as type from '@/type.js';
 
@@ -253,6 +254,47 @@ function stephanoid(n, a, b) {
 }
 
 /**
+ * 顶点去重并更新面索引。
+ * @param {type.Point3D[]} rawVertices - 顶点数组
+ * @param {number[][]} rawFaces - 面数组
+ * @returns {object} - 去重后的顶点与面
+ */
+function deduplicateVertices(rawVertices, rawFaces) {
+  const coordinateToNewIndex = Object.create(null);
+  const uniqueVertices = [];
+
+  for (const index in rawVertices) {
+    const vertex = rawVertices[index];
+    const key = `${vertex.x},${vertex.y},${vertex.z}`;
+
+    if (!(key in coordinateToNewIndex)) {
+      coordinateToNewIndex[key] = uniqueVertices.length;
+      uniqueVertices.push(vertex);
+    }
+  }
+
+  const uniqueFaces = [];
+
+  for (const face of rawFaces) {
+    const newFace = [];
+
+    for (const rawIndex of face) {
+      const vertex = rawVertices[rawIndex];
+      const key = `${vertex.x},${vertex.y},${vertex.z}`;
+
+      newFace.push(coordinateToNewIndex[key]);
+    }
+
+    uniqueFaces.push(newFace);
+  }
+
+  return {
+    vertices: uniqueVertices,
+    faces: uniqueFaces
+  };
+}
+
+/**
  * 生成 n 台塔的网格数据。
  * @param {number} n - 多边形的边数。
  * @param {number} d - 多边形的步长。
@@ -261,29 +303,6 @@ function stephanoid(n, a, b) {
 function cupola(n, d = 1) {
   if (getGCD(n, d) !== 1) throw new Error('不支持复合台塔。');
 
-  /**
-   * 生成星形多边形的迭代器。
-   * @param {number} start - 开始。
-   * @param {number} end - 结束。
-   * @param {number} step - 步长。
-   * @yields [number] - 索引。
-   */
-  function* starIndexGenerator(start, end, step) {
-    let current = start;
-
-    while (true) {
-      yield current;
-
-      current += step;
-      if (current > end) {
-        current -= end;
-      }
-
-      if (current === start) {
-        break;
-      }
-    }
-  }
   const twistAngle = (Math.PI / (2 * n)) * d;
 
   // 半径（边长 s=1）
@@ -305,28 +324,24 @@ function cupola(n, d = 1) {
   const rawFaces = [];
   const bottomVertexIndices = [];
 
-  // 底面顶点（y=-height/2），为半台塔时生成两次顶点。
-  const bottomRepeatCount = isOdd(d) ? 1 : 2;
+  // 底面顶点
+  for (let index = 0; index < 2 * n; index += 1) {
+    const theta = (index * (2 * d * Math.PI)) / (2 * n) + twistAngle;
 
-  for (let repeat = 0; repeat < bottomRepeatCount; repeat += 1) {
-    for (const index of starIndexGenerator(1, 2 * n, d)) {
-      const theta = (2 * Math.PI * (index - 1)) / (2 * n) + twistAngle;
+    rawVertices.push({
+      x: bottomRadius * Math.cos(theta),
+      y: -height / 2,
+      z: bottomRadius * Math.sin(theta)
+    });
 
-      rawVertices.push({
-        x: bottomRadius * Math.cos(theta),
-        y: -height / 2,
-        z: bottomRadius * Math.sin(theta)
-      });
-
-      bottomVertexIndices.push(rawVertices.length - 1);
-    }
+    bottomVertexIndices.push(rawVertices.length - 1);
   }
 
-  // 顶面顶点（y=height/2）
+  // 顶面顶点
   const topVertexIndices = [];
 
-  for (const index of starIndexGenerator(1, n, d)) {
-    const theta = (2 * Math.PI * (index - 1)) / n;
+  for (let index = 0; index < n; index += 1) {
+    const theta = (index * (2 * d * Math.PI)) / n;
 
     rawVertices.push({
       x: topRadius * Math.cos(theta),
@@ -368,42 +383,123 @@ function cupola(n, d = 1) {
     rawFaces.push([topVertex1, topVertex2, bottomVertex1, bottomVertex2]);
   }
 
-  // ---- 顶点去重并更新面索引 ----
-  const coordinateToNewIndex = Object.create(null);
-  const uniqueVertices = [];
+  const { vertices, faces } = deduplicateVertices(rawVertices, rawFaces);
 
-  for (const index in rawVertices) {
-    const vertex = rawVertices[index];
-    const key = `${vertex.x},${vertex.y},${vertex.z}`;
-
-    if (!(key in coordinateToNewIndex)) {
-      coordinateToNewIndex[key] = uniqueVertices.length;
-      uniqueVertices.push(vertex);
-    }
-  }
-
-  const uniqueFaces = [];
-
-  for (const face of rawFaces) {
-    const newFace = [];
-
-    for (const rawIndex of face) {
-      const vertex = rawVertices[rawIndex];
-      const key = `${vertex.x},${vertex.y},${vertex.z}`;
-
-      newFace.push(coordinateToNewIndex[key]);
-    }
-
-    uniqueFaces.push(newFace);
-  }
-
-  const edges = getUniqueSortedPairs(uniqueFaces).map(edge =>
-    edge.map(index => uniqueVertices[index])
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
   );
 
   return {
-    vertices: uniqueVertices,
-    faces: uniqueFaces,
+    vertices,
+    faces,
+    edges,
+    norms: {},
+    nonclosed: new Set()
+  };
+}
+
+/**
+ * 生成 n 角丸塔的网格数据。
+ * @param {number} n  - 多边形边数
+ * @param {number} d  - 多边形步长
+ * @param {number} rb - 底面半径
+ * @param {number} rt - 顶面半径
+ * @param {number} h  - 高度
+ * @returns {type.NonTriMesh3D} 网格数据对象。
+ */
+function rotunda(n, d = 1, rb = 2.0, rt = 1.0, h = 1.0) {
+  if (getGCD(n, d) !== 1) throw new Error('不支持复合丸塔。');
+
+  const alpha = (Math.PI * d) / (2 * n);
+
+  const rawVertices = [];
+  const rawFaces = [];
+
+  // 底面顶点（j = 1..2n，索引 0..2n-1）
+  const bottomIndices = [];
+  for (let j = 1; j <= 2 * n; j++) {
+    const theta = ((2 * Math.PI * (j - 1)) / (2 * n)) * d + alpha;
+    rawVertices.push({
+      x: -rb * Math.cos(theta),
+      y: -h / 2,
+      z: -rb * Math.sin(theta)
+    });
+    bottomIndices.push(rawVertices.length - 1);
+  }
+
+  // 顶面顶点（j = 1..n，索引 2n..3n-1）
+  const topIndices = [];
+  for (let j = 1; j <= n; j++) {
+    const theta = (2 * Math.PI * (j - 1) * d) / n;
+    rawVertices.push({
+      x: -rt * Math.cos(theta),
+      y: h / 2,
+      z: -rt * Math.sin(theta)
+    });
+    topIndices.push(rawVertices.length - 1);
+  }
+
+  // 计算等距点
+  const equalPt = equalPoint(d, n, rb, rt, h);
+  const rMid = Math.sqrt(equalPt[0] ** 2 + equalPt[2] ** 2);
+  const hMid = equalPt[1];
+  const thetaMid = Math.atan2(equalPt[2], equalPt[0]);
+
+  // 中间圈顶点（k = 0..n-1，索引 3n..4n-1）
+  const midIndices = [];
+  for (let k = 0; k < n; k++) {
+    const theta = thetaMid + ((2 * Math.PI * k) / n) * d;
+    rawVertices.push({
+      x: rMid * Math.cos(theta),
+      y: hMid - h / 2,
+      z: rMid * Math.sin(theta)
+    });
+    midIndices.push(rawVertices.length - 1);
+  }
+
+  // 底面（仅 d 为奇数时添加）
+  if (d % 2 === 1) {
+    rawFaces.push(bottomIndices);
+  }
+
+  // 顶面
+  rawFaces.push(topIndices);
+
+  // 底部三角形面：连接中间圈顶点和底面顶点
+  for (let i = 0; i < n; i++) {
+    const idxMid = i + 3 * n;
+    const idxBottom1 = (2 * i + 2) % (2 * n);
+    const idxBottom2 = (2 * i + 3) % (2 * n);
+    rawFaces.push([idxMid, idxBottom1, idxBottom2]);
+  }
+
+  // 顶部三角形面：连接中间圈顶点和顶面顶点
+  for (let i = 0; i < n; i++) {
+    const idxMid = i + 3 * n;
+    const idxBottom1 = ((i + 1) % n) + 2 * n;
+    const idxBottom2 = ((i + 2) % n) + 2 * n;
+    rawFaces.push([idxMid, idxBottom1, idxBottom2]);
+  }
+
+  // 五边形面：连接中间圈顶点、顶面顶点和底面顶点
+  for (let i = 0; i < n; i++) {
+    const idxMid = i + 3 * n;
+    const idxMid2 = ((i + 1) % n) + 3 * n;
+    const idxTop = ((i + 2) % n) + 2 * n;
+    const idxBottom1 = (2 * i + 4) % (2 * n);
+    const idxBottom2 = (2 * i + 3) % (2 * n);
+    rawFaces.push([idxMid, idxTop, idxMid2, idxBottom1, idxBottom2]);
+  }
+
+  const { vertices, faces } = deduplicateVertices(rawVertices, rawFaces);
+
+  const edges = getUniqueSortedPairs(faces).map(edge =>
+    edge.map(index => vertices[index])
+  );
+
+  return {
+    vertices,
+    faces,
     edges,
     norms: {},
     nonclosed: new Set()
@@ -799,6 +895,7 @@ export default {
   trapezohedron,
   stephanoid,
   cupola,
+  rotunda,
   duoprism,
   duoantiprism,
   duotegum,

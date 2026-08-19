@@ -284,6 +284,37 @@ export function setupSolidInfFamiliesEventListeners() {
     }
   });
 
+  this.genRotundaBtn.addEventListener('click', async () => {
+    const [n, s] = this.rotundaNInput.value.split('/').map(i => +i);
+    const [rb, rt] = this.rotundaRInput.value.split('/').map(i => +i);
+    const h = +this.rotundaHInput.value;
+
+    if (s >= n) {
+      this.triggerErrorDialog(sGeNErrorHtml);
+      console.error(sGeNErrorText);
+      return;
+    }
+
+    if (!isOdd(s ?? 1)) {
+      this.triggerErrorDialog(
+        '当 s 为偶数时时，将得到半丸塔，没有底面且底面顶点数与顶面相同。'
+      );
+      console.error(
+        '当 s 为偶数时时，将得到半丸塔，没有底面且底面顶点数与顶面相同。'
+      );
+    }
+
+    try {
+      await this.loadMeshFromData(
+        infFamilies.rotunda(n, s, rb, rt, h),
+        this.initialMaterial
+      );
+    } catch (e) {
+      this.triggerErrorDialog(e.stack);
+      console.error(e);
+    }
+  });
+
   this.genDuoprismBtn.addEventListener('click', async () => {
     const [m, s1] = this.duoprismMInput.value.split('/').map(i => +i);
     const [n, s2] = this.duoprismNInput.value.split('/').map(i => +i);

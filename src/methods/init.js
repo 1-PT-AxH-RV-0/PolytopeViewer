@@ -109,7 +109,7 @@ export function _initializeDomElements() {
   this.configFileInput = document.getElementById('configFileInput');
   this.highlightCellsBtn = document.getElementById('highlightCells');
   this.highlightFacesBtn = document.getElementById('highlightFaces');
-  
+
   this.errorModal = document.getElementById('errorModal');
   this.errorMsg = document.getElementById('errorMsg');
 
@@ -125,19 +125,24 @@ export function _initializeDomElements() {
 
   this.genTrapezohedronBtn = document.getElementById('genTrapezohedron');
   this.trapezohedronNInput = document.getElementById('trapezohedronN');
-  
+
   this.genStephanoidBtn = document.getElementById('genStephanoid');
   this.stephanoidNInput = document.getElementById('stephanoidN');
   this.stephanoidAInput = document.getElementById('stephanoidA');
   this.stephanoidBInput = document.getElementById('stephanoidB');
-  
+
   this.genCupolaBtn = document.getElementById('genCupola');
   this.cupolaNInput = document.getElementById('cupolaN');
+
+  this.genRotundaBtn = document.getElementById('genRotunda');
+  this.rotundaNInput = document.getElementById('rotundaN');
+  this.rotundaRInput = document.getElementById('rotundaR');
+  this.rotundaHInput = document.getElementById('rotundaH');
 
   this.genDuoprismBtn = document.getElementById('genDuoprism');
   this.duoprismMInput = document.getElementById('duoprismM');
   this.duoprismNInput = document.getElementById('duoprismN');
-  
+
   this.genDuoantiprismBtn = document.getElementById('genDuoantiprism');
   this.duoantiprismMInput = document.getElementById('duoantiprismM');
   this.duoantiprismNInput = document.getElementById('duoantiprismN');
@@ -145,7 +150,7 @@ export function _initializeDomElements() {
   this.genDuotegumBtn = document.getElementById('genDuotegum');
   this.duotegumMInput = document.getElementById('duotegumM');
   this.duotegumNInput = document.getElementById('duotegumN');
-  
+
   this.genPqDigonalDisphenoidBtn = document.getElementById('genPqDigonalDisphenoid');
   this.pqDigonalDisphenoidPQInput = document.getElementById('pqDigonalDisphenoidPQ');
   /* eslint-enable */
