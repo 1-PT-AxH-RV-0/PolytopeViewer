@@ -169,7 +169,8 @@ class PolytopeRendererApp {
       roughness: 0.4,
       metalness: 0.2,
       flatShading: true,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
+      depthWrite: true
     });
     this.editor = null;
     this.errorModalBs = null;

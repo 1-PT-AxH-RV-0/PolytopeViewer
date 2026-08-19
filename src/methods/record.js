@@ -256,6 +256,7 @@ export function genFrame(frameIndex) {
 
   changeMaterialProperty(this.facesGroup, 'opacity', faceOpacity);
   changeMaterialProperty(this.facesGroup, 'transparent', faceOpacity !== 1);
+  changeMaterialProperty(this.facesGroup, 'depthWrite', faceOpacity === 1);
 
   /* eslint-disable */
   changeMaterialProperty(this.facesGroup, 'visible', visibilities.faces ?? true);

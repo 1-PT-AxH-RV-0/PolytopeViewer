@@ -30,6 +30,11 @@ export function updateProperties() {
     'transparent',
     +this.faceOpacitySlider.noUiSlider.get(true) !== 1
   );
+  changeMaterialProperty(
+    this.facesGroup,
+    'depthWrite',
+    +this.faceOpacitySlider.noUiSlider.get(true) === 1
+  );
   this.toggleCamera(this.perspSwitcher.checked);
 
   this.cylinderRadiusUni.value =

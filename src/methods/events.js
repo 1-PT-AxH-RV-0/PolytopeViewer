@@ -50,6 +50,11 @@ export function setupEventListeners() {
       'transparent',
       +this.faceOpacitySlider.noUiSlider.get(true) !== 1
     );
+    changeMaterialProperty(
+      this.facesGroup,
+      'depthWrite',
+      +this.faceOpacitySlider.noUiSlider.get(true) === 1
+    );
     this.requestSingleRender();
   });
   this.wireframeAndVerticesDimSlider.noUiSlider.on('update', () => {

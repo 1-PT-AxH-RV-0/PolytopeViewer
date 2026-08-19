@@ -20,6 +20,7 @@ function changeFaceColor(faces, colorInt) {
   } else if (faces instanceof THREE.Mesh) {
     faces.material.color.set(colorInt.rgb);
     faces.material.transparent = colorInt.a !== 1;
+    faces.material.depthWrite = colorInt.a === 1;
     faces.material.opacity = colorInt.a;
   }
 }
