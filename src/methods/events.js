@@ -286,7 +286,6 @@ export function setupSolidInfFamiliesEventListeners() {
 
   this.genRotundaBtn.addEventListener('click', async () => {
     const [n, s] = this.rotundaNInput.value.split('/').map(i => +i);
-    const [rb, rt] = this.rotundaRInput.value.split('/').map(i => +i);
     const h = +this.rotundaHInput.value;
 
     if (s >= n) {
@@ -306,7 +305,7 @@ export function setupSolidInfFamiliesEventListeners() {
 
     try {
       await this.loadMeshFromData(
-        infFamilies.rotunda(n, s, rb, rt, h),
+        infFamilies.rotunda(n, s, h),
         this.initialMaterial
       );
     } catch (e) {

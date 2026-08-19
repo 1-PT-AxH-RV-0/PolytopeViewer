@@ -136,7 +136,6 @@ export function _initializeDomElements() {
 
   this.genRotundaBtn = document.getElementById('genRotunda');
   this.rotundaNInput = document.getElementById('rotundaN');
-  this.rotundaRInput = document.getElementById('rotundaR');
   this.rotundaHInput = document.getElementById('rotundaH');
 
   this.genDuoprismBtn = document.getElementById('genDuoprism');

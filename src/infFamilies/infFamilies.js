@@ -402,13 +402,17 @@ function cupola(n, d = 1) {
  * 生成 n 角丸塔的网格数据。
  * @param {number} n  - 多边形边数
  * @param {number} d  - 多边形步长
- * @param {number} rb - 底面半径
- * @param {number} rt - 顶面半径
  * @param {number} h  - 高度
  * @returns {type.NonTriMesh3D} 网格数据对象。
  */
-function rotunda(n, d = 1, rb = 2.0, rt = 1.0, h = 1.0) {
+function rotunda(n, d = 1, h = 1.0) {
   if (getGCD(n, d) !== 1) throw new Error('不支持复合丸塔。');
+
+  const polygonEdgeLength1 = 2 * Math.sin((Math.PI * d) / n);
+  const polygonEdgeLength2 = 2 * Math.sin((Math.PI * d) / (2 * n));
+
+  const rt = 1;
+  const rb = polygonEdgeLength1 / polygonEdgeLength2;
 
   const alpha = (Math.PI * d) / (2 * n);
 
@@ -516,9 +520,9 @@ function rotunda(n, d = 1, rb = 2.0, rt = 1.0, h = 1.0) {
  * @throws {Error} - 当为复合双角柱时抛出。
  */
 function duoprism(m, n, s1 = 1, s2 = 1) {
-  const polygon_edge_length1 = 2 * Math.sin((Math.PI * s1) / m);
-  const polygon_edge_length2 = 2 * Math.sin((Math.PI * s2) / n);
-  const polygon2ScaleFactor = polygon_edge_length1 / polygon_edge_length2;
+  const polygonEdgeLength1 = 2 * Math.sin((Math.PI * s1) / m);
+  const polygonEdgeLength2 = 2 * Math.sin((Math.PI * s2) / n);
+  const polygon2ScaleFactor = polygonEdgeLength1 / polygonEdgeLength2;
 
   const offset1 = !isOdd(m) ? (Math.PI * 1) / m : 0;
   const offset2 = Math.PI / 2 - Math.PI / n;
@@ -668,10 +672,10 @@ function duotegum(m, n, s1 = 1, s2 = 1) {
   }
 
   // 计算使得得到均匀对偶双罩体且顶点或面心居中
-  const polygon_edge_length1 = 2 * Math.sin((Math.PI * s1) / m);
-  const polygon_edge_length2 = 2 * Math.sin((Math.PI * s2) / n);
+  const polygonEdgeLength1 = 2 * Math.sin((Math.PI * s1) / m);
+  const polygonEdgeLength2 = 2 * Math.sin((Math.PI * s2) / n);
   const polygon2ScaleFactor =
-    (polygon_edge_length1 / polygon_edge_length2) *
+    (polygonEdgeLength1 / polygonEdgeLength2) *
     (Math.cos((Math.PI * s2) / n) / Math.cos((Math.PI * s1) / m));
 
   const offset1 = !isOdd(m) ? (Math.PI * 1) / m : 0;

@@ -92,7 +92,6 @@ class PolytopeRendererApp {
 
     this.genRotundaBtn = null;
     this.rotundaNInput = null;
-    this.rotundaRInput = null;
     this.rotundaHInput = null;
 
     this.genDuoprismBtn = null;
