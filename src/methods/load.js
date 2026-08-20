@@ -292,7 +292,6 @@ export function load4DMesh(meshData, material) {
     const indices = [];
 
     const faceIndices = range(...meshData.facesMap[originalFaceIndex]);
-    console.log(faceIndices);
     for (const faceIndex of faceIndices) {
       const face = meshData.faces[faceIndex];
       const localIndices = [];

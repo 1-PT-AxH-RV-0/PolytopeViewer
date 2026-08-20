@@ -220,7 +220,6 @@ export function highlightFaces(highlightConfig) {
     }
 
     if (Object.hasOwnProperty.call(facesSelectorConfig, 'ngons')) {
-      console.log(this.ngonsInFaces);
       for (const n of facesSelectorConfig.ngons) {
         if (!Object.hasOwnProperty.call(this.ngonsInFaces, n)) {
           throw new Error(`${n} 边形的面不存在。`);
