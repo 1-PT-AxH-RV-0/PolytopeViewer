@@ -37,7 +37,7 @@ export function deduplicateVertices(rawVertices, rawFaces) {
 
   for (const index in rawVertices) {
     const vertex = rawVertices[index];
-    const key = `${vertex.x},${vertex.y},${vertex.z}`;
+    const key = `${vertex.x.toFixed(5)},${vertex.y.toFixed(5)},${vertex.z.toFixed(5)}`;
 
     if (!(key in coordinateToNewIndex)) {
       coordinateToNewIndex[key] = uniqueVertices.length;
@@ -52,7 +52,7 @@ export function deduplicateVertices(rawVertices, rawFaces) {
 
     for (const rawIndex of face) {
       const vertex = rawVertices[rawIndex];
-      const key = `${vertex.x},${vertex.y},${vertex.z}`;
+      const key = `${vertex.x.toFixed(5)},${vertex.y.toFixed(5)},${vertex.z.toFixed(5)}`;
 
       newFace.push(coordinateToNewIndex[key]);
     }
