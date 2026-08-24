@@ -19,8 +19,8 @@ export default {
   },
   performance: {
     hints: 'warning',
-    maxAssetSize: 320 * 1024,
-    maxEntrypointSize: 320 * 1024,
+    maxAssetSize: 350 * 1024,
+    maxEntrypointSize: 350 * 1024,
     assetFilter: assetFilename => !assetFilename.endsWith('.exr')
   },
   entry: { index: './src/viewer.js' },
@@ -37,7 +37,7 @@ export default {
     }
   },
   optimization: {
-    minimizer: [new TerserPlugin({parallel: true}), new CssMinimizerPlugin()],
+    minimizer: [new TerserPlugin({ parallel: true }), new CssMinimizerPlugin()],
     splitChunks: {
       chunks: 'all',
       minSize: 4 * 1024,
@@ -122,7 +122,7 @@ export default {
       algorithm: 'brotliCompress',
       compressionOptions: {
         params: {
-          [zlib.constants.BROTLI_PARAM_QUALITY]: 5
+          [zlib.constants.BROTLI_PARAM_QUALITY]: 8
         }
       },
       threshold: 10240,

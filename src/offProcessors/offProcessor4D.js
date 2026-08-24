@@ -66,17 +66,22 @@ function process4DMeshData(
   const processedFaces = [];
   const processedCells = [];
 
+  // ---------- 建立顶点索引缓存 ----------
+  const vertexCache = new Map();
+  const pointKey = (p) =>
+    `${p.x.toFixed(5)},${p.y.toFixed(5)},${p.z.toFixed(5)},${p.w.toFixed(5)}`;
+
+  // 初始化缓存（仅包含所有原始顶点）
+  vertices.forEach((v, i) => {
+    vertexCache.set(pointKey(v), i);
+  });
+
   const totalItems = faces.length;
   let processedItems = 0;
   let prevPostTime = performance.now();
 
   const facesMap = {};
   faces.forEach((face, faceIndex) => {
-    /**
-     * 三角剖分单个面。
-     * @param {Array<type.Point4D>} vertices4D - 顶点数组。
-     * @returns {Array<[number, number, number]>} - 三角剖分出来的三角形。
-     */
     function triangulateFace(vertices4D) {
       if (vertices4D.length === 3) return [face];
 
@@ -94,14 +99,18 @@ function process4DMeshData(
             pt.z = z;
             pt.w = w;
             const origPoint = apply4DInverseRotation(pt, rotationMatrix);
-            const origIndex = processedVertices.findIndex(p =>
-              are4DPointsClose(p, origPoint)
-            );
 
-            if (origIndex > -1) return origIndex;
+            const key = pointKey(origPoint);
+            const cachedIndex = vertexCache.get(key);
+            if (cachedIndex !== undefined) {
+              return cachedIndex;
+            }
 
+            // 新顶点：添加到数组和缓存
+            const newIndex = processedVertices.length;
             processedVertices.push(origPoint);
-            return processedVertices.length - 1;
+            vertexCache.set(key, newIndex);
+            return newIndex;
           })
         );
 
@@ -121,7 +130,6 @@ function process4DMeshData(
     ];
 
     processedItems++;
-    // 每隔 200ms 发送一次进度。
     if (progressCallback && performance.now() - prevPostTime >= 200) {
       prevPostTime = performance.now();
       progressCallback(processedItems, totalItems);
