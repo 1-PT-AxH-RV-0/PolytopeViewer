@@ -258,7 +258,7 @@ function sphereMaterial(
       vec3 center3D = schlegelProjection(t_center4D);
       float radius_scale = 1.0;
       if (!isOrtho) {
-        radius_scale = min(projectionDistance / (projectionDistance - t_center4D.w), 2.0);
+        radius_scale = min(projectionDistance / (projectionDistance - t_center4D.w), 3.0);
       }
       transformed = transformed * radius * radius_scale + center3D + offset3D;
       `
@@ -339,8 +339,8 @@ function cylinderMaterial(
         float v1_radius_scale = 1.0;
         float v2_radius_scale = 1.0;
         if (!isOrtho) {
-            v1_radius_scale = min(projectionDistance / (projectionDistance - tv1.w), 2.0);
-            v2_radius_scale = min(projectionDistance / (projectionDistance - tv2.w), 2.0);
+            v1_radius_scale = min(projectionDistance / (projectionDistance - tv1.w), 3.0);
+            v2_radius_scale = min(projectionDistance / (projectionDistance - tv2.w), 3.0);
         }
         // 判断顶点在哪头并选择正确的缩放
         mat4 cylinderTransformSimulation = getCylinderTransform(pv1, pv2, 0.001);

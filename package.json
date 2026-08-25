@@ -33,7 +33,7 @@
   },
   "scripts": {
     "format": "eslint --fix . && prettier --write \"**/*.html\" && prettier --write \"**/*.scss\" && stylelint \"**/*.scss\" --fix",
-    "server": "http-server ./dist --brotli -p 8271"
+    "server": "http-server ./dist --brotli -p 8271 --watch"
   },
   "dependencies": {
     "@codemirror/lang-yaml": "^6.1.2",
