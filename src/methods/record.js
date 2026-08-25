@@ -104,7 +104,7 @@ export async function startRecord() {
 
   this.capturer = new CCapture({
     format: 'webm',
-    framerate: 30,
+    framerate: this.recordConfig.framerate ?? 30,
     name: 'Animation',
     verbose: true,
     quality: 100

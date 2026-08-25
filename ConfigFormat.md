@@ -18,23 +18,24 @@
 | initialSeparationDist       | number            | 初始分离距离（3D）          | 必须为实数，只在 3D 模式下可用                                                        |
 | initialFaceScale            | number            | 初始面缩放（3D）            | 必须为实数，只在 3D 模式下可用                                                        |
 | initialScaleFactor          | number            | 初始缩放因子                | 必须为正实数                                                                          |
-| initialCameraLookAt         | number[3]         | 初始摄像机注视点            | 必须为 3 个实数的数组                                                                |
+| initialCameraLookAt         | number[3]         | 初始摄像机注视点            | 必须为 3 个实数的数组                                                                 |
 | initialCameraDistance       | number            | 初始摄像机与注视点间距离    | 必须为正实数                                                                          |
-| initialCameraRotation       | number[3]         | 初始摄像机旋转角度          | 必须为 3 个实数的数组                                                                |
+| initialCameraRotation       | number[3]         | 初始摄像机旋转角度          | 必须为 3 个实数的数组                                                                 |
 | endExtraFrames              | number            | 末尾的额外帧数，默认 30(1s) | 必须为自然数                                                                          |
 | size                        | number            | 生成的视频的长宽            | 必须为正整数                                                                          |
+| framerate                   | number            | 生成的视频的帧率            | 必须为正整数，默认30                                                                  |
 | ssaaUsed                    | number            | 使用 SSAA，值为 SSAA 倍数   | 必须为正整数                                                                          |
 | bloomUsed                   | boolean           | 是否启用泛光                | 必须为布尔值                                                                          |
 
 ## 动作配置(actions)
 
 ### 通用字段
-| 字段      | 类型              | 说明                             | 约束条件                     |
-|-----------|-------------------|----------------------------------|------------------------------|
-| type      | string            | 动作类型                         | 必须是支持的类型之一         |
-| start/end | number            | 动作开始 / 结束帧（部分类型适用）| ≥0 的整数，且 end≥start      |
+| 字段      | 类型              | 说明                             | 约束条件                      |
+|-----------|-------------------|----------------------------------|-------------------------------|
+| type      | string            | 动作类型                         | 必须是支持的类型之一          |
+| start/end | number            | 动作开始 / 结束帧（部分类型适用）| ≥0 的整数，且 end≥start       |
 | interp    | string            | 动作过渡插值函数（部分类型适用） | 可选值见下方说明，默认 linear |
-| at        | number            | 执行动作的帧（部分类型适用）     | ≥0 的整数                    |
+| at        | number            | 执行动作的帧（部分类型适用）     | ≥0 的整数                     |
 
 ### 动作类型说明
 
@@ -42,7 +43,7 @@
 |---------------------|-----------------|-----------|--------------------------------------------------------|--------------------------------------------------------------------------|
 | rot                 | angle           | number    | 旋转角度，角度制                                       | 必须为实数                                                               |
 |                     | plane           | number    | 旋转平面，0~5 的值分别代表 xy、xz、xw、yz、yw、zw 平面 | 0~5 的整数，2、4、5（xw、yw 和 zw）仅在 4D 模式可用                      |
-|                     | priority        | number    | 旋转的优先级                                           | 可选，默认为 0，整数，可负，不能是无穷                                                   |
+|                     | priority        | number    | 旋转的优先级                                           | 可选，默认为 0，整数，可负，不能是无穷                                   |
 | trans4              | ofs             | number[4] | 4D 偏移量                                              | 必须为 4 个实数的数组（仅 4D 模式可用）                                  |
 | trans3              | ofs             | number[3] | 3D 偏移量                                              | 必须为 3 个实数的数组                                                    |
 | setVerticesEdgesDim | dimOfs          | number    | 顶点和边的尺寸偏移量                                   | 必须为实数                                                               |
@@ -59,8 +60,8 @@
 | setScaleFactor      | scaleFactorOfs  | number    | 缩放因子偏移量                                         | 必须为实数                                                               |
 | setCameraLookAt     | lookAtOfs       | number[3] | 摄像机注视点偏移量                                     | 必须为 3 个实数的数组                                                    |
 | setCameraDistance   | distanceOfs     | number    | 摄像机与注视点间距离偏移量                             | 必须为实数                                                               |
-| setCameraRotation   | axis            | number    | 旋转轴                                                 | 必须为实数                                                    |
-|                     | angle           | number    | 旋转角度                                               | 必须为实数                                                    |
+| setCameraRotation   | axis            | number    | 旋转轴                                                 | 必须为实数                                                               |
+|                     | angle           | number    | 旋转角度                                               | 必须为实数                                                               |
 
 ### 插值函数(interp)可选值
 

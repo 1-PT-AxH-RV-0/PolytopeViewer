@@ -119,6 +119,12 @@ export function validateCellsSelectorConfig(config, prefix = '') {
  */
 export function validateRecordConfig(config, is4D, interpFuncMap) {
   if (
+    Object.hasOwnProperty.call(config, 'framerate') &&
+    (!Number.isInteger(config.framerate) || !config.framerate > 0)
+  ) {
+    throw new Error('framerate 字段必须是正整数。');
+  }
+  if (
     Object.hasOwnProperty.call(config, 'ssaaUsed') &&
     (!Number.isInteger(config.ssaaUsed) || !config.ssaaUsed > 0)
   ) {
