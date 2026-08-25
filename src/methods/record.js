@@ -142,6 +142,8 @@ export async function startRecord() {
     this.capturer = null;
     this.isRecordingFlag = false;
 
+    window.dispatchEvent(new Event('resize'));
+
     this.updateProperties();
     this.updateProjectionDistance();
     this.updateRotation();
@@ -153,13 +155,6 @@ export async function startRecord() {
     this.composer.passes[0] = this.renderPass;
     this.bloomPass.strength = 0.3;
     this.bloomPass.threshold = 0.98;
-
-    const dpr = window.devicePixelRatio || 1;
-    const maxSize = Math.min(
-      Math.min(window.innerWidth, window.innerHeight),
-      720
-    );
-    this.renderer.setSize(maxSize * dpr, maxSize * dpr, false);
 
     this.isRenderingFlag = false;
     this.requestSingleRender();
