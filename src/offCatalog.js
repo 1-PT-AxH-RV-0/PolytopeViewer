@@ -468,6 +468,100 @@ export const offCatalog = {
       ]
     },
     {
+      id: 'uniform',
+      label: '均匀多面体',
+      items: [
+        { name: '正四面体', path: 'Platonic/Tetrahedron.off' },
+        { name: '截角四面体', path: 'Archimedean/Truncated_tetrahedron.off' },
+        { name: '立方体', path: 'Platonic/Cube.off' },
+        { name: '扭棱立方体', path: 'Archimedean/Snub_cube.off' },
+        
+        { name: '截角立方体', path: 'Archimedean/Truncated_cube.off' },
+        { name: '大立方合截半立方体', path: 'Uniform/Great_cubicuboctahedron.off' },
+        { name: '拟小斜方截半立方体', path: 'Uniform/Nonconvex_great_rhombicuboctahedron.off' },
+        { name: '大斜方立方体', path: 'Uniform/Great_rhombicube.off' },
+        
+        { name: '截半立方体', path: 'Archimedean/Cuboctahedron.off' },
+        { name: '八面半八面体', path: 'Uniform/Octahemioctahedron.off' },
+        { name: '立方半八面体', path: 'Uniform/Cubohemioctahedron.off' },
+        
+        { name: '小斜方截半立方体', path: 'Archimedean/Small_rhombicuboctahedron.off' },
+        { name: '拟截角立方体', path: 'Uniform/Stellated_truncated_cube.off' },
+        { name: '小立方合截半立方体', path: 'Uniform/Small_cubicuboctahedron.off' },
+        { name: '小斜方立方体', path: 'Uniform/Small_rhombicube.off' },
+        
+        { name: '大斜方截半立方体', path: 'Archimedean/Great_rhombicuboctahedron.off' },
+        { name: '立方截角截半立方体', path: 'Uniform/Cubitruncated_cuboctahedron.off' },
+        { name: '拟大斜方截半立方体', path: 'Uniform/Great_truncated_cuboctahedron.off' },
+        
+        { name: '正八面体', path: 'Platonic/Octahedron.off' },
+        { name: '四面半六面体', path: 'Uniform/Tetrahemihexahedron.off' },
+        { name: '截角八面体', path: 'Archimedean/Truncated_octahedron.off' },
+        
+        { name: '正十二面体', path: 'Platonic/Dodecahedron.off' },
+        { name: '大星形十二面体', path: 'KeplerPoinsot/Great_stellated_dodecahedron.off' },
+        { name: '小双三角截半十二面体', path: 'Uniform/Small_ditrigonal_icosidodecahedron.off' },
+        { name: '大双三角截半十二面体', path: 'Uniform/Great_ditrigonal_icosidodecahedron.off' },
+        { name: '双三角截半大十二面体', path: 'Uniform/Ditrigonal_dodecadodecahedron.off' },
+        
+        { name: '截角十二面体', path: 'Archimedean/Truncated_dodecahedron.off' },
+        { name: '大双三角十二合截半十二面体', path: 'Uniform/Great_ditrigonal_dodecicosidodecahedron.off' },
+        { name: '大二十合截半十二面体', path: 'Uniform/Great_icosicosidodecahedron.off' },
+        { name: '大截半十二面体', path: 'Uniform/Great_dodecicosahedron.off' },
+        { name: '小逆反屈扭棱二十合截半十二面体', path: 'Uniform/Small_retrosnub_icosicosidodecahedron.off' },
+        
+        { name: '截半十二面体', path: 'Archimedean/Icosidodecahedron.off' },
+        { name: '小十二半十二面体', path: 'Uniform/Small_dodecahemidodecahedron.off' },
+        { name: '大十二半十二面体', path: 'Uniform/Great_dodecahemidodecahedron.off' },
+        { name: '小二十半十二面体', path: 'Uniform/Small_icosihemidodecahedron.off' },
+        { name: '大二十半十二面体', path: 'Uniform/Great_icosihemidodecahedron.off' },
+        { name: '小十二半二十面体', path: 'Uniform/Small_dodecahemicosahedron.off' },
+        { name: '大十二半二十面体', path: 'Uniform/Great_dodecahemicosahedron.off' },
+        { name: '截半大十二面体', path: 'Uniform/Dodecadodecahedron.off' },
+        { name: '大截半十二面体', path: 'Uniform/Great_icosidodecahedron.off' },
+        
+        { name: '小斜方截半十二面体', path: 'Archimedean/Small_rhombicosidodecahedron.off' },
+        { name: '拟截角小星形十二面体', path: 'Uniform/Small_stellated_truncated_dodecahedron.off' },
+        { name: '拟截角大星形十二面体', path: 'Uniform/Great_stellated_truncated_dodecahedron.off' },
+        { name: '小十二合截半十二面体', path: 'Uniform/Small_dodecicosidodecahedron.off' },
+        { name: '小斜方十二面体', path: 'Uniform/Small_rhombidodecahedron.off' },
+        { name: '截角大二十面体', path: 'Uniform/Truncated_great_icosahedron.off' },
+        { name: '小二十合截半十二面体', path: 'Uniform/Small_icosicosidodecahedron.off' },
+        { name: '小双三角十二合截半十二面体', path: 'Uniform/Small_ditrigonal_dodecicosidodecahedron.off' },
+        { name: '小截半十二面体', path: 'Uniform/Small_dodecicosahedron.off' },
+        { name: '大双斜方截半十二面体', path: 'Uniform/Great_dirhombicosidodecahedron.off' },
+        { name: '大扭棱十二合截半十二面体', path: 'Uniform/Great_snub_dodecicosidodecahedron.off' },
+        
+        { name: '大斜方截半十二面体', path: 'Archimedean/Great_rhombicosidodecahedron.off' },
+        { name: '二十截角截半大十二面体', path: 'Uniform/Icositruncated_dodecadodecahedron.off' },
+        { name: '拟大斜方截半大十二面体', path: 'Uniform/Truncated_dodecadodecahedron.off' },
+        { name: '拟大斜方截半大二十面体', path: 'Uniform/Great_truncated_icosidodecahedron.off' },
+        
+        { name: '扭棱十二面体', path: 'Archimedean/Snub_dodecahedron.off' },
+        { name: '扭棱截半大十二面体', path: 'Uniform/Snub_dodecadodecahedron.off' },
+        { name: '逆扭棱截半大十二面体', path: 'Uniform/Inverted_snub_dodecadodecahedron.off' },
+        { name: '大扭棱截半十二面体', path: 'Uniform/Great_snub_icosidodecahedron.off' },
+        { name: '大逆扭棱截半十二面体', path: 'Uniform/Great_inverted_snub_icosidodecahedron.off' },
+        { name: '扭棱二十合截半大二十面体', path: 'Uniform/Snub_icosidodecadodecahedron.off' },
+        { name: '大反屈扭棱截半十二面体', path: 'Uniform/Great_retrosnub_icosidodecahedron.off' },
+        
+        { name: '正二十面体', path: 'Platonic/Icosahedron.off' },
+        { name: '大十二面体', path: 'KeplerPoinsot/Great_dodecahedron.off' },
+        { name: '大二十面体', path: 'KeplerPoinsot/Great_icosahedron.off' },
+        { name: '小星形十二面体', path: 'KeplerPoinsot/Small_stellated_dodecahedron.off' },
+        
+        { name: '截角二十面体', path: 'Archimedean/Truncated_icosahedron.off' },
+        { name: '截角大十二面体', path: 'Uniform/Truncated_great_dodecahedron.off' },
+        { name: '大十二合截半十二面体', path: 'Uniform/Great_dodecicosidodecahedron.off' },
+        { name: '拟小斜方截半十二面体', path: 'Uniform/Nonconvex_great_rhombicosidodecahedron.off' },
+        { name: '大斜方十二面体', path: 'Uniform/Great_rhombidodecahedron.off' },
+        { name: '斜方十二合十二面体', path: 'Uniform/Rhombidodecadodecahedron.off' },
+        { name: '二十合截半大十二面体', path: 'Uniform/Icosidodecadodecahedron.off' },
+        { name: '斜方二十面体', path: 'Uniform/Rhombicosahedron.off' },
+        { name: '小扭棱二十合截半十二面体', path: 'Uniform/Small_snub_icosicosidodecahedron.off' },
+      ]
+    },
+    {
       id: 'uniformCompounds',
       label: '均匀复合多面体',
       items: [
