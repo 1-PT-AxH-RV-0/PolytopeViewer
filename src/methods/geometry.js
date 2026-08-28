@@ -2,6 +2,11 @@ import * as THREE from 'three';
 import shaderCompCallback from '@/shader/shaderCompCallback.js';
 import * as types from '@/type.js';
 
+import {
+  computeNormal,
+  computeNormalOutward,
+  arePointsClose
+} from '@/math/geo3D.js';
 import { toBufferGeometry } from '@/utils/threeHelpers.js';
 import { getUniqueSortedPairs } from '@/utils/general.js';
 
@@ -288,7 +293,10 @@ export function createSeparatedFacesGroup(meshData, material) {
         verticesMap.set(vertexIndex, vertices.length / 3);
         vertices.push(vertex.x, vertex.y, vertex.z);
       }
-      indices.push(...face.map(idx => verticesMap.get(idx)));
+      const faceVert = face.map(idx => meshData.vertices[idx]);
+      const faceIdx = face.map(idx => verticesMap.get(idx));
+      const normalOut = arePointsClose(computeNormal(faceVert), computeNormalOutward(faceVert));
+      indices.push(...(normalOut ? faceIdx : faceIdx.toReversed()));
     }
 
     singleFaceGeometry.setAttribute(
