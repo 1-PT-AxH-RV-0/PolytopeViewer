@@ -559,6 +559,13 @@ export const offCatalog = {
         { name: '二十合截半大十二面体', path: 'Uniform/Icosidodecadodecahedron.off' },
         { name: '斜方二十面体', path: 'Uniform/Rhombicosahedron.off' },
         { name: '小扭棱二十合截半十二面体', path: 'Uniform/Small_snub_icosicosidodecahedron.off' },
+
+        { name: '二十面复大十二面体', path: 'Uniform/Small_complex_icosidodecahedron.off' },
+        { name: '大二十面复小星形十二面体', path: 'Uniform/Great_complex_icosidodecahedron.off' },
+        { name: '小斜方截半大二十面体/小双三角截半十二面复五立方体', path: 'Uniform/Small_complex_rhombicosidodecahedron.off' },
+        { name: '双三角截半大十二面复五立方体', path: 'Uniform/Complex_rhombidodecadodecahedron.off' },
+        { name: '大双三角截半十二面复五立方体', path: 'Uniform/Great_complex_rhombicosidodecahedron.off' },
+        { name: '大双扭棱双斜方十二面体', path: 'Uniform/Great_disnub_dirhombidodecahedron.off' },
       ]
     },
     {
