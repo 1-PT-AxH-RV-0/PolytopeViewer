@@ -8,7 +8,7 @@ import CompressionPlugin from 'compression-webpack-plugin';
 import zlib from 'zlib';
 import { offCatalog } from './src/offCatalog.js';
 
-const production = true;
+const production = process.env.BUILD_MODE === 'prod';
 
 export default {
   cache: {
@@ -127,7 +127,7 @@ export default {
       },
       threshold: 10240,
       minRatio: 0.8,
-      deleteOriginalAssets: false
+      deleteOriginalAssets: !production
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css'
