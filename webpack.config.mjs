@@ -127,7 +127,7 @@ export default {
       },
       threshold: 10240,
       minRatio: 0.8,
-      deleteOriginalAssets: true
+      deleteOriginalAssets: false
     }),
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash].css'
